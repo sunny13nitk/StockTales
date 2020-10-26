@@ -12,19 +12,24 @@
 	<description>Web Module for Stock Tales</description>
 
 
+	
 
 	<dependencies>
-		<!-- petClinicData added as a dependency - Jar will be loaded -->
+
 		<dependency>
 			<groupId>sb.funprojects</groupId>
 			<artifactId>scripsAdmin</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+
+
 
 
 		<dependency>
@@ -42,7 +47,12 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.1.6.Final</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>

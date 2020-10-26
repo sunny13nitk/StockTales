@@ -3,11 +3,11 @@ package stocktales.scripsEngine.uploadEngine.scripSheetServices.implementations;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import javax.persistence.EntityManager;
+
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.SharedSessionContract;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +45,8 @@ public class XLS_Scrip_Create_Srv implements IXLS_Scrip_Create_Srv
 	 */
 	
 	@Autowired
+	EntityManager entityManager;
+	
 	private SessionFactory sFac;
 	
 	@Autowired
@@ -99,7 +101,7 @@ public class XLS_Scrip_Create_Srv implements IXLS_Scrip_Create_Srv
 				created = true;
 				
 				// close the WB Context
-				((SharedSessionContract) wbCtxt).close();
+				
 			}
 			
 			catch (Exception e)
@@ -130,16 +132,18 @@ public class XLS_Scrip_Create_Srv implements IXLS_Scrip_Create_Srv
 	public void saveScripRoot(
 	)
 	{
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
 		if (scRoot != null && sFac != null)
 		{
-			Session sess;
+			/*Session sess;
 			try
 			{
 				sess = sFac.getCurrentSession();
 			} catch (HibernateException e)
 			{
 				sess = sFac.openSession();
-			}
+			}*/
 			
 			if (sess != null)
 			{
@@ -147,7 +151,7 @@ public class XLS_Scrip_Create_Srv implements IXLS_Scrip_Create_Srv
 				
 				Query<EN_SC_General> qRootIns = sess
 				        .createSQLQuery("INSERT INTO TB_SC_General (SCCode, SCName,Sector, UPH, CMP,"
-				                + "CurrPE, CurrPB, DivYield, MktCap, MCapToSales, EPS, PEG, CPS, SGToCapex, NumShares, DERatio, TTMSales ) VALUES "
+				                + "CurrPE, CurrPB, div_yield, mkt_cap, mcap_to_sales, EPS, PEG, CPS, sgto_capex, num_shares, DERatio, TTMSales ) VALUES "
 				                + " (:lv_SCCode, :lv_SCName, :lv_Sector, :lv_UPH, :lv_CMP, :lv_CurrPE, :lv_CurrPB, :lv_DivYield, :lv_MktCap, "
 				                + ":lv_MCapToSales, :lv_EPS, :lv_PEG, :lv_CPS, :lv_SGToCapex, :lv_NumShares, :lv_DERatio, :lv_TTMSales)");
 				
@@ -186,16 +190,18 @@ public class XLS_Scrip_Create_Srv implements IXLS_Scrip_Create_Srv
 	public void saveScripObject(
 	)
 	{
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
 		if (scRoot != null && sFac != null)
 		{
-			Session sess;
+			/*Session sess;
 			try
 			{
 				sess = sFac.getCurrentSession();
 			} catch (HibernateException e)
 			{
 				sess = sFac.openSession();
-			}
+			}*/
 			
 			if (sess != null)
 			{

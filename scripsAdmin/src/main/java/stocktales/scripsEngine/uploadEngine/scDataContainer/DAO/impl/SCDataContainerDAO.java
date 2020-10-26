@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.HibernateException;
+import javax.persistence.EntityManager;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -41,6 +42,8 @@ public class SCDataContainerDAO implements ISCDataContainerDAO
 	private ISCWBMetadataSrv wbMdtSrv;
 	
 	@Autowired
+	EntityManager entityManager;
+	
 	private SessionFactory sFac;
 	
 	@Override
@@ -144,18 +147,19 @@ public class SCDataContainerDAO implements ISCDataContainerDAO
 	        SCSheetMetadata shMdt, scDataContainer scDC
 	) throws Exception
 	{
-		String qS = getQueryString(shMdt);
-		
+		String  qS   = getQueryString(shMdt);
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
 		if (sFac != null)
 		{
-			Session sess;
+			/*Session sess;
 			try
 			{
 				sess = sFac.getCurrentSession();
 			} catch (HibernateException e)
 			{
 				sess = sFac.openSession();
-			}
+			}*/
 			
 			if (sess != null)
 			{

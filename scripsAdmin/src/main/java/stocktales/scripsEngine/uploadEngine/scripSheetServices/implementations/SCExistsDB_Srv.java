@@ -2,6 +2,7 @@ package stocktales.scripsEngine.uploadEngine.scripSheetServices.implementations;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.hibernate.Session;
@@ -20,8 +21,11 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 {
 	
 	// need to inject the session factory
-	@Autowired
+	
 	private SessionFactory sFac;
+	
+	@Autowired
+	EntityManager entityManager;
 	
 	@Override
 	@Transactional
@@ -31,9 +35,11 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 	{
 		boolean scExists = false;
 		
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
 		if (scCode != null && sFac != null)
 		{
-			Session sess = sFac.getCurrentSession();
+			//Session sess = sFac.getCurrentSession();
 			if (sess != null)
 			{
 				Query<EN_SC_GeneralQ> qscRoot = sess.createQuery("from EN_SC_GeneralQ where SCCode =: lv_scCode",
@@ -68,10 +74,12 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 	) throws EX_General
 	{
 		EN_SC_GeneralQ scRoot = null;
+		Session        sess   = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
 		
 		if (scCode != null && sFac != null)
 		{
-			Session sess = sFac.getCurrentSession();
+			//Session sess = sFac.getCurrentSession();
 			if (sess != null)
 			{
 				Query<EN_SC_GeneralQ> qscRoot = sess.createQuery("from EN_SC_GeneralQ where SCCode =: lv_scCode",
@@ -106,9 +114,12 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 	{
 		boolean scExists = false;
 		
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
+		
 		if (scDesc != null && sFac != null)
 		{
-			Session sess = sFac.getCurrentSession();
+			//Session sess = sFac.getCurrentSession();
 			if (sess != null)
 			{
 				
@@ -146,9 +157,11 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 	) throws EX_General
 	{
 		EN_SC_GeneralQ scRoot = null;
+		Session        sess   = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
 		if (scDesc != null && sFac != null)
 		{
-			Session sess = sFac.getCurrentSession();
+			//Session sess = sFac.getCurrentSession();
 			if (sess != null)
 			{
 				

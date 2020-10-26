@@ -11,7 +11,7 @@
 		<colToScanStart>0</colToScanStart>
 		<colToScanEnd>0</colToScanEnd>
 		<entPKey>SCCode</entPKey>
-		<assembly>root.scripsEngine.uploadEngine.entities.EN_SC_General</assembly>
+		<assembly>stocktales.scripsEngine.uploadEngine.entities.EN_SC_General</assembly>
 		<fldsMdt>
 			<sheetField>COMPANY NAME</sheetField>
 			<objField>SCName</objField>
@@ -180,7 +180,7 @@
 		<colToScanStart>2</colToScanStart>
 		<colToScanEnd>11</colToScanEnd>
 		<entPKey>BalSheet_ID</entPKey>
-		<assembly>root.scripsEngine.uploadEngine.entities.EN_SC_BalSheet</assembly>
+		<assembly>stocktales.scripsEngine.uploadEngine.entities.EN_SC_BalSheet</assembly>
 
 		<!--Header Properties -->
 		<headScanConfig>
@@ -629,7 +629,7 @@
 		<colToScanStart>0</colToScanStart>
 		<colToScanEnd>0</colToScanEnd>
 		<entPKey>TTM_ID</entPKey>
-		<assembly>root.scripsEngine.uploadEngine.entities.EN_SC_Last4QData</assembly>
+		<assembly>stocktales.scripsEngine.uploadEngine.entities.EN_SC_Last4QData</assembly>
 
 
 		<fldsMdt>
@@ -764,7 +764,7 @@
 		<colToScanStart>1</colToScanStart>
 		<colToScanEnd>6</colToScanEnd>
 		<entPKey>Trend_ID</entPKey>
-		<assembly>root.scripsEngine.uploadEngine.entities.EN_SC_Trends</assembly>
+		<assembly>stocktales.scripsEngine.uploadEngine.entities.EN_SC_Trends</assembly>
 		<headScanConfig>
 			<rowToScan>1</rowToScan>
 			<colToScanStart>2</colToScanStart>
@@ -940,7 +940,7 @@
 		<colToScanStart>0</colToScanStart>
 		<colToScanEnd>0</colToScanEnd>
 		<entPKey>ID_10YData</entPKey>
-		<assembly>root.scripsEngine.uploadEngine.entities.EN_SC_10YData</assembly>
+		<assembly>stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData</assembly>
 
 		<fldsMdt>
 			<sheetField>Gross PAT</sheetField>
@@ -1059,7 +1059,7 @@
 		<colToScanEnd>11</colToScanEnd>
 		<headerDataType>String</headerDataType>
 		<entPKey>QTR_ID</entPKey>
-		<assembly>root.scripsEngine.uploadEngine.entities.EN_SC_Quarters</assembly>
+		<assembly>stocktales.scripsEngine.uploadEngine.entities.EN_SC_Quarters</assembly>
 		<!--Header Properties -->
 		<headScanConfig>
 			<rowToScan>41</rowToScan>

@@ -2,10 +2,10 @@ package stocktales.scripsEngine.uploadEngine.scripSheetServices.DBSrv.impl;
 
 import java.lang.reflect.Method;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Table;
 import javax.transaction.Transactional;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -23,7 +23,10 @@ import stocktales.scripsEngine.utilities.types.Object_Info;
 
 public class SCDBUpdateSrv implements ISCDBUpdateSrv
 {
+	
 	@Autowired
+	EntityManager entityManager;
+	
 	private SessionFactory sFac;
 	
 	private ScripUpdateContainerPOJO scUpdCont;
@@ -71,18 +74,20 @@ public class SCDBUpdateSrv implements ISCDBUpdateSrv
 	public int prepareExecuteQuery(
 	) throws Exception
 	{
-		int numrowsAffected = 0;
+		int     numrowsAffected = 0;
+		Session sess            = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
 		if (sFac != null)
 		{
 			
-			Session sess;
+			/*Session sess;
 			try
 			{
 				sess = sFac.getCurrentSession();
 			} catch (HibernateException e)
 			{
 				sess = sFac.openSession();
-			}
+			}*/
 			
 			if (sess != null)
 			{
