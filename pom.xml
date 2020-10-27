@@ -20,6 +20,7 @@
 	<modules>
 		<module>scripsAdmin</module>
 		<module>StockTalesWeb</module>
+		<module>portfolios</module>
 	</modules>
 
 	<properties>
