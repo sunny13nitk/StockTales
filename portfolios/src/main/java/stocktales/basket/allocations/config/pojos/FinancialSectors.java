@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/*
+ * Class to handle and specify financial Sectors for different Treatment
+ */
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DurationWeights
+public class FinancialSectors
 {
-	private double wt3Yr;
-	private double wt5Yr;
-	private double wt7Yr;
-	private double wt10Yr;
-	
+	private String sectorName;
 }

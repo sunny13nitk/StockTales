@@ -1,4 +1,4 @@
-package stocktales.basket.allocations.config.pojos;
+package stocktales.basket.allocations.autoAllocation.pojos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DurationWeights
+public class DurVWvNett_ED extends DurVWvNett
 {
-	private double wt3Yr;
-	private double wt5Yr;
-	private double wt7Yr;
-	private double wt10Yr;
+	private double divYield;
 	
+	private double resValue;
 }

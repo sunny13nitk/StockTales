@@ -10,6 +10,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import stocktales.basket.allocations.config.pojos.AllocationWeights;
 import stocktales.basket.allocations.config.pojos.DurationWeights;
+import stocktales.basket.allocations.config.pojos.FinancialSectors;
 
 /*
  * ------------------ PROPERTY FILES BASED BEANS -----------------------
@@ -58,5 +59,17 @@ public class PropertyConfig
 		AllocationWeights allocWts = new AllocationWeights(wtED, wtRR, wtCF);
 		
 		return allocWts;
+	}
+	
+	@Bean
+	@Autowired //For PropertySourcesPlaceholderConfigurer
+	public FinancialSectors financialSectorsConfig(
+	        @Value("${SectorName}") String sectorName
+	)
+	
+	{
+		FinancialSectors finSec = new FinancialSectors(sectorName);
+		
+		return finSec;
 	}
 }

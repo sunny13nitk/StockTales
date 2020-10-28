@@ -1,5 +1,6 @@
 package stocktales.scripsEngine.uploadEngine.scripSheetServices.implementations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -190,6 +191,62 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 		}
 		
 		return scRoot;
+	}
+	
+	@Override
+	public List<EN_SC_GeneralQ> getAllScripsHeaders(
+	) throws EX_General
+	{
+		List<EN_SC_GeneralQ> scGQHeaders = null;
+		
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
+		if (sFac != null)
+		{
+			if (sess != null)
+			{
+				Query<EN_SC_GeneralQ> qscRoot = sess.createQuery("from EN_SC_GeneralQ", EN_SC_GeneralQ.class);
+				if (qscRoot != null)
+				{
+					scGQHeaders = qscRoot.getResultList();
+				}
+			}
+		}
+		return scGQHeaders;
+	}
+	
+	@Override
+	public List<String> getAllScripNames(
+	) throws EX_General
+	{
+		List<String>         scNames     = null;
+		List<EN_SC_GeneralQ> scGQHeaders = null;
+		
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
+		if (sFac != null)
+		{
+			if (sess != null)
+			{
+				Query<EN_SC_GeneralQ> qscRoot = sess.createQuery("from EN_SC_GeneralQ", EN_SC_GeneralQ.class);
+				if (qscRoot != null)
+				{
+					scGQHeaders = qscRoot.getResultList();
+					
+				}
+			}
+			sess.close();
+			
+			if (scGQHeaders != null)
+			{
+				scNames = new ArrayList<String>();
+				for (EN_SC_GeneralQ en_SC_GeneralQ : scGQHeaders)
+				{
+					scNames.add(en_SC_GeneralQ.getSCCode());
+				}
+			}
+		}
+		return scNames;
 	}
 	
 }
