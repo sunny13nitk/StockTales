@@ -2,6 +2,7 @@ package stocktales.services.interfaces;
 
 import java.util.List;
 
+import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 
@@ -20,4 +21,7 @@ public interface ScripService
 	
 	public List<String> getAllScripNames(
 	) throws EX_General;
+	
+	public List<SC_EDRC_Summary> getEDRCSummaryforAll(
+	);
 }

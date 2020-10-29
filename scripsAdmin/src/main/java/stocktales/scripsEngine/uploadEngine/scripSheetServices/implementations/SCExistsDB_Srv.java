@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
+import stocktales.scripsEngine.uploadEngine.scripSheetServices.types.ScripSector;
 
 @Service("SCExistsDB_Srv")
 
@@ -212,7 +213,9 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 				}
 			}
 		}
+		
 		return scGQHeaders;
+		
 	}
 	
 	@Override
@@ -235,7 +238,6 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 					
 				}
 			}
-			sess.close();
 			
 			if (scGQHeaders != null)
 			{
@@ -247,6 +249,51 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 			}
 		}
 		return scNames;
+	}
+	
+	@Override
+	public List<ScripSector> getAllScripSectors(
+	) throws EX_General
+	{
+		List<ScripSector>    scSectors   = null;
+		List<EN_SC_GeneralQ> scGQHeaders = null;
+		
+		Session sess = this.entityManager.unwrap(Session.class);
+		sFac = sess.getSessionFactory();
+		if (sFac != null)
+		{
+			if (sess != null)
+			{
+				Query<EN_SC_GeneralQ> qscRoot = sess.createQuery("from EN_SC_GeneralQ", EN_SC_GeneralQ.class);
+				if (qscRoot != null)
+				{
+					scGQHeaders = qscRoot.getResultList();
+					
+				}
+			}
+			
+			if (scGQHeaders != null)
+			{
+				scSectors = new ArrayList<ScripSector>();
+				for (EN_SC_GeneralQ en_SC_GeneralQ : scGQHeaders)
+				{
+					scSectors.add(new ScripSector(en_SC_GeneralQ.getSCCode(), en_SC_GeneralQ.getSector()));
+				}
+			}
+		}
+		return scSectors;
+	}
+	
+	@Override
+	public List<String> getAllSectors(
+	) throws EX_General
+	{
+		
+		List<String> sectors = null;
+		sectors = entityManager.createQuery(
+		        "select distinct p.Sector " + "from EN_SC_General p", String.class).getResultList();
+		
+		return sectors;
 	}
 	
 }

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Stock Tales</title>
+<!-- Metro 4 -->
+<link rel="stylesheet"
+   href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+<title>Stock Tales</title>
+</head>
+<body>
+
+   <div class="grid" style="padding: 20px">
+
+      <!--Top Row - Starts  -->
+      <div class="row">
+
+         <div class="colspan-3 offset-1">
+            <h4 style="color: #4465a1">Scrips EDRC Scores</h4>
+         </div>
+
+         <div class="colspan-7" style="margin-left: 10px">
+            <div class="remark primary"
+               style="padding-top: 10px; margin: 2px; color: #4465a1; font-weight: medium;">
+               EDRC Scores are time-weighted scores that combine
+               Earnings, Dividends, Return Ratios (ROCE/ROE) and Cash
+               Flows over 3Yr, 5Yr, 7Yr and 10 Yr periods.</div>
+
+         </div>
+
+      </div>
+      <!--Top Row - Ends  -->
+
+      <!--Table Row - Starts  -->
+      <div class="row" style="margin-top: 20px">
+         <div class="colspan-11 offset-1" style="margin-left: 10px">
+            <table
+               class="table compact striped table-border row-hover mt-4"
+               id="t-inspector" data-role="table"
+               data-show-search="true" data-show-rows-steps="false"
+               data-search-min-length="1" data-search-threshold="300"
+               data-rows="-1" data-search-fields="SCCode, Sector"
+               data-horizontal-scroll="true"
+               data-info-wrapper=".my-info-wrapper"
+               data-thousand-separator=","
+               data-pagination-wrapper=".my-pagination-wrapper">
+               <thead>
+                  <tr>
+
+                     <th data-name="SCCode"
+                        class="sortable-column sort-asc">Scrip Name</th>
+
+                     <th data-name="Sector"
+                        class="sortable-column sort-asc">Sector</th>
+
+                     <th data-name="UPH"
+                        class="sortable-column sort-asc"
+                        data-format="number"
+                        data-cls-column=" text-center">ED
+                        Score(Wt.Avg.)</th>
+
+
+                     <th data-name="SalesGR"
+                        class="sortable-column sort-asc"
+                        data-format="number"
+                        data-cls-column=" text-center">RR
+                        Score(Wt.Avg.)</th>
+
+                     <th data-name="PATGR"
+                        class="sortable-column sort-asc"
+                        data-format="number"
+                        data-cls-column=" text-center">CFO
+                        Score(Wt.Avg.)</th>
+
+                     <th data-name="OPM_Avg"
+                        class="sortable-column sort-asc"
+                        data-format="number"
+                        data-cls-column=" text-center">EDRC Score</th>
+
+                     <th data-name="TTMSales"
+                        class="sortable-column sort-asc"
+                        data-format="number"
+                        data-cls-column=" text-center">%</th>
+
+
+
+                  </tr>
+               </thead>
+               <tbody>
+
+
+                  <tr th:each="EDRCSummaryI : ${EDRCSummary}">
+                     <td><a
+                        th:href="@{'/scrips/edrc/' + ${EDRCSummaryI.scCode}}"
+                        th:text="${EDRCSummaryI.scCode}"></a></td>
+
+                     <td th:text="${EDRCSummaryI.sector}">Financials</td>
+                     <td style="text-align: center"
+                        th:text="${EDRCSummaryI.avWtED}">31.5</td>
+                     <td style="text-align: center"
+                        th:text="${EDRCSummaryI.avWtRR}">23.5</td>
+                     <td style="text-align: center"
+                        th:text="${EDRCSummaryI.avWtCF}">73.5</td>
+                     <td style="text-align: center">
+                        <div data-role="progress" data-type="buffer"
+                           data-cls-bar="bg-blue"
+                           data-cls-buffer="bg-white" data-small="true"
+                           th:attr="data-value=${EDRCSummaryI.EDRC}"></div>
+                     </td>
+                     <td th:text="${EDRCSummaryI.EDRC}">33.4</td>
+
+                  </tr>
+
+               </tbody>
+            </table>
+
+            <p class="h5  text-center my-info-wrapper "></p>
+            <div
+               class="d-flex flex-justify-center my-pagination-wrapper"></div>
+         </div>
+      </div>
+      <!--Table Row - Ends -->
+
+
+   </div>
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+</html>

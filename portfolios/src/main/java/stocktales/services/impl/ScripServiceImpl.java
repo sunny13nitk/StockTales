@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import stocktales.basket.allocations.autoAllocation.facades.impl.EDRCFacadeImpl;
+import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.config.pojos.FinancialSectors;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
@@ -19,6 +21,9 @@ public class ScripServiceImpl implements ScripService
 	
 	@Autowired
 	private FinancialSectors cfFinSec;
+	
+	@Autowired
+	private EDRCFacadeImpl edrcFacSrv;
 	
 	@Override
 	public boolean isScripBelongingToFinancialSector(
@@ -96,6 +101,23 @@ public class ScripServiceImpl implements ScripService
 	{
 		
 		return repoSCGen.getAllScripNames();
+	}
+	
+	@Override
+	public List<SC_EDRC_Summary> getEDRCSummaryforAll(
+	)
+	{
+		List<String> scrips = null;
+		try
+		{
+			scrips = this.getAllScripNames();
+			
+		} catch (EX_General e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return edrcFacSrv.getEDRCforSCripsList(scrips);
 	}
 	
 }

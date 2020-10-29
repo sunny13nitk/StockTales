@@ -4,6 +4,7 @@ import java.util.List;
 
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
+import stocktales.scripsEngine.uploadEngine.scripSheetServices.types.ScripSector;
 
 /**
  * 
@@ -31,5 +32,11 @@ public interface ISCExistsDB_Srv
 	) throws EX_General;
 	
 	public List<String> getAllScripNames(
+	) throws EX_General;
+	
+	public List<ScripSector> getAllScripSectors(
+	) throws EX_General;
+	
+	public List<String> getAllSectors(
 	) throws EX_General;
 }
