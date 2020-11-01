@@ -9,10 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllocationWeights
+public class StrengthWeights
 {
-	private double wtED; //Earnings and Div Yield weight
-	private double wtRR; // ROCE/ROE weight
-	private double wtCF; //Avg. FCF/CFO weight
-	
+	private double EDRC;
+	private double ValR;
 }

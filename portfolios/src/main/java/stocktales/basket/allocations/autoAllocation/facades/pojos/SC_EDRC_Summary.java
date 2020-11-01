@@ -17,4 +17,7 @@ public class SC_EDRC_Summary
 	private double avWtRR;
 	private double avWtCF;
 	private double EDRC;
+	private double valR;
+	private double patCFOAdh;
+	private double strengthScore;
 }

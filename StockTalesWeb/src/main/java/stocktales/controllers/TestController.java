@@ -1,6 +1,7 @@
 package stocktales.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,8 @@ import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacad
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
+import stocktales.repository.SC10YearRepository;
+import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
 
@@ -27,6 +30,9 @@ public class TestController
 	
 	@Autowired
 	private EDRCFacade edrcFacSrv;
+	
+	@Autowired
+	private SC10YearRepository sc10Yrepo;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -87,6 +93,22 @@ public class TestController
 			e.printStackTrace();
 		}
 		
+		return "success";
+	}
+	
+	@GetMapping("/repo_10Yr/{scCode}")
+	public String test10YRepo(
+	        @PathVariable String scCode
+	)
+	{
+		if (scCode != null)
+		{
+			Optional<EN_SC_10YData> ent10Y = sc10Yrepo.findBySCCode(scCode);
+			if (ent10Y.isPresent())
+			{
+				System.out.println(ent10Y.get().getSCCode() + " : " + ent10Y.get().getValR());
+			}
+		}
 		return "success";
 	}
 }

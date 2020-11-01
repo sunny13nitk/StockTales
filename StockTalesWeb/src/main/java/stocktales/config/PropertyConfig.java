@@ -11,6 +11,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import stocktales.basket.allocations.config.pojos.AllocationWeights;
 import stocktales.basket.allocations.config.pojos.DurationWeights;
 import stocktales.basket.allocations.config.pojos.FinancialSectors;
+import stocktales.basket.allocations.config.pojos.StrengthWeights;
 
 /*
  * ------------------ PROPERTY FILES BASED BEANS -----------------------
@@ -71,6 +72,17 @@ public class PropertyConfig
 		FinancialSectors finSec = new FinancialSectors(sectorName);
 		
 		return finSec;
+	}
+	
+	@Bean
+	@Autowired //For PropertySourcesPlaceholderConfigurer
+	public StrengthWeights strenghtWeightsConfig(
+	        @Value("${StrengthWeights.EDRC}") final double EDRC, @Value("${StrengthWeights.ValR}") final double valR
+	)
+	{
+		StrengthWeights strengthWts = new StrengthWeights(EDRC, valR);
+		
+		return strengthWts;
 	}
 	
 }

@@ -152,6 +152,7 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 							
 							scEDRCscore.getCashflowsScore().setNettValue(scEDRCscore.getCashflowsScore().getDurItems()
 							        .stream().mapToDouble(DurVWv::getWv).sum() * wtFacCFO);
+							
 						}
 						
 						//Calculate Final EDRC Scores
