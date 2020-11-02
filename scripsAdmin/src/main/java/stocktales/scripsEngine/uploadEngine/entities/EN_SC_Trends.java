@@ -7,18 +7,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(
-        name = "TB_SC_Trends"
-)
+@Table(name = "TB_SC_Trends")
 public class EN_SC_Trends
 {
 	@Id
-	@GeneratedValue(
-	        strategy = GenerationType.IDENTITY
-	)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int    Trend_ID;
 	private String SCCode;
-	private String Period;
+	private String period;
 	private int    SalesGR;
 	private int    RecvTR;
 	private int    OPMAvg;      // Renamed
@@ -117,14 +113,14 @@ public class EN_SC_Trends
 	public String getPeriod(
 	)
 	{
-		return Period;
+		return period;
 	}
 	
 	public void setPeriod(
 	        String period
 	)
 	{
-		Period = period;
+		this.period = period;
 	}
 	
 	public int getSalesGR(

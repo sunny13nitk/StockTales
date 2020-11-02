@@ -13,6 +13,8 @@ public class ScValuation
 {
 	private String scCode;
 	private double edrcScore;
+	private double strengthScore;
+	private double UPH;
 	private double MoS;
 	private double currPE;
 	private double weightedPE;

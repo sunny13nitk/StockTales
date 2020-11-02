@@ -145,7 +145,7 @@
 			<isBonusAware>true</isBonusAware>
 			<dataType>Decimal</dataType>
 		</fldsMdt>
-		
+
 		<fldsMdt>
 			<sheetField>Debt/Equity</sheetField>
 			<objField>DERatio</objField>
@@ -154,7 +154,7 @@
 			<isBonusAware>false</isBonusAware>
 			<dataType>Decimal</dataType>
 		</fldsMdt>
-		
+
 		<fldsMdt>
 			<sheetField>TTM Sales</sheetField>
 			<objField>TTMSales</objField>
@@ -880,7 +880,7 @@
 			<isBonusAware>false</isBonusAware>
 			<dataType>Decimal</dataType>
 		</fldsMdt>
-		
+
 		<fldsMdt>
 			<sheetField>ROE</sheetField>
 			<objField>ROEAvg</objField>
@@ -898,7 +898,7 @@
 			<isBonusAware>false</isBonusAware>
 			<dataType>Numerical</dataType>
 		</fldsMdt>
-		
+
 		<fldsMdt>
 			<sheetField>Avg. SSGR</sheetField>
 			<objField>SSGRAvg</objField>
@@ -907,7 +907,7 @@
 			<isBonusAware>false</isBonusAware>
 			<dataType>Numerical</dataType>
 		</fldsMdt>
-		
+
 		<fldsMdt>
 			<sheetField>(Int+Dep)/PAT</sheetField>
 			<objField>FViabAvg</objField>
@@ -916,7 +916,7 @@
 			<isBonusAware>false</isBonusAware>
 			<dataType>Numerical</dataType>
 		</fldsMdt>
-		
+
 		<fldsMdt>
 			<sheetField>(Recv+Inv)/Sales</sheetField>
 			<objField>WCCAvg</objField>

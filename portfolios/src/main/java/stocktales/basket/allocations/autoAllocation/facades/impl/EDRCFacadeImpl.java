@@ -15,19 +15,26 @@ import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacad
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
+import stocktales.basket.allocations.config.pojos.CalibrationItem;
 import stocktales.basket.allocations.config.pojos.StrengthWeights;
-import stocktales.basket.allocations.config.pojos.ValSoothingSS;
 import stocktales.basket.allocations.config.services.CLRConfig;
 import stocktales.repository.SC10YearRepository;
+import stocktales.repository.TrendsRepository;
+import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
+import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Trends;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.types.ScripSector;
+import stocktales.services.interfaces.ScripService;
 
 @Service
 public class EDRCFacadeImpl implements EDRCFacade
 {
 	@Autowired
 	private EDRCScoreCalcSrv edrcSrv;
+	
+	@Autowired
+	private ScripService scSrv;
 	
 	@Autowired
 	private SC10YearRepository sc10Yrepo;
@@ -40,6 +47,15 @@ public class EDRCFacadeImpl implements EDRCFacade
 	
 	@Autowired
 	private CLRConfig clrConfig;
+	
+	@Autowired
+	private TrendsRepository repoTrends;
+	
+	@Autowired
+	private SC10YearRepository repo10Yr;
+	
+	@Value("${trendValPeriod}")
+	private String trendValPeriod;
 	
 	private List<ScripSector> scripSectors;
 	
@@ -112,13 +128,118 @@ public class EDRCFacadeImpl implements EDRCFacade
 					if (isValuationSoothingEnabled)
 					{
 						//Scan for Right Valuation Zone
-						double                  cvalR         = summary.getValR();
-						Optional<ValSoothingSS> currValConfig = this.clrConfig.getValSoothConfigL().stream()
+						double                    cvalR         = summary.getValR();
+						Optional<CalibrationItem> currValConfig = this.clrConfig.getValSoothConfigL().stream()
 						        .filter(x -> x.getMinm() <= cvalR && x.getMaxm() >= cvalR).findFirst();
 						if (currValConfig.isPresent())
 						{
 							summary.setStrengthScore(
 							        Precision.round((summary.getStrengthScore() * currValConfig.get().getSf()), 1));
+							
+						}
+						
+					}
+					
+					/*
+					 * Re-calibrate for Un-pledged Promoter Holding, Working Capital Cycle, Financial Strength 
+					 * (Interest + Dep.) /PAT - Only for Non financial Scrips
+					 */
+					
+					if (!scSrv.isScripBelongingToFinancialSector(scrip))
+					
+					{
+						
+						//UPH SS Calibration
+						if (clrConfig.getUPHConfigL() != null)
+						{
+							try
+							{
+								double UPH = scExSrv.Get_ScripExisting_DB(scrip).getUPH();
+								
+								Optional<CalibrationItem> currUPHConfig = this.clrConfig.getUPHConfigL().stream()
+								        .filter(x -> x.getMinm() <= UPH && x.getMaxm() >= UPH).findFirst();
+								if (currUPHConfig.isPresent())
+								{
+									summary.setStrengthScore(
+									        Precision.round((summary.getStrengthScore() * currUPHConfig.get().getSf()),
+									                1));
+									
+								}
+							} catch (EX_General e)
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+						}
+						
+						//WC Cycle Calibration
+						if (clrConfig.getWCConfigL() != null)
+						{
+							
+							Optional<EN_SC_Trends> trendEntO = repoTrends.findBySCCodeAndPeriod(scrip, trendValPeriod);
+							if (trendEntO.isPresent())
+							{
+								EN_SC_Trends trendEnt = trendEntO.get();
+								double       WCCycle  = trendEnt.getWCCAvg();
+								
+								Optional<CalibrationItem> currWCConfig = this.clrConfig.getWCConfigL().stream()
+								        .filter(x -> x.getMinm() <= WCCycle && x.getMaxm() >= WCCycle).findFirst();
+								if (currWCConfig.isPresent())
+								{
+									summary.setStrengthScore(
+									        Precision.round((summary.getStrengthScore() * currWCConfig.get().getSf()),
+									                1));
+									
+								}
+							}
+							
+						}
+						
+						//IDBP Cycle Calibration
+						if (clrConfig.getIDBPConfigL() != null)
+						{
+							
+							Optional<EN_SC_Trends> trendEntO = repoTrends.findBySCCodeAndPeriod(scrip, trendValPeriod);
+							if (trendEntO.isPresent())
+							{
+								EN_SC_Trends trendEnt = trendEntO.get();
+								double       IDBP     = trendEnt.getFViabAvg();
+								
+								Optional<CalibrationItem> currIDBPConfig = this.clrConfig.getIDBPConfigL().stream()
+								        .filter(x -> x.getMinm() <= IDBP && x.getMaxm() >= IDBP).findFirst();
+								if (currIDBPConfig.isPresent())
+								{
+									summary.setStrengthScore(
+									        Precision.round((summary.getStrengthScore() * currIDBPConfig.get().getSf()),
+									                1));
+									
+								}
+							}
+							
+						}
+						
+						//CFO/PAT Calibration
+						if (clrConfig.getCFOPATConfigL() != null)
+						{
+							
+							Optional<EN_SC_10YData> sc10YEntO = repo10Yr.findBySCCode(scrip);
+							if (sc10YEntO.isPresent())
+							{
+								EN_SC_10YData sc10YEnt = sc10YEntO.get();
+								
+								double CFOPATAdh = sc10YEnt.getCFOPATR();
+								
+								Optional<CalibrationItem> currCFOPATConfig = this.clrConfig.getCFOPATConfigL().stream()
+								        .filter(x -> x.getMinm() <= CFOPATAdh && x.getMaxm() >= CFOPATAdh).findFirst();
+								if (currCFOPATConfig.isPresent())
+								{
+									summary.setStrengthScore(
+									        Precision.round(
+									                (summary.getStrengthScore() * currCFOPATConfig.get().getSf()), 1));
+									
+								}
+							}
 							
 						}
 						

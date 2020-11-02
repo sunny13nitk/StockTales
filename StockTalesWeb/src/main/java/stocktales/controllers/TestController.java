@@ -13,6 +13,8 @@ import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacad
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
+import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
+import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
 import stocktales.repository.SC10YearRepository;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
@@ -33,6 +35,9 @@ public class TestController
 	
 	@Autowired
 	private SC10YearRepository sc10Yrepo;
+	
+	@Autowired
+	private SCWtPESrv scWtPESrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -111,4 +116,18 @@ public class TestController
 		}
 		return "success";
 	}
+	
+	@GetMapping("/wtPE/{scCode}")
+	public String testwtPE(
+	        @PathVariable String scCode
+	)
+	{
+		if (scCode != null)
+		{
+			scWtPE scripWtPE = scWtPESrv.getWeightedPEforScrip(scCode);
+			System.out.println(scripWtPE.getScCode() + " : " + scripWtPE.getWtPE());
+		}
+		return "success";
+	}
+	
 }

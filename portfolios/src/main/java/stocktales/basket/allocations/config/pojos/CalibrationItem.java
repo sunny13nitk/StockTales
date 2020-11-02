@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ValSoothingSS
+public class CalibrationItem
 {
 	private double minm;
 	private double maxm;
