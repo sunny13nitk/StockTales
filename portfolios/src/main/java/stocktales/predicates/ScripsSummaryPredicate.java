@@ -15,14 +15,14 @@ public class ScripsSummaryPredicate extends GenericSCEDRCSummaryPredicate
 	{
 		
 		return (x.getAvWtED() > 15 && x.getAvWtRR() >= 18 && (x.getAvWtCF() == 0 || x.getAvWtCF() > 40)
-		        && (x.getValR() > 7 && x.getValR() < 45));
+		        && (x.getValR() > 7 && x.getValR() < 45) && (x.getStrengthScore() >= 20));
 		
 	}
 	
 	public String getNotes(
 	)
 	{
-		return "(Earnings & Div. Score > 15) AND (Return Ratios Score > 18) AND (Cash Flow Score (Non Financials) > 40) AND (Value Ratio Between 7  and 45) )";
+		return "(Earnings & Div. Score > 15) AND (Return Ratios Score > 18) AND (Cash Flow Score (Non Financials) > 40) AND (Value Ratio Between 7  and 45) AND (Strength Score > 20) ";
 	}
 	
 }

@@ -3,6 +3,7 @@ package stocktales.basket.allocations.autoAllocation.services;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -80,18 +81,19 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 									acc_rr  += wtvalue;
 									
 									scEDRCscore.getEarningsDivScore().getDurItems().add(
-									        new DurVWv(trend.getPeriod(), trend.getPATGR(),
-									                trend.getPATGR() * wtvalue));
+									        new DurVWv(trend.getPeriod(), Precision.round(trend.getPATGR(), 1),
+									                Precision.round((trend.getPATGR() * wtvalue), 1)));
 									
 									if (!isFinancialScrip) //ROCE
 									{
 										scEDRCscore.getReturnRatiosScore().getDurItems().add(
-										        new DurVWv(trend.getPeriod(), trend.getROCEAvg(),
-										                trend.getROCEAvg() * wtvalue));
+										        new DurVWv(trend.getPeriod(), Precision.round(trend.getROCEAvg(), 1),
+										                Precision.round((trend.getROCEAvg() * wtvalue), 1)));
 										
 										scEDRCscore.getCashflowsScore().getDurItems().add(
-										        new DurVWv(trend.getPeriod(), trend.getFCF_CFO_Avg(),
-										                trend.getFCF_CFO_Avg() * wtvalue));
+										        new DurVWv(trend.getPeriod(),
+										                Precision.round(trend.getFCF_CFO_Avg(), 1),
+										                Precision.round((trend.getFCF_CFO_Avg() * wtvalue), 1)));
 										
 										acc_cfo += wtvalue;
 									}
@@ -99,8 +101,8 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 									else //ROE
 									{
 										scEDRCscore.getReturnRatiosScore().getDurItems().add(
-										        new DurVWv(trend.getPeriod(), trend.getROEAvg(),
-										                trend.getROEAvg() * wtvalue));
+										        new DurVWv(trend.getPeriod(), Precision.round(trend.getROEAvg(), 1),
+										                Precision.round((trend.getROEAvg() * wtvalue), 1)));
 									}
 									
 								}
@@ -118,10 +120,12 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 							wtFacEPS = 1 / acc_eps;
 						}
 						
-						scEDRCscore.getEarningsDivScore().setNettValue(scEDRCscore.getEarningsDivScore().getDurItems()
-						        .stream().mapToDouble(DurVWv::getWv).sum() * wtFacEPS);
-						scEDRCscore.getEarningsDivScore().setResValue(scEDRCscore.getEarningsDivScore().getNettValue()
-						        + scEDRCscore.getEarningsDivScore().getDivYield());
+						scEDRCscore.getEarningsDivScore()
+						        .setNettValue(Precision.round((scEDRCscore.getEarningsDivScore().getDurItems().stream()
+						                .mapToDouble(DurVWv::getWv).sum() * wtFacEPS), 1));
+						scEDRCscore.getEarningsDivScore()
+						        .setResValue(Precision.round(scEDRCscore.getEarningsDivScore().getNettValue()
+						                + scEDRCscore.getEarningsDivScore().getDivYield(), 1));
 						
 						//----------------  ROCE/ROE  -------------------------------------------------
 						double residualwt_rr = 1 - acc_rr;
@@ -131,8 +135,9 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 							wtFacRR = 1 / acc_eps;
 						}
 						
-						scEDRCscore.getReturnRatiosScore().setNettValue(scEDRCscore.getReturnRatiosScore().getDurItems()
-						        .stream().mapToDouble(DurVWv::getWv).sum() * wtFacRR);
+						scEDRCscore.getReturnRatiosScore()
+						        .setNettValue(Precision.round((scEDRCscore.getReturnRatiosScore().getDurItems().stream()
+						                .mapToDouble(DurVWv::getWv).sum() * wtFacRR), 1));
 						
 						//----------------  CFO -------------------------------------------------
 						double nullCFERDC = 1;
@@ -150,8 +155,9 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 								wtFacCFO = 1 / acc_cfo;
 							}
 							
-							scEDRCscore.getCashflowsScore().setNettValue(scEDRCscore.getCashflowsScore().getDurItems()
-							        .stream().mapToDouble(DurVWv::getWv).sum() * wtFacCFO);
+							scEDRCscore.getCashflowsScore()
+							        .setNettValue(Precision.round((scEDRCscore.getCashflowsScore().getDurItems()
+							                .stream().mapToDouble(DurVWv::getWv).sum() * wtFacCFO), 1));
 							
 						}
 						
@@ -159,15 +165,18 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 						if (nullCFERDC > 1) //Financial Scrip
 						{
 							scEDRCscore.setEdrcScore(
-							        (scEDRCscore.getEarningsDivScore().getResValue() * cfAllocWts.getWtED()
-							                + scEDRCscore.getReturnRatiosScore().getNettValue() * cfAllocWts.getWtRR())
-							                * nullCFERDC);
+							        Precision.round(
+							                (scEDRCscore.getEarningsDivScore().getResValue() * cfAllocWts.getWtED()
+							                        + scEDRCscore.getReturnRatiosScore().getNettValue()
+							                                * cfAllocWts.getWtRR() * nullCFERDC),
+							                1));
 						} else //Non Financial Scrip
 						{
-							scEDRCscore
-							        .setEdrcScore(scEDRCscore.getEarningsDivScore().getResValue() * cfAllocWts.getWtED()
+							scEDRCscore.setEdrcScore(Precision.round(
+							        (scEDRCscore.getEarningsDivScore().getResValue() * cfAllocWts.getWtED()
 							                + scEDRCscore.getReturnRatiosScore().getNettValue() * cfAllocWts.getWtRR()
-							                + scEDRCscore.getCashflowsScore().getNettValue() * cfAllocWts.getWtCF());
+							                + scEDRCscore.getCashflowsScore().getNettValue() * cfAllocWts.getWtCF()),
+							        1));
 						}
 					}
 				}

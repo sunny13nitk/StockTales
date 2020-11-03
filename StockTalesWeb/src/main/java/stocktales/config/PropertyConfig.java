@@ -11,6 +11,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import stocktales.basket.allocations.config.pojos.AllocationWeights;
 import stocktales.basket.allocations.config.pojos.DurationWeights;
 import stocktales.basket.allocations.config.pojos.FinancialSectors;
+import stocktales.basket.allocations.config.pojos.FinancialsConfig;
 import stocktales.basket.allocations.config.pojos.StrengthWeights;
 
 /*
@@ -83,6 +84,21 @@ public class PropertyConfig
 		StrengthWeights strengthWts = new StrengthWeights(EDRC, valR);
 		
 		return strengthWts;
+	}
+	
+	@Bean
+	@Autowired //For PropertySourcesPlaceholderConfigurer
+	public FinancialsConfig setFinConfig(
+	        @Value("${Financials.UPH}") final double UPH, @Value("${Financials.ROE}") final double ROE, @Value(
+	            "${Financials.BOOSTBest}"
+	        ) final double BoostBest, @Value("${Financials.BOOSTROE}") final double BoostROE, @Value(
+	            "${Financials.BOOSTBASE}"
+	        ) final double BoostBase
+	)
+	{
+		FinancialsConfig FinConfig = new FinancialsConfig(UPH, ROE, BoostBest, BoostROE, BoostBase);
+		
+		return FinConfig;
 	}
 	
 }

@@ -101,6 +101,22 @@ public class TestController
 		return "success";
 	}
 	
+	@GetMapping("/edrcFacade/{scCode}")
+	public String testEDRCFacadeforScrip(
+	        @PathVariable String scCode
+	)
+	{
+		
+		SC_EDRC_Summary edrc_item = edrcFacSrv.getEDRCforSCrip(scCode);
+		if (edrc_item != null)
+		{
+			System.out.println(edrc_item.getScCode() + "|" + edrc_item.getAvWtED() + "|" + edrc_item.getAvWtRR() + "|"
+			        + edrc_item.getAvWtCF() + "|" + edrc_item.getEDRC());
+		}
+		
+		return "success";
+	}
+	
 	@GetMapping("/repo_10Yr/{scCode}")
 	public String test10YRepo(
 	        @PathVariable String scCode

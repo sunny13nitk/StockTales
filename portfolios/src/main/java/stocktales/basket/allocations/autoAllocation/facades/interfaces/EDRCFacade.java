@@ -14,4 +14,8 @@ public interface EDRCFacade
 	public List<SC_EDRC_Summary> getEDRCforSCripsList(
 	        List<String> scrips, Predicate<? extends SC_EDRC_Summary> predicate
 	);
+	
+	public SC_EDRC_Summary getEDRCforSCrip(
+	        String scCode
+	);
 }

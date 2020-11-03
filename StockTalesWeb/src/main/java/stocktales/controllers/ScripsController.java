@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
@@ -64,6 +65,19 @@ public class ScripsController
 		}
 		
 		return "reports/EDRCSummary";
+	}
+	
+	@GetMapping("/edrc/{scCode}")
+	public String showScripsEDRCmyFilter(
+	        @PathVariable String scCode, Model model
+	)
+	{
+		
+		if (scCode != null && this.edrcFacSrv != null)
+		{
+			model.addAttribute("summary", edrcFacSrv.getEDRCforSCrip(scCode));
+		}
+		return "reports/ScripStrengthScoreDetails";
 	}
 	
 }

@@ -14,10 +14,13 @@ import org.springframework.stereotype.Service;
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
+import stocktales.basket.allocations.autoAllocation.pojos.SCCalibrationItem;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
 import stocktales.basket.allocations.config.pojos.CalibrationItem;
+import stocktales.basket.allocations.config.pojos.FinancialsConfig;
 import stocktales.basket.allocations.config.pojos.StrengthWeights;
 import stocktales.basket.allocations.config.services.CLRConfig;
+import stocktales.enums.SCSScoreCalibrationHeaders;
 import stocktales.repository.SC10YearRepository;
 import stocktales.repository.TrendsRepository;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
@@ -26,6 +29,7 @@ import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.types.ScripSector;
 import stocktales.services.interfaces.ScripService;
+import stocktales.utilities.MathUtilities;
 
 @Service
 public class EDRCFacadeImpl implements EDRCFacade
@@ -54,6 +58,9 @@ public class EDRCFacadeImpl implements EDRCFacade
 	@Autowired
 	private SC10YearRepository repo10Yr;
 	
+	@Autowired
+	private FinancialsConfig cfFinancials;
+	
 	@Value("${trendValPeriod}")
 	private String trendValPeriod;
 	
@@ -73,179 +80,11 @@ public class EDRCFacadeImpl implements EDRCFacade
 			if (scrips.size() > 0 && edrcSrv != null)
 			{
 				result = new ArrayList<SC_EDRC_Summary>();
-				SC_EDRC_Summary summary = null;
 				
 				for (String scrip : scrips)
 				{
-					ScripEDRCScore scEDRC = edrcSrv.getEDRCforScrip(scrip);
-					String         sector = null;
-					if (scripSectors == null)
-					{
-						try
-						{
-							loadScripsandSectors();
-						} catch (EX_General e)
-						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-					}
 					
-					sector = scripSectors.stream().filter(x -> x.getScCode().equals(scrip)).findFirst().get()
-					        .getSector();
-					
-					if (scEDRC != null)
-					{
-						double strengthWt = Precision
-						        .round((sc10Yrepo.findBySCCode(scrip).get().getValR() * strWts.getValR()
-						                + scEDRC.getEdrcScore() * strWts.getEDRC()), 1);
-						
-						if (scEDRC.getCashflowsScore() != null)
-						{
-							summary = new SC_EDRC_Summary(scrip, sector,
-							        Precision.round(scEDRC.getEarningsDivScore().getResValue(), 1),
-							        Precision.round(scEDRC.getReturnRatiosScore().getNettValue(), 1),
-							        Precision.round(scEDRC.getCashflowsScore().getNettValue(), 1),
-							        Precision.round(scEDRC.getEdrcScore(), 1),
-							        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getValR(), 1),
-							        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getCFOPATR(), 1), strengthWt);
-						} else
-						{
-							summary = new SC_EDRC_Summary(scrip, sector,
-							        Precision.round(scEDRC.getEarningsDivScore().getResValue(), 1),
-							        Precision.round(scEDRC.getReturnRatiosScore().getNettValue(), 1), 0,
-							        Precision.round(scEDRC.getEdrcScore(), 1),
-							        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getValR(), 1),
-							        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getCFOPATR(), 1), strengthWt);
-						}
-					}
-					
-					/*
-					 * If Valuation Soothing of Strength Score is Active - Sooth out the scores
-					 */
-					
-					if (isValuationSoothingEnabled)
-					{
-						//Scan for Right Valuation Zone
-						double                    cvalR         = summary.getValR();
-						Optional<CalibrationItem> currValConfig = this.clrConfig.getValSoothConfigL().stream()
-						        .filter(x -> x.getMinm() <= cvalR && x.getMaxm() >= cvalR).findFirst();
-						if (currValConfig.isPresent())
-						{
-							summary.setStrengthScore(
-							        Precision.round((summary.getStrengthScore() * currValConfig.get().getSf()), 1));
-							
-						}
-						
-					}
-					
-					/*
-					 * Re-calibrate for Un-pledged Promoter Holding, Working Capital Cycle, Financial Strength 
-					 * (Interest + Dep.) /PAT - Only for Non financial Scrips
-					 */
-					
-					if (!scSrv.isScripBelongingToFinancialSector(scrip))
-					
-					{
-						
-						//UPH SS Calibration
-						if (clrConfig.getUPHConfigL() != null)
-						{
-							try
-							{
-								double UPH = scExSrv.Get_ScripExisting_DB(scrip).getUPH();
-								
-								Optional<CalibrationItem> currUPHConfig = this.clrConfig.getUPHConfigL().stream()
-								        .filter(x -> x.getMinm() <= UPH && x.getMaxm() >= UPH).findFirst();
-								if (currUPHConfig.isPresent())
-								{
-									summary.setStrengthScore(
-									        Precision.round((summary.getStrengthScore() * currUPHConfig.get().getSf()),
-									                1));
-									
-								}
-							} catch (EX_General e)
-							{
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-						}
-						
-						//WC Cycle Calibration
-						if (clrConfig.getWCConfigL() != null)
-						{
-							
-							Optional<EN_SC_Trends> trendEntO = repoTrends.findBySCCodeAndPeriod(scrip, trendValPeriod);
-							if (trendEntO.isPresent())
-							{
-								EN_SC_Trends trendEnt = trendEntO.get();
-								double       WCCycle  = trendEnt.getWCCAvg();
-								
-								Optional<CalibrationItem> currWCConfig = this.clrConfig.getWCConfigL().stream()
-								        .filter(x -> x.getMinm() <= WCCycle && x.getMaxm() >= WCCycle).findFirst();
-								if (currWCConfig.isPresent())
-								{
-									summary.setStrengthScore(
-									        Precision.round((summary.getStrengthScore() * currWCConfig.get().getSf()),
-									                1));
-									
-								}
-							}
-							
-						}
-						
-						//IDBP Cycle Calibration
-						if (clrConfig.getIDBPConfigL() != null)
-						{
-							
-							Optional<EN_SC_Trends> trendEntO = repoTrends.findBySCCodeAndPeriod(scrip, trendValPeriod);
-							if (trendEntO.isPresent())
-							{
-								EN_SC_Trends trendEnt = trendEntO.get();
-								double       IDBP     = trendEnt.getFViabAvg();
-								
-								Optional<CalibrationItem> currIDBPConfig = this.clrConfig.getIDBPConfigL().stream()
-								        .filter(x -> x.getMinm() <= IDBP && x.getMaxm() >= IDBP).findFirst();
-								if (currIDBPConfig.isPresent())
-								{
-									summary.setStrengthScore(
-									        Precision.round((summary.getStrengthScore() * currIDBPConfig.get().getSf()),
-									                1));
-									
-								}
-							}
-							
-						}
-						
-						//CFO/PAT Calibration
-						if (clrConfig.getCFOPATConfigL() != null)
-						{
-							
-							Optional<EN_SC_10YData> sc10YEntO = repo10Yr.findBySCCode(scrip);
-							if (sc10YEntO.isPresent())
-							{
-								EN_SC_10YData sc10YEnt = sc10YEntO.get();
-								
-								double CFOPATAdh = sc10YEnt.getCFOPATR();
-								
-								Optional<CalibrationItem> currCFOPATConfig = this.clrConfig.getCFOPATConfigL().stream()
-								        .filter(x -> x.getMinm() <= CFOPATAdh && x.getMaxm() >= CFOPATAdh).findFirst();
-								if (currCFOPATConfig.isPresent())
-								{
-									summary.setStrengthScore(
-									        Precision.round(
-									                (summary.getStrengthScore() * currCFOPATConfig.get().getSf()), 1));
-									
-								}
-							}
-							
-						}
-						
-					}
-					
-					result.add(summary);
+					result.add(this.getEDRCforSCrip(scrip));
 				}
 			}
 		}
@@ -261,6 +100,7 @@ public class EDRCFacadeImpl implements EDRCFacade
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<SC_EDRC_Summary> getEDRCforSCripsList(
 	        List<String> scrips, Predicate<? extends SC_EDRC_Summary> predicate
@@ -281,6 +121,273 @@ public class EDRCFacadeImpl implements EDRCFacade
 		}
 		// TODO Auto-generated method stub
 		return filteredR;
+	}
+	
+	@Override
+	public SC_EDRC_Summary getEDRCforSCrip(
+	        String scrip
+	)
+	{
+		SC_EDRC_Summary summary = null;
+		
+		ScripEDRCScore scEDRC = edrcSrv.getEDRCforScrip(scrip);
+		String         sector = null;
+		if (scripSectors == null)
+		{
+			try
+			{
+				loadScripsandSectors();
+			} catch (EX_General e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		sector = scripSectors.stream().filter(x -> x.getScCode().equals(scrip)).findFirst().get().getSector();
+		
+		if (scEDRC != null)
+		{
+			double strengthWt = Precision.round((sc10Yrepo.findBySCCode(scrip).get().getValR() * strWts.getValR()
+			        + scEDRC.getEdrcScore() * strWts.getEDRC()), 1);
+			
+			if (scEDRC.getCashflowsScore() != null)
+			{
+				summary = new SC_EDRC_Summary(scrip, sector, scEDRC,
+				        Precision.round(scEDRC.getEarningsDivScore().getResValue(), 1),
+				        Precision.round(scEDRC.getReturnRatiosScore().getNettValue(), 1),
+				        Precision.round(scEDRC.getCashflowsScore().getNettValue(), 1),
+				        Precision.round(scEDRC.getEdrcScore(), 1),
+				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getValR(), 1),
+				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getCFOPATR(), 1), strengthWt, strengthWt,
+				        new ArrayList<SCCalibrationItem>());
+			} else
+			{
+				summary = new SC_EDRC_Summary(scrip, sector, scEDRC,
+				        Precision.round(scEDRC.getEarningsDivScore().getResValue(), 1),
+				        Precision.round(scEDRC.getReturnRatiosScore().getNettValue(), 1), 0,
+				        Precision.round(scEDRC.getEdrcScore(), 1),
+				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getValR(), 1),
+				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getCFOPATR(), 1), strengthWt, strengthWt,
+				        new ArrayList<SCCalibrationItem>());
+			}
+		}
+		
+		/*
+		 * If Valuation Soothing of Strength Score is Active - Sooth out the scores
+		 */
+		
+		if (isValuationSoothingEnabled)
+		{
+			//Scan for Right Valuation Zone
+			double                    cvalR         = summary.getValR();
+			Optional<CalibrationItem> currValConfig = this.clrConfig.getValSoothConfigL().stream()
+			        .filter(x -> x.getMinm() <= cvalR && x.getMaxm() >= cvalR).findFirst();
+			if (currValConfig.isPresent())
+			{
+				SCCalibrationItem calItem = new SCCalibrationItem();
+				calItem.setCalHeader(SCSScoreCalibrationHeaders.ValueRatioCalibration);
+				calItem.setTriggerVal(Precision.round(cvalR, 1));
+				calItem.setValB4(summary.getStrengthScore());
+				summary.setStrengthScore(
+				        Precision.round((summary.getStrengthScore() * currValConfig.get().getSf()), 1));
+				calItem.setValAfter(summary.getStrengthScore());
+				calItem.setDelta(
+				        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+				summary.getCalibrations().add(calItem);
+			}
+			
+		}
+		
+		/*
+		 * Re-calibrate for Un-pledged Promoter Holding, Working Capital Cycle, Financial Strength 
+		 * (Interest + Dep.) /PAT - Only for Non financial Scrips
+		 */
+		
+		if (!scSrv.isScripBelongingToFinancialSector(scrip))
+		
+		{
+			
+			//UPH SS Calibration
+			if (clrConfig.getUPHConfigL() != null)
+			{
+				try
+				{
+					double UPH = scExSrv.Get_ScripExisting_DB(scrip).getUPH();
+					
+					Optional<CalibrationItem> currUPHConfig = this.clrConfig.getUPHConfigL().stream()
+					        .filter(x -> x.getMinm() <= UPH && x.getMaxm() >= UPH).findFirst();
+					if (currUPHConfig.isPresent())
+					{
+						SCCalibrationItem calItem = new SCCalibrationItem();
+						calItem.setCalHeader(
+						        SCSScoreCalibrationHeaders.UnpledgedPromoterHoldingCalibration);
+						calItem.setTriggerVal(Precision.round(UPH, 1));
+						calItem.setValB4(summary.getStrengthScore());
+						
+						summary.setStrengthScore(
+						        Precision.round((summary.getStrengthScore() * currUPHConfig.get().getSf()), 1));
+						
+						calItem.setValAfter(summary.getStrengthScore());
+						calItem.setDelta(
+						        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+						summary.getCalibrations().add(calItem);
+						
+					}
+				} catch (EX_General e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			
+			//WC Cycle Calibration
+			if (clrConfig.getWCConfigL() != null)
+			{
+				
+				Optional<EN_SC_Trends> trendEntO = repoTrends.findBySCCodeAndPeriod(scrip, trendValPeriod);
+				if (trendEntO.isPresent())
+				{
+					EN_SC_Trends trendEnt = trendEntO.get();
+					double       WCCycle  = trendEnt.getWCCAvg();
+					
+					Optional<CalibrationItem> currWCConfig = this.clrConfig.getWCConfigL().stream()
+					        .filter(x -> x.getMinm() <= WCCycle && x.getMaxm() >= WCCycle).findFirst();
+					if (currWCConfig.isPresent())
+					{
+						SCCalibrationItem calItem = new SCCalibrationItem();
+						calItem.setCalHeader(SCSScoreCalibrationHeaders.WorkingCapitalCycleCalibration);
+						calItem.setTriggerVal(Precision.round(WCCycle, 1));
+						calItem.setValB4(summary.getStrengthScore());
+						summary.setStrengthScore(
+						        Precision.round((summary.getStrengthScore() * currWCConfig.get().getSf()), 1));
+						
+						calItem.setValAfter(summary.getStrengthScore());
+						calItem.setDelta(
+						        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+						summary.getCalibrations().add(calItem);
+						
+					}
+				}
+				
+			}
+			
+			//IDBP Cycle Calibration
+			if (clrConfig.getIDBPConfigL() != null)
+			{
+				
+				Optional<EN_SC_Trends> trendEntO = repoTrends.findBySCCodeAndPeriod(scrip, trendValPeriod);
+				if (trendEntO.isPresent())
+				{
+					EN_SC_Trends trendEnt = trendEntO.get();
+					double       IDBP     = trendEnt.getFViabAvg();
+					
+					Optional<CalibrationItem> currIDBPConfig = this.clrConfig.getIDBPConfigL().stream()
+					        .filter(x -> x.getMinm() <= IDBP && x.getMaxm() >= IDBP).findFirst();
+					if (currIDBPConfig.isPresent())
+					{
+						SCCalibrationItem calItem = new SCCalibrationItem();
+						calItem.setCalHeader(
+						        SCSScoreCalibrationHeaders.InterestDepriciationByPATCalibration);
+						calItem.setTriggerVal(Precision.round(IDBP, 1));
+						calItem.setValB4(summary.getStrengthScore());
+						
+						summary.setStrengthScore(
+						        Precision.round((summary.getStrengthScore() * currIDBPConfig.get().getSf()), 1));
+						
+						calItem.setValAfter(summary.getStrengthScore());
+						calItem.setDelta(
+						        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+						summary.getCalibrations().add(calItem);
+					}
+				}
+				
+			}
+			
+			//CFO/PAT Calibration
+			if (clrConfig.getCFOPATConfigL() != null)
+			{
+				
+				Optional<EN_SC_10YData> sc10YEntO = repo10Yr.findBySCCode(scrip);
+				if (sc10YEntO.isPresent())
+				{
+					EN_SC_10YData sc10YEnt = sc10YEntO.get();
+					
+					double CFOPATAdh = sc10YEnt.getCFOPATR();
+					
+					Optional<CalibrationItem> currCFOPATConfig = this.clrConfig.getCFOPATConfigL().stream()
+					        .filter(x -> x.getMinm() <= CFOPATAdh && x.getMaxm() >= CFOPATAdh).findFirst();
+					if (currCFOPATConfig.isPresent())
+					{
+						SCCalibrationItem calItem = new SCCalibrationItem();
+						calItem.setCalHeader(SCSScoreCalibrationHeaders.CFOPATAdherenceCalibration);
+						calItem.setTriggerVal(Precision.round(CFOPATAdh, 1));
+						calItem.setValB4(summary.getStrengthScore());
+						
+						summary.setStrengthScore(
+						        Precision.round(
+						                (summary.getStrengthScore() * currCFOPATConfig.get().getSf()), 1));
+						
+						calItem.setValAfter(summary.getStrengthScore());
+						calItem.setDelta(
+						        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+						summary.getCalibrations().add(calItem);
+					}
+				}
+				
+			}
+			
+		}
+		
+		else //Adjust Financial Scrips FOR WC + UPH + CFP/PAT adherence to a tune of 8 + 8 +3 = 19% for a level playfield
+		{
+			try
+			{
+				SCCalibrationItem calItem = new SCCalibrationItem();
+				calItem.setCalHeader(SCSScoreCalibrationHeaders.FinancialSectorBaseBooster);
+				calItem.setTriggerVal(Precision.round(0, 1));
+				calItem.setValB4(summary.getStrengthScore());
+				
+				double booster = cfFinancials.getBoostBase();
+				double UPH     = scExSrv.Get_ScripExisting_DB(scrip).getUPH();
+				if (UPH >= cfFinancials.getUPH() && summary.getAvWtRR() >= cfFinancials.getROE())
+				{
+					calItem.setCalHeader(SCSScoreCalibrationHeaders.FinancialSectorBestBooster);
+					calItem.setTriggerVal(Precision.round(UPH, 1));
+					calItem.setValB4(summary.getStrengthScore());
+					booster = 1 + cfFinancials.getBoostBest();
+				} else
+				{
+					//check for ROE
+					if (summary.getAvWtRR() >= cfFinancials.getROE())
+					{
+						calItem.setCalHeader(SCSScoreCalibrationHeaders.FinancialSectorROEBooster);
+						calItem.setTriggerVal(Precision.round(summary.getAvWtRR(), 1));
+						calItem.setValB4(summary.getStrengthScore());
+						booster = 1 + cfFinancials.getBoostROE();
+					}
+				}
+				
+				summary.setStrengthScore(
+				        Precision.round(
+				                (summary.getStrengthScore() * booster), 1));
+				
+				calItem.setValAfter(summary.getStrengthScore());
+				calItem.setDelta(
+				        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+				summary.getCalibrations().add(calItem);
+				
+			} catch (EX_General e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return summary;
 	}
 	
 }

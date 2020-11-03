@@ -93,13 +93,13 @@ public class CLRConfig implements CommandLineRunner
 		 */
 		CalibrationItem wzone1 = new CalibrationItem(0, 12, 1.07);
 		WCConfigL.add(wzone1);
-		CalibrationItem wzone2 = new CalibrationItem(12, 20, .97);
+		CalibrationItem wzone2 = new CalibrationItem(12, 20, 1);
 		WCConfigL.add(wzone2);
-		CalibrationItem wzone3 = new CalibrationItem(20, 25, .95);
+		CalibrationItem wzone3 = new CalibrationItem(20, 25, .97);
 		WCConfigL.add(wzone3);
-		CalibrationItem wzone4 = new CalibrationItem(25, 30, .92);
+		CalibrationItem wzone4 = new CalibrationItem(25, 35, .94);
 		WCConfigL.add(wzone4);
-		CalibrationItem wzone5 = new CalibrationItem(30, 40, .88);
+		CalibrationItem wzone5 = new CalibrationItem(35, 40, .89);
 		WCConfigL.add(wzone5);
 		CalibrationItem wzone6 = new CalibrationItem(40, 100, .8);
 		WCConfigL.add(wzone6);
@@ -112,8 +112,12 @@ public class CLRConfig implements CommandLineRunner
 		IDBPConfigL.add(izone1);
 		CalibrationItem izone2 = new CalibrationItem(20, 30, .95);
 		IDBPConfigL.add(izone2);
-		CalibrationItem izone3 = new CalibrationItem(30, 70, .9);
+		CalibrationItem izone3 = new CalibrationItem(30, 40, .9);
 		IDBPConfigL.add(izone3);
+		CalibrationItem izone4 = new CalibrationItem(40, 50, .75);
+		IDBPConfigL.add(izone4);
+		CalibrationItem izone5 = new CalibrationItem(50, 500, .6);
+		IDBPConfigL.add(izone5);
 		
 		//Populate CFO/PAT Calibration
 		/*
