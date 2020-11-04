@@ -83,7 +83,7 @@
 
       <!--Table Row - Starts  -->
       <div class="row" style="margin-top: 20px">
-         <div class="colspan-11 offset-1" style="margin-left: 10px">
+         <div class="colspan-12">
             <table
                class="table compact striped table-border row-hover mt-4"
                id="t-inspector" data-role="table"
@@ -146,6 +146,8 @@
                         data-format="number"
                         data-cls-column=" text-center">Score</th>
 
+                     <th data-cls-column=" text-center">Actions</th>
+
 
                   </tr>
                </thead>
@@ -191,6 +193,17 @@
                      </td>
                      <td th:text="${EDRCSummaryI.strengthScore}">22.6</td>
 
+                     <!--Buttons - OCA  -->
+                     <td style="text-align: center;"><a
+                        class="button yellow cycle small outline"
+                        th:href="@{'/scrips/val/' + ${EDRCSummaryI.scCode}}"
+                        data-role="hint"
+                        data-hint-text="Check Target Price"
+                        data-cls-hint="bg-lightyellow fg-black drop-shadow"
+                        data-hint-position="bottom"><span
+                           class="mif-money fg-orange"></span></a>
+                        </li></td>
+                     <!--Buttons - OCA  -->
                   </tr>
 
                </tbody>

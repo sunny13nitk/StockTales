@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Stock Tales</title>
+<!-- Metro 4 -->
+<link rel="stylesheet"
+   href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+<title>Stock Tales</title>
+</head>
+<body>
+
+   <div class="grid" style="padding: 20px">
+
+      <!--Top Row - Starts  -->
+      <div class="row">
+
+         <div class="colspan-5 " style="margin-left: 10px">
+            <h3 style="color: #4465a1">
+               Scrips Valuation - <span th:text="${scVal.scCode}">BAJFINANCE</span>
+            </h3>
+         </div>
+
+      </div>
+      <!--Top Row - Ends  -->
+
+      <div class="colspan-10 " style="margin-left: 10px">
+         <div class="row flex-align-end">
+            <div class="cell">
+               <blockquote class="right-side">
+                  <h5 style="color: #8000fc" th:text="${scVal.price5Yr}">
+                  </h5>
+                  <span style="color: #486590; font-weight: medium;">Target
+                     Price (5yrs. hence)</span>
+               </blockquote>
+
+            </div>
+
+
+            <div class="cell">
+               <blockquote class="right-side">
+                  <h5 style="color: #32B480" th:text="${scVal.EDScore}">
+                  </h5>
+                  <span style="color: #486590; font-weight: medium;">ED
+                     yield</span>
+               </blockquote>
+            </div>
+
+            <div class="cell">
+               <blockquote class="right-side">
+                  <h4 style="color: #D74A76"
+                     th:text="${scVal.ret5YrCAGR}"></h4>
+                  <span style="color: #486590; font-weight: medium;">CAGR
+                     Returns </span>
+               </blockquote>
+            </div>
+
+         </div>
+
+      </div>
+
+   </div>
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+</html>

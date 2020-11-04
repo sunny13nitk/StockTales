@@ -47,9 +47,9 @@ public class CLRConfig implements CommandLineRunner
 		 */
 		CalibrationItem zone1 = new CalibrationItem(0, 3, .8);
 		valSoothConfigL.add(zone1);
-		CalibrationItem zone2 = new CalibrationItem(3, 5, .85);
+		CalibrationItem zone2 = new CalibrationItem(3, 4, .87);
 		valSoothConfigL.add(zone2);
-		CalibrationItem zone3 = new CalibrationItem(5, 12, 1);
+		CalibrationItem zone3 = new CalibrationItem(4, 12, 1);
 		valSoothConfigL.add(zone3);
 		CalibrationItem zone4 = new CalibrationItem(12, 18, .95);
 		valSoothConfigL.add(zone4);

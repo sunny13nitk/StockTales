@@ -12,10 +12,12 @@ import lombok.Setter;
 public class ScValuation
 {
 	private String scCode;
-	private double edrcScore;
+	private double EDScore;
+	private double CMP;
 	private double strengthScore;
 	private double UPH;
 	private double MoS;
+	private double currEPS;
 	private double currPE;
 	private double weightedPE;
 	private double price5Yr;

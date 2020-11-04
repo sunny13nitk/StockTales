@@ -18,4 +18,17 @@ public class MathUtilities
 		
 		return Precision.round(delta, 1);
 	}
+	
+	public static double getCAGRFinalValue(
+	        double initialValue, double rate, int duration
+	)
+	{
+		double finalValue = initialValue;
+		
+		for (int i = 0; i < duration; i++)
+		{
+			finalValue = finalValue + (rate / 100) * finalValue;
+		}
+		return finalValue;
+	}
 }

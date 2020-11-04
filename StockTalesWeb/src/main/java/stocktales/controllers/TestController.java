@@ -5,16 +5,21 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
+import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
+import stocktales.helperPOJO.ScValFormPOJO;
 import stocktales.repository.SC10YearRepository;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
@@ -38,6 +43,9 @@ public class TestController
 	
 	@Autowired
 	private SCWtPESrv scWtPESrv;
+	
+	@Autowired
+	private SCValuationSrv scValSrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -146,4 +154,29 @@ public class TestController
 		return "success";
 	}
 	
+	@GetMapping("/scVal/{scCode}")
+	public String testscValuation(
+	        @PathVariable String scCode, Model model
+	)
+	{
+		if (scCode != null)
+		{
+			ScValFormPOJO scvalPOJO = new ScValFormPOJO(scCode, .7, 0);
+			model.addAttribute("scValPOJO", scvalPOJO);
+		}
+		return "test/forms/scVal";
+	}
+	
+	@PostMapping("/scVal/{scCode}")
+	public String testscVal(
+	        @ModelAttribute("scValPOJO") ScValFormPOJO scValPOJO, Model model
+	)
+	{
+		if (scValPOJO != null)
+		{
+			model.addAttribute("scVal",
+			        scValSrv.getValuationforScrip(scValPOJO.getScCode(), scValPOJO.getCMP(), scValPOJO.getMoS()));
+		}
+		return "test/op/scVal";
+	}
 }
