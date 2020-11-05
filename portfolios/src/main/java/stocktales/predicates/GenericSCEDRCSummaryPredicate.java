@@ -2,11 +2,15 @@ package stocktales.predicates;
 
 import java.util.function.Predicate;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 
 @Component("GenericPredicate")
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class GenericSCEDRCSummaryPredicate implements Predicate<SC_EDRC_Summary>
 {
 	

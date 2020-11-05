@@ -12,6 +12,7 @@ import stocktales.basket.allocations.config.pojos.AllocationWeights;
 import stocktales.basket.allocations.config.pojos.DurationWeights;
 import stocktales.basket.allocations.config.pojos.FinancialSectors;
 import stocktales.basket.allocations.config.pojos.FinancialsConfig;
+import stocktales.basket.allocations.config.pojos.MCapAllocations;
 import stocktales.basket.allocations.config.pojos.StrengthWeights;
 
 /*
@@ -99,6 +100,17 @@ public class PropertyConfig
 		FinancialsConfig FinConfig = new FinancialsConfig(UPH, ROE, BoostBest, BoostROE, BoostBase);
 		
 		return FinConfig;
+	}
+	
+	@Bean
+	@Autowired //For PropertySourcesPlaceholderConfigurer
+	public MCapAllocations MCapAllocationsConfig(
+	        @Value("${MCapValue}") final double MCap, @Value("${MaxAllocLimit}") final double allocMax
+	)
+	{
+		MCapAllocations mCapAlloc = new MCapAllocations(MCap, allocMax);
+		
+		return mCapAlloc;
 	}
 	
 }
