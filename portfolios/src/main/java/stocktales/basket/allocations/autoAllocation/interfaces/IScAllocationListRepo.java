@@ -24,8 +24,12 @@ public interface IScAllocationListRepo
 	        String ScCode
 	);
 	
-	public void stageAllocationsforScrips(
+	public List<ScAllocation> stageAllocationsforScrips(
 	        List<String> scrips
+	);
+	
+	public void refreshAllocation(
+	        ScAllocation scAlloc
 	);
 	
 }

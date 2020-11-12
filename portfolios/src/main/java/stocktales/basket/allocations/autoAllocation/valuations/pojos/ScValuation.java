@@ -13,6 +13,7 @@ public class ScValuation
 {
 	private String scCode;
 	private double EDScore;
+	private double EDSCcoreB4MoS;
 	private double CMP;
 	private double strengthScore;
 	private double UPH;

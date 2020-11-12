@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Stock Tales</title>
+<!-- Metro 4 -->
+<link rel="stylesheet"
+   href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+<title>Stock Tales</title>
+</head>
+<body>
+
+   <div class="grid" style="padding: 20px">
+
+      <!--Top Row - Starts  -->
+      <div class="row">
+
+         <div class="colspan-11 " style="margin-left: 10px">
+            <h3 style="color: #4465a1">Strategy Staging -
+               Continued..</h3>
+         </div>
+
+
+      </div>
+      <!--Top Row - Ends  -->
+
+
+      <!--Error Messages Row - Starts -->
+
+      <div class="col-xs-15">
+         <div th:if="${formError != null}">
+
+            <!-- Check for Form error -->
+
+            <div class="remark alert"
+               style="padding-top: 10px; margin: 2px">
+               <label th:text="'Error Loading Scrip' + ${formError}"></label>
+            </div>
+         </div>
+      </div>
+
+
+      <div class="col-xs-15">
+         <div th:if="${formSucc != null}">
+
+
+            <div class="remark success"
+               style="padding-top: 10px; margin: 2px">
+               <label th:text=" ${formSucc}"></label>
+            </div>
+
+
+
+         </div>
+      </div>
+
+      <!--Error Messages Row - Ends -->
+
+
+      <!-- Quick Stats Row - Starts -->
+
+      <div class="row">
+
+         <div class="colspan-8 offset-2">
+            <div class="card" style="padding-top: -20px">
+
+               <div class="row flex-align-center">
+                  <div class="cell">
+                     <blockquote class="right-side">
+                        <h3 style="color: #8000fc"
+                           th:text="${qStats.numScrips}"></h3>
+                        <span
+                           style="color: #486590; font-weight: medium;">Number
+                           of Scrips</span>
+                     </blockquote>
+
+                  </div>
+
+
+                  <div class="cell">
+                     <blockquote class="right-side">
+                        <h4 style="color: #32B480"
+                           th:text="${qStats.maxAlloc.value }"></h4>
+                        <h5 style="color: #4465a1"
+                           th:text="${qStats.maxAlloc.name}">BAJFINANCE</h5>
+                        <span
+                           style="color: #486590; font-weight: medium;">Max'm.
+                           % Allocation</span>
+                     </blockquote>
+                  </div>
+
+                  <div class="cell">
+                     <blockquote class="right-side">
+                        <h4 style="color: #D74A76"
+                           th:text="${qStats.minAlloc.value}"></h4>
+                        <h5 style="color: #4465a1"
+                           th:text="${qStats.minAlloc.name}">BAJFINANCE</h5>
+                        <span
+                           style="color: #486590; font-weight: medium;">Min'm.
+                           % Allocation</span>
+                     </blockquote>
+                  </div>
+
+               </div>
+
+            </div>
+
+         </div>
+
+      </div>
+
+
+      <!-- Quick Stats Row - Ends -->
+
+      <!-- Strategy Form Row - Starts  -->
+
+      <div class="colspan-10 offset-1" style="margin-top: 5px">
+
+         <div class="card">
+
+            <h6 style="color: #4465a1; margin-left: 10px">Maintain
+               below Details to Save Strategy</h6>
+
+            <form th:object="${strategy}"
+               th:action="@{'/stratergy/save'} " method="post">
+
+               <div class="colspan-7 offset-1"
+                  style="margin-top: 10px; margin-bottom: 10px;">
+                  <label>Strategy Name</label> <input type="text"
+                     class="metro-input" th:field="*{name}" />
+               </div>
+
+               <div class="colspan-7 offset-1"
+                  style="margin-top: 10px; margin-bottom: 10px;">
+                  <label>Concept for Strategy</label>
+                  <textarea type="text" data-role="textarea"
+                     class="metro-input" th:field="*{concept}"
+                     data-max-height="200" data-auto-size="true">  </textarea>
+                  <small class="text-muted">A brief note about
+                     the Concept behind the Strategy</small>
+               </div>
+
+
+               <div class="colspan-7 offset-1"
+                  style="margin-top: 10px; margin-bottom: 10px;">
+                  <input type="checkbox" data-role="switch"
+                     th:field="*{active}" data-caption="Active">
+
+                  <input type="checkbox" data-role="switch"
+                     th:field="*{rebalanceallowed}"
+                     data-caption="Rebalancing Enabled">
+               </div>
+
+
+               <div class="colspan-1 offset-10"
+                  style="margin-top: 10px; margin-bottom: 10px;">
+                  <button class="button rounded"
+                     style="background-color: #59D3AF; color: white; margin-top: 5px; margin-bottom: 10px"
+                     data-role="hint" data-hint-position="bottom"
+                     data-cls-hint="bg-LightGreen fg-black"
+                     data-hint-text="Save Strategy">
+                     <span class="mif-floppy-disk"
+                        style="margin-left: 0px"> </span> <span
+                        style="margin-left: 3px">Save</span>
+                  </button>
+
+               </div>
+            </form>
+         </div>
+      </div>
+
+      <!-- Strategy Form Row - Ends  -->
+
+
+
+
+
+
+   </div>
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+</html>

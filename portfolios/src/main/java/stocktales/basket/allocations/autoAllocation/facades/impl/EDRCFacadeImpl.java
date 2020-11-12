@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
+import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary_List_Repo;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
 import stocktales.basket.allocations.autoAllocation.pojos.SCCalibrationItem;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
@@ -60,6 +61,9 @@ public class EDRCFacadeImpl implements EDRCFacade
 	
 	@Autowired
 	private FinancialsConfig cfFinancials;
+	
+	@Autowired
+	private SC_EDRC_Summary_List_Repo edrcFilteredRepo;
 	
 	@Value("${trendValPeriod}")
 	private String trendValPeriod;
@@ -116,7 +120,13 @@ public class EDRCFacadeImpl implements EDRCFacade
 		{
 			filteredR = result.stream().filter((Predicate<? super SC_EDRC_Summary>) predicate)
 			        .collect(Collectors.toList());
-			
+			if (filteredR != null)
+			{
+				if (filteredR.size() > 0)
+				{
+					edrcFilteredRepo.setEdrcFilteredList(filteredR);
+				}
+			}
 			return filteredR;
 		}
 		// TODO Auto-generated method stub

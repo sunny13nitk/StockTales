@@ -20,6 +20,7 @@ import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValu
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
 import stocktales.helperPOJO.ScValFormPOJO;
+import stocktales.predicates.manager.PredicateManager;
 import stocktales.repository.SC10YearRepository;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
@@ -43,6 +44,9 @@ public class TestController
 	
 	@Autowired
 	private SCWtPESrv scWtPESrv;
+	
+	@Autowired
+	private PredicateManager predMgr;
 	
 	@Autowired
 	private SCValuationSrv scValSrv;
@@ -165,6 +169,39 @@ public class TestController
 			model.addAttribute("scValPOJO", scvalPOJO);
 		}
 		return "test/forms/scVal";
+	}
+	
+	@GetMapping("/predicates")
+	public String testpredicates(
+	
+	)
+	{
+		if (predMgr != null)
+		{
+			List<String> beanNames = predMgr.getPredicateBeanNames();
+			for (String string : beanNames)
+			{
+				System.out.println(string);
+			}
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/predicates/{predName}")
+	public String testpredicatesbyName(
+	        @PathVariable String predName
+	
+	)
+	{
+		if (predMgr != null)
+		{
+			
+			System.out.println("Bean Name : " + predMgr.getActivePredicateBeanName(predName));
+			
+		}
+		
+		return "success";
 	}
 	
 	@PostMapping("/scVal/{scCode}")

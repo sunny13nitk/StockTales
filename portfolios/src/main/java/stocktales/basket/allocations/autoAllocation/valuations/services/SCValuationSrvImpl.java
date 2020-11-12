@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
@@ -20,6 +21,9 @@ public class SCValuationSrvImpl implements SCValuationSrv
 	
 	@Autowired
 	private SCExistsDB_Srv scDBSrv;
+	
+	@Autowired
+	private EDRCFacade edrcFacadeSrv;
 	
 	@Autowired
 	private SCWtPESrv scWtPESrv;
@@ -54,15 +58,17 @@ public class SCValuationSrvImpl implements SCValuationSrv
 					scValuation = new ScValuation();
 					scValuation.setScCode(scCode);
 					scValuation.setCurrEPS(enGenQ.getEPS());
+					scValuation.setUPH(enGenQ.getUPH());
+					scValuation.setMoS(this.MOS);
 					
 					if (CMP > 0)
 					{
 						scValuation.setCMP(CMP);
-						scValuation.setCurrPE((CMP / scValuation.getCurrEPS()));
+						scValuation.setCurrPE(Precision.round((CMP / scValuation.getCurrEPS()), 1));
 					} else
 					{
 						scValuation.setCMP(enGenQ.getCMP());
-						scValuation.setCurrPE(enGenQ.getCurrPE());
+						scValuation.setCurrPE(Precision.round(enGenQ.getCurrPE(), 1));
 					}
 				}
 			}
@@ -71,14 +77,16 @@ public class SCValuationSrvImpl implements SCValuationSrv
 			if (edrcSrv != null)
 			{
 				scValuation.setEDScore(edrcSrv.getEDRCforScrip(scCode).getEarningsDivScore().getResValue());
+				scValuation.setEDSCcoreB4MoS(scValuation.getEDScore());
 				//Adjust EDRC Score for MoS
 				scValuation.setEDScore(Precision.round((scValuation.getEDScore() * this.MOS), 1));
+				
 			}
 			
 			// Get the weighted PE from SCWtPE Srv
 			if (scWtPESrv != null)
 			{
-				scValuation.setWeightedPE(scWtPESrv.getWeightedPEforScrip(scCode).getWtPE());
+				scValuation.setWeightedPE(Precision.round(scWtPESrv.getWeightedPEforScrip(scCode).getWtPE(), 1));
 			}
 			
 			//Calculate 5Yr Henceforth Price
@@ -95,6 +103,8 @@ public class SCValuationSrvImpl implements SCValuationSrv
 				
 				scValuation.setRet5YrCAGR(Precision.round(cagrAchv, 1));
 			}
+			
+			scValuation.setStrengthScore(edrcFacadeSrv.getEDRCforSCrip(scCode).getStrengthScore());
 			
 		} catch (Exception e)
 		{

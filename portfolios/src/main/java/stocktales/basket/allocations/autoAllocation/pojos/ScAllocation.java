@@ -13,4 +13,25 @@ import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation
 public class ScAllocation extends ScValuation
 {
 	private double allocation;
+	
+	public ScAllocation(
+	        ScValuation scVal
+	)
+	{
+		this.setCMP(scVal.getCMP());
+		this.setCurrEPS(scVal.getCurrEPS());
+		this.setCurrPE(scVal.getCurrPE());
+		this.setEDScore(scVal.getEDScore());
+		this.setEDSCcoreB4MoS(scVal.getEDSCcoreB4MoS());
+		this.setMoS(scVal.getMoS());
+		this.setPrice5Yr(scVal.getPrice5Yr());
+		this.setRet5YrCAGR(scVal.getRet5YrCAGR());
+		this.setScCode(scVal.getScCode());
+		this.setStrengthScore(scVal.getStrengthScore());
+		this.setUPH(scVal.getUPH());
+		this.setWeightedPE(scVal.getWeightedPE());
+		this.setStrengthScore(scVal.getStrengthScore());
+		
+	}
+	
 }
