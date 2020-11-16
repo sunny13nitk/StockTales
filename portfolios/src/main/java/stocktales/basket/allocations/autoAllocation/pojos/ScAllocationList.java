@@ -14,5 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ScAllocationList
 {
+	private int                stgyId;
 	private List<ScAllocation> scAllocations = new ArrayList<ScAllocation>();
 }

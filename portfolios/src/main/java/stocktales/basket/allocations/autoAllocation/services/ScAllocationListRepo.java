@@ -149,4 +149,50 @@ public class ScAllocationListRepo implements IScAllocationListRepo
 		return scrips;
 	}
 	
+	@Override
+	public void clearAllocations(
+	)
+	{
+		this.scAllocList.clear();
+		
+	}
+	
+	@Override
+	public void addAllocation(
+	        ScAllocation scAlloc
+	)
+	{
+		//No duplicates
+		
+		if (scAlloc != null)
+		{
+			//Get the Scrip Allocation Matching Scrip Code from REpo
+			
+			if (scAllocList.size() > 0)
+			{
+				
+				Optional<ScAllocation> currAllocO = this.getScAllocList().stream()
+				        .filter(x -> x.getScCode().equals(scAlloc.getScCode())).findFirst();
+				if (!currAllocO.isPresent())
+				{
+					this.scAllocList.add(scAlloc);
+				}
+			} else
+			{
+				this.scAllocList.add(scAlloc);
+			}
+		}
+		
+	}
+	
+	@Override
+	public void clear_replace_allocations(
+	        List<ScAllocation> allocations
+	)
+	{
+		clearAllocations();
+		this.scAllocList = allocations;
+		
+	}
+	
 }

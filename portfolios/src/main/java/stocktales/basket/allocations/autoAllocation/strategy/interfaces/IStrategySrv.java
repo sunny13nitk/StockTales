@@ -5,6 +5,7 @@ import java.util.List;
 import stocktales.basket.allocations.autoAllocation.pojos.ScAllocation;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.StQuickStats;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.Strategy;
+import stocktales.helperPOJO.StrategyListPOJO;
 
 public interface IStrategySrv
 {
@@ -24,5 +25,12 @@ public interface IStrategySrv
 	
 	public Strategy save(
 	        Strategy strategy
+	);
+	
+	public List<StrategyListPOJO> getStrategiesList(
+	);
+	
+	public List<ScAllocation> getValuationsSimulationforStrategy(
+	        int StgId
 	);
 }

@@ -21,6 +21,7 @@ import stocktales.basket.allocations.autoAllocation.pojos.ScAllocation;
 import stocktales.basket.allocations.autoAllocation.pojos.ScAllocationList;
 import stocktales.basket.allocations.autoAllocation.strategy.interfaces.IStrategySrv;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.Strategy;
+import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation;
 import stocktales.services.interfaces.ScripService;
@@ -43,6 +44,9 @@ public class StratergyController
 	
 	@Autowired
 	private IStrategySrv stgySrv;
+	
+	@Autowired
+	private IRepoStrategy stgRepo;
 	
 	private List<String> scCodes;
 	
@@ -217,6 +221,43 @@ public class StratergyController
 		return "strategy/Staging_2";
 	}
 	
+	@GetMapping("/list")
+	public String listAll(
+	        Model model
+	)
+	{
+		if (stgySrv != null)
+		{
+			model.addAttribute("stgList", stgySrv.getStrategiesList());
+		}
+		return "strategy/list";
+	}
+	
+	@GetMapping("/{stgId}")
+	public String showStrategyDetails(
+	        @PathVariable("stgId") int stgId, Model model
+	)
+	{
+		if (stgId > 0)
+		{
+			
+			//Get the Strategy and its allocItems
+			if (stgySrv != null)
+			{
+				this.allocationsRepo.clear_replace_allocations(stgySrv.getValuationsSimulationforStrategy(stgId));
+				//Add Allocations List
+				ScAllocationList scAllocList = new ScAllocationList();
+				scAllocList.setScAllocations(allocationsRepo.getScAllocList());
+				//Add Strategy ID
+				scAllocList.setStgyId(stgId);
+				model.addAttribute("scStagingList", scAllocList);
+				
+			}
+		}
+		
+		return "strategy/simulation";
+	}
+	
 	/*
 	 * ------------------------------------------------------------------
 	 *                     POST MAPPINGS
@@ -262,29 +303,7 @@ public class StratergyController
 		
 		if (scAllocations != null)
 		{
-			List<ScAllocation> allocList = new ArrayList<ScAllocation>();
-			allocList = scAllocations.getScAllocations();
-			if (allocList.size() > 0)
-			{
-				//for Each Allocation Item
-				for (ScAllocation scAllocation : allocList)
-				{
-					//Get the Valuation = Retrigger Valuation Calculation using current CMP MoS
-					ScValuation scValRecalc = scValSrv.getValuationforScrip(scAllocation.getScCode(),
-					        scAllocation.getCMP(), scAllocation.getMoS());
-					if (scValRecalc != null)
-					{
-						//Create SCAllocation POJO using this valuation calc above
-						ScAllocation newAlloc = new ScAllocation(scValRecalc);
-						//Set allocation Percentage as per POJO in loop pass to Create SC Allocation
-						newAlloc.setAllocation(scAllocation.getAllocation());
-						//Call Repo Method Refresh passing the Updated SCAllocation POJO
-						this.allocationsRepo.refreshAllocation(newAlloc);
-					}
-					
-				}
-				
-			}
+			refreshAllocations(scAllocations);
 		}
 		//redirect to stratergy/staging_1
 		return "redirect:/stratergy/staging_1";
@@ -302,6 +321,56 @@ public class StratergyController
 		}
 		
 		return "success";
+	}
+	
+	@PostMapping("/simulation")
+	public String simulateStrategy(
+	        @ModelAttribute("scStagingList") ScAllocationList scAllocations, Model model
+	)
+	{
+		
+		refreshAllocations(scAllocations);
+		//Add Allocations List
+		ScAllocationList scAllocList = new ScAllocationList();
+		scAllocList.setScAllocations(this.allocationsRepo.getScAllocList());
+		//Add Strategy ID
+		scAllocList.setStgyId(scAllocations.getStgyId());
+		model.addAttribute("scStagingList", scAllocList);
+		
+		return "strategy/simulation";
+	}
+	
+	/*************************************************************************
+	 * ------------------PRIVATE METHODS -----------------------------------
+	 *************************************************************************/
+	
+	private void refreshAllocations(
+	        ScAllocationList scAllocations
+	)
+	{
+		List<ScAllocation> allocList = new ArrayList<ScAllocation>();
+		allocList = scAllocations.getScAllocations();
+		if (allocList.size() > 0)
+		{
+			//for Each Allocation Item
+			for (ScAllocation scAllocation : allocList)
+			{
+				//Get the Valuation = Retrigger Valuation Calculation using current CMP MoS
+				ScValuation scValRecalc = scValSrv.getValuationforScrip(scAllocation.getScCode(), scAllocation.getCMP(),
+				        scAllocation.getMoS());
+				if (scValRecalc != null)
+				{
+					//Create SCAllocation POJO using this valuation calc above
+					ScAllocation newAlloc = new ScAllocation(scValRecalc);
+					//Set allocation Percentage as per POJO in loop pass to Create SC Allocation
+					newAlloc.setAllocation(scAllocation.getAllocation());
+					//Call Repo Method Refresh passing the Updated SCAllocation POJO
+					this.allocationsRepo.refreshAllocation(newAlloc);
+				}
+				
+			}
+			
+		}
 	}
 	
 }

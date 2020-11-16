@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +22,10 @@ import stocktales.basket.allocations.autoAllocation.strategy.pojos.StAllocItem;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.StQuickStats;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.Strategy;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
+import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
+import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation;
 import stocktales.helperPOJO.NameValDouble;
+import stocktales.helperPOJO.StrategyListPOJO;
 import stocktales.predicates.manager.PredicateManager;
 
 @Getter
@@ -34,6 +38,9 @@ public class StrategySrv implements IStrategySrv
 {
 	@Autowired
 	private IRepoStrategy repoStgy;
+	
+	@Autowired
+	private SCValuationSrv scValSrv;
 	
 	@Autowired
 	private PredicateManager predMgr;
@@ -130,6 +137,64 @@ public class StrategySrv implements IStrategySrv
 		}
 		
 		return qStats;
+	}
+	
+	@Override
+	public List<StrategyListPOJO> getStrategiesList(
+	)
+	{
+		List<StrategyListPOJO> strategies = null;
+		
+		List<Strategy> stgyDB = repoStgy.findAll();
+		if (stgyDB != null)
+		{
+			if (stgyDB.size() > 0)
+			{
+				strategies = new ArrayList<StrategyListPOJO>();
+				for (Strategy strategy : stgyDB)
+				{
+					StrategyListPOJO strategyI = new StrategyListPOJO(strategy.getStid(), strategy.getName(),
+					        strategy.getConcept(), strategy.getAllocItems().size());
+					strategies.add(strategyI);
+				}
+			}
+		}
+		return strategies;
+	}
+	
+	@Override
+	public List<ScAllocation> getValuationsSimulationforStrategy(
+	        int StgId
+	)
+	{
+		List<ScAllocation> allocList = new ArrayList<ScAllocation>();
+		
+		//Get the Strategy and its allocItems
+		
+		Optional<Strategy> stgyO = repoStgy.findById(StgId);
+		
+		if (stgyO.isPresent())
+		{
+			if (stgyO.get().getAllocItems() != null)
+			{
+				if (stgyO.get().getAllocItems().size() > 0)
+				{
+					for (StAllocItem allocI : stgyO.get().getAllocItems())
+					{
+						//Compute Valuation for Each AllocItem
+						ScValuation scVal = scValSrv.getValuationforScrip(allocI.getSccode(), 0, allocI.getMos());
+						//Create Allocation for Each Valuation with allocation percentage from allocItem being looped
+						ScAllocation scAlloc = new ScAllocation(scVal);
+						scAlloc.setAllocation(allocI.getAlloc());
+						//Add to Repo List Bean the allocation
+						allocList.add(scAlloc);
+					}
+				}
+			}
+			
+		}
+		
+		return allocList;
 	}
 	
 }

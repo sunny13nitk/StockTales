@@ -32,4 +32,15 @@ public interface IScAllocationListRepo
 	        ScAllocation scAlloc
 	);
 	
+	public void clearAllocations(
+	);
+	
+	public void addAllocation(
+	        ScAllocation scAlloc
+	);
+	
+	public void clear_replace_allocations(
+	        List<ScAllocation> allocations
+	);
+	
 }
