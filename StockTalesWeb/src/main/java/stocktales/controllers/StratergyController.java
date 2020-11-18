@@ -320,7 +320,7 @@ public class StratergyController
 			stgySrv.save(strategy);
 		}
 		
-		return "success";
+		return "strategy/list";
 	}
 	
 	@PostMapping("/simulation")

@@ -97,7 +97,7 @@ public class ScripsController
 			ScValFormPOJO scvalPOJO = new ScValFormPOJO(scCode, .7, 0);
 			model.addAttribute("scValPOJO", scvalPOJO);
 		}
-		return "test/forms/scVal";
+		return "valuations/forms/scVal";
 	}
 	
 	@PostMapping("/val/{scCode}")
@@ -110,7 +110,20 @@ public class ScripsController
 			model.addAttribute("scVal",
 			        scValSrv.getValuationforScrip(scValPOJO.getScCode(), scValPOJO.getCMP(), scValPOJO.getMoS()));
 		}
-		return "test/op/scVal";
+		return "valuations/op/scVal";
+	}
+	
+	@PostMapping("/scVal/{scCode}")
+	public String testscValSubmit(
+	        @ModelAttribute("scValPOJO") ScValFormPOJO scValPOJO, Model model
+	)
+	{
+		if (scValPOJO != null)
+		{
+			model.addAttribute("scVal",
+			        scValSrv.getValuationforScrip(scValPOJO.getScCode(), scValPOJO.getCMP(), scValPOJO.getMoS()));
+		}
+		return "valuations/op/scVal";
 	}
 	
 }

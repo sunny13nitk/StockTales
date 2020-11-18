@@ -10,6 +10,6 @@ public class HomeController
 	public String showHome(
 	)
 	{
-		return "home/home";
+		return "home/StockTalesIndex";
 	}
 }

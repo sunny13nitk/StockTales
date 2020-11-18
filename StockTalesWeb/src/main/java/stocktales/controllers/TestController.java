@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
@@ -204,16 +202,4 @@ public class TestController
 		return "success";
 	}
 	
-	@PostMapping("/scVal/{scCode}")
-	public String testscVal(
-	        @ModelAttribute("scValPOJO") ScValFormPOJO scValPOJO, Model model
-	)
-	{
-		if (scValPOJO != null)
-		{
-			model.addAttribute("scVal",
-			        scValSrv.getValuationforScrip(scValPOJO.getScCode(), scValPOJO.getCMP(), scValPOJO.getMoS()));
-		}
-		return "test/op/scVal";
-	}
 }
