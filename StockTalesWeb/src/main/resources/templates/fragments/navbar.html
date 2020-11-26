@@ -25,39 +25,94 @@
          <li class="item-separator"></li>
 
 
-
-
-
          <li><a th:href="@{'/'}"> <span class="icon"><span
                   class="mif-home"></span></span> <span class="caption">Home</span>
          </a></li>
 
          <li class="item-separator"></li>
 
+         <li><a href="#" class="dropdown-toggle bg-red fg-white">
+               <span class="icon"><span class="mif-eye"></span></span> <span
+               class="caption">Screener</span>
+         </a>
+            <ul class="navview-menu bg-red fg-white"
+               data-role="dropdown">
+               <li><a th:href="@{'/scrips/edrc'}"> <span
+                     class="icon"><span class="mif-clipboard"></span></span>
+                     <span class="caption">Scrips Lookup</span>
+               </a></li>
+               <li><a th:href="@{'/scrips/edrc/myFilter'}"> <span
+                     class="icon"><span class="mif-filter"></span></span>
+                     <span class="caption">Filters</span>
+               </a></li>
 
-         <li><a th:href="@{'/scrips/edrc'}"> <span class="icon"><span
-                  class="mif-clipboard"></span></span> <span class="caption">Scrips
-                  Lookup</span>
-         </a></li>
-         <li><a th:href="@{'/scrips/edrc/myFilter'}"> <span
-               class="icon"><span class="mif-filter"></span></span> <span
-               class="caption">Filters</span>
-         </a></li>
-         <li><a th:href="@{'/stratergy/list'}"> <span
-               class="icon"><span class="mif-compass2"></span></span> <span
-               class="caption">Strategies</span>
-         </a></li>
+               <li><a th:href="@{'/stratergy/list'}"> <span
+                     class="icon"><span class="mif-compass2"></span></span>
+                     <span class="caption">Strategies</span>
+               </a></li>
+            </ul></li>
 
          <li class="item-separator"></li>
 
-         <li><a th:href="@{'/admin/sc/upload'}"> <span
-               class="icon"><span class="mif-upload"></span></span> <span
-               class="caption">Upload Scrip</span>
-         </a></li>
-         <li><a href="#"> <span class="icon"><span
-                  class="mif-stethoscope"></span></span> <span class="caption">Scrip
-                  Status Report</span>
-         </a></li>
+         <li><a href="#" class="dropdown-toggle bg-red fg-white">
+               <span class="icon"><span class="mif-devices"></span></span>
+               <span class="caption">Upload Cockpit</span>
+         </a>
+            <ul class="navview-menu bg-red fg-white"
+               data-role="dropdown">
+               <li><a th:href="@{'/admin/sc/upload'}"> <span
+                     class="icon"><span class="mif-upload"></span></span>
+                     <span class="caption">Upload Scrip</span>
+               </a></li>
+               <li><a href="#"> <span class="icon"><span
+                        class="mif-stethoscope"></span></span> <span
+                     class="caption">Scrip Status Report</span>
+               </a></li>
+            </ul></li>
+
+         <li class="item-separator"></li>
+
+         <li><a href="#" class="dropdown-toggle bg-red fg-white">
+               <span class="icon"><span class="mif-cogs"></span></span>
+               <span class="caption">Configurations</span>
+         </a>
+            <ul class="navview-menu bg-red fg-white"
+               data-role="dropdown">
+               <li><a th:href="@{'/config/secfpool'}"> <span
+                     class="icon"><span
+                        class="mif-insert-template"></span></span> <span
+                     class="caption">Sector Field Pools</span>
+               </a></li>
+               <li><a href="#"> <span class="icon"><span
+                        class="mif-sunrise"></span></span> <span
+                     class="caption">Scrip Field Pools</span>
+               </a></li>
+            </ul></li>
+
+
+         <li class="item-separator"></li>
+         <li class="item-separator"></li>
+         <li class="item-separator"></li>
+         <li class="item-separator"></li>
+
+         <li><a href="#" class="dropdown-toggle bg-red fg-white">
+               <span class="icon"><span class="mif-user-secret"></span></span>
+               <span class="caption">Site Admin</span>
+         </a>
+            <ul class="navview-menu bg-red fg-white"
+               data-role="dropdown">
+
+               <li><a th:href="@{'/siteconfig/list'}"> <span
+                     class="icon"><span class="mif-list2"></span></span>
+                     <span class="caption">Site Paths List</span>
+               </a></li>
+               <li><a th:href="@{'/siteconfig/qvsp'}"> <span
+                     class="icon"><span class="mif-navigation"></span></span>
+                     <span class="caption">New Site Path</span>
+               </a></li>
+
+            </ul></li>
+
       </ul>
    </nav>
 </body>

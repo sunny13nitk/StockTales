@@ -21,9 +21,11 @@ import stocktales.basket.allocations.autoAllocation.pojos.ScAllocation;
 import stocktales.basket.allocations.autoAllocation.pojos.ScAllocationList;
 import stocktales.basket.allocations.autoAllocation.strategy.interfaces.IStrategySrv;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.Strategy;
+import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.interfaces.IStgyRebalanceSrv;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation;
+import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.services.interfaces.ScripService;
 
 @Controller
@@ -48,6 +50,9 @@ public class StratergyController
 	@Autowired
 	private IRepoStrategy stgRepo;
 	
+	@Autowired
+	private IStgyRebalanceSrv srv_Stgy_Rebal;
+	
 	private List<String> scCodes;
 	
 	@GetMapping("/myFilter")
@@ -62,13 +67,7 @@ public class StratergyController
 			try
 			{
 				//Populate Scrip Codes if Null
-				if (this.scCodes == null)
-				{
-					if (scSrv != null)
-					{
-						this.scCodes = scSrv.getAllScripNames();
-					}
-				}
+				getSCCodes();
 				
 				//Add a Local Variable to Filter Scrips coming from Filter Predicate
 				List<String> scCodesList = new ArrayList<String>();
@@ -168,7 +167,7 @@ public class StratergyController
 					//Get all Scrips Codes
 					//Add a Local Variable to Filter Scrips coming from Current Allocations Collection
 					List<String> scCodesList = new ArrayList<String>();
-					scCodesList = this.scCodes; //Al SC Codes
+					scCodesList = getSCCodes(); //Al SC Codes
 					
 					for (ScAllocation scAllocation : scAllocList.getScAllocations())
 					{
@@ -258,10 +257,21 @@ public class StratergyController
 		return "strategy/simulation";
 	}
 	
+	@GetMapping("/rebal/{stgId}")
+	public String showRebalancing(
+	        @PathVariable("stgId") String stgId, Model model
+	)
+	{
+		model.addAttribute("rblPOJO", srv_Stgy_Rebal.triggerReBalancingforStgy(new Integer(stgId)));
+		model.addAttribute("scCodes", getSCCodes());
+		return "strategy/reBalance";
+	}
+	
 	/*
-	 * ------------------------------------------------------------------
+	 * ____________________________________________________________________________________
+	 * 
 	 *                     POST MAPPINGS
-	 * -----------------------------------------------------------------
+	 * _____________________________________________________________________________________
 	 */
 	
 	@PostMapping(value = "/staging_1", params = "action=validProc")
@@ -371,6 +381,36 @@ public class StratergyController
 			}
 			
 		}
+	}
+	
+	/* _______________________________________________________________________________________
+	 * 
+	 *                                  PRIVATE METHODS
+	 * _______________________________________________________________________________________
+	 */
+	
+	public List<String> getSCCodes(
+	)
+	{
+		
+		//Populate Scrip Codes if Null
+		if (this.scCodes == null)
+		{
+			if (scSrv != null)
+			{
+				try
+				{
+					this.scCodes = scSrv.getAllScripNames();
+				} catch (EX_General e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return this.scCodes;
+		
 	}
 	
 }

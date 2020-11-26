@@ -35,6 +35,10 @@ public class CLRConfig implements CommandLineRunner
 	
 	private List<CalibrationItem> CFOPATConfigL = new ArrayList<CalibrationItem>();
 	
+	private List<CalibrationItem> FCFYieldConfigL = new ArrayList<CalibrationItem>();
+	
+	private List<CalibrationItem> CFOYieldConfigL = new ArrayList<CalibrationItem>();
+	
 	@Override
 	public void run(
 	        String... args
@@ -82,18 +86,18 @@ public class CLRConfig implements CommandLineRunner
 		UPHConfigL.add(pzone4);
 		CalibrationItem pzone5 = new CalibrationItem(65, 70, 1);
 		UPHConfigL.add(pzone5);
-		CalibrationItem pzone6 = new CalibrationItem(70, 73, 1.05);
+		CalibrationItem pzone6 = new CalibrationItem(70, 73, 1.06);
 		UPHConfigL.add(pzone6);
-		CalibrationItem pzone7 = new CalibrationItem(73, 90, 1.08);
+		CalibrationItem pzone7 = new CalibrationItem(73, 90, 1.1);
 		UPHConfigL.add(pzone7);
 		
 		//Populate WC Calibration
 		/*
 		 * REWARD leaner WC cycle and punish the fatter ones
 		 */
-		CalibrationItem wzone1 = new CalibrationItem(0, 12, 1.07);
+		CalibrationItem wzone1 = new CalibrationItem(0, 12, 1.1);
 		WCConfigL.add(wzone1);
-		CalibrationItem wzone2 = new CalibrationItem(12, 20, 1);
+		CalibrationItem wzone2 = new CalibrationItem(12, 20, 1.03);
 		WCConfigL.add(wzone2);
 		CalibrationItem wzone3 = new CalibrationItem(20, 25, .97);
 		WCConfigL.add(wzone3);
@@ -130,10 +134,42 @@ public class CLRConfig implements CommandLineRunner
 		CFOPATConfigL.add(czone2);
 		CalibrationItem czone3 = new CalibrationItem(75, 85, .9);
 		CFOPATConfigL.add(czone3);
-		CalibrationItem czone4 = new CalibrationItem(85, 95, .95);
+		CalibrationItem czone4 = new CalibrationItem(85, 95, 1.0);
 		CFOPATConfigL.add(czone4);
-		CalibrationItem czone5 = new CalibrationItem(95, 200, 1.03);
+		CalibrationItem czone5 = new CalibrationItem(95, 200, 1.05);
 		CFOPATConfigL.add(czone5);
+		
+		//Populate FCF Yield Calibration
+		/*
+		 * REWARD where Free cash Flows cumulative over last 10 years over Current Mcap is higher. Real
+		 * Cash yield currently
+		 */
+		CalibrationItem cfzone1 = new CalibrationItem(-500, 3, .95);
+		FCFYieldConfigL.add(cfzone1);
+		CalibrationItem cfzone2 = new CalibrationItem(3, 5, 1.03);
+		FCFYieldConfigL.add(cfzone2);
+		CalibrationItem cfzone3 = new CalibrationItem(5, 7, 1.05);
+		FCFYieldConfigL.add(cfzone3);
+		CalibrationItem cfzone4 = new CalibrationItem(7, 10, 1.07);
+		FCFYieldConfigL.add(cfzone4);
+		CalibrationItem cfzone5 = new CalibrationItem(10, 200, 1.1);
+		FCFYieldConfigL.add(cfzone5);
+		
+		//Populate FCF Yield Calibration
+		/*
+		 * Cash Flow from Operations yields - CFO of the compnay over last 10 years divided by its total
+		 *  cumulative Debt and Equity
+		 * 		 */
+		CalibrationItem cfozone1 = new CalibrationItem(-500, 20, .95);
+		CFOYieldConfigL.add(cfozone1);
+		CalibrationItem cfozone2 = new CalibrationItem(20, 25, 1.05);
+		CFOYieldConfigL.add(cfozone2);
+		CalibrationItem cfozone3 = new CalibrationItem(25, 30, 1.07);
+		CFOYieldConfigL.add(cfozone3);
+		CalibrationItem cfozone4 = new CalibrationItem(30, 40, 1.09);
+		CFOYieldConfigL.add(cfozone4);
+		CalibrationItem cfozone5 = new CalibrationItem(40, 200, 1.11);
+		CFOYieldConfigL.add(cfozone5);
 		
 	}
 	

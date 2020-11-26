@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
+import stocktales.basket.allocations.autoAllocation.interfaces.ISrv_FCFSCore;
 import stocktales.basket.allocations.autoAllocation.pojos.DurVWv;
 import stocktales.basket.allocations.autoAllocation.pojos.DurVWvNett;
 import stocktales.basket.allocations.autoAllocation.pojos.DurVWvNett_ED;
@@ -34,6 +35,9 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 	
 	@Autowired
 	private ScripService scripSrv;
+	
+	@Autowired
+	private ISrv_FCFSCore fcfScoreSrv;
 	
 	@Override
 	public ScripEDRCScore getEDRCforScrip(
@@ -155,9 +159,11 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 								wtFacCFO = 1 / acc_cfo;
 							}
 							
-							scEDRCscore.getCashflowsScore()
-							        .setNettValue(Precision.round((scEDRCscore.getCashflowsScore().getDurItems()
-							                .stream().mapToDouble(DurVWv::getWv).sum() * wtFacCFO), 1));
+							double wtdFCFCFOScore = scEDRCscore.getCashflowsScore().getDurItems().stream()
+							        .mapToDouble(DurVWv::getWv).sum();
+							
+							scEDRCscore.getCashflowsScore().setNettValue(
+							        Precision.round((wtdFCFCFOScore * wtFacCFO), 1));
 							
 						}
 						

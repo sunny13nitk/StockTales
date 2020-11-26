@@ -7,17 +7,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(
-        name = "TB_SC_BalSheet"
-)
+@Table(name = "TB_SC_BalSheet")
 public class EN_SC_BalSheet
 {
 	@Id
-	@GeneratedValue(
-	        strategy = GenerationType.IDENTITY
-	)
-	private long   BalSheet_ID;
-	private int    Year;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long BalSheet_ID;
+	
+	private int    year;          //REnamed
 	private String SCCode;
 	private int    Sales;
 	private int    OP;
@@ -94,14 +91,14 @@ public class EN_SC_BalSheet
 	public int getYear(
 	)
 	{
-		return Year;
+		return year;
 	}
 	
 	public void setYear(
 	        int year
 	)
 	{
-		Year = year;
+		this.year = year;
 	}
 	
 	public int getSales(

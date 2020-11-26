@@ -22,6 +22,8 @@ public class SC_EDRC_Summary
 	private double                  avWtED;
 	private double                  avWtRR;
 	private double                  avWtCF;
+	private double                  FCFYield;
+	private double                  CFOYield;
 	private double                  EDRC;
 	private double                  valR;
 	private double                  patCFOAdh;

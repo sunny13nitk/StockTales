@@ -15,6 +15,8 @@ import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacad
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary_List_Repo;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
+import stocktales.basket.allocations.autoAllocation.interfaces.ISrv_FCFSCore;
+import stocktales.basket.allocations.autoAllocation.pojos.FCFScore;
 import stocktales.basket.allocations.autoAllocation.pojos.SCCalibrationItem;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
 import stocktales.basket.allocations.config.pojos.CalibrationItem;
@@ -64,6 +66,9 @@ public class EDRCFacadeImpl implements EDRCFacade
 	
 	@Autowired
 	private SC_EDRC_Summary_List_Repo edrcFilteredRepo;
+	
+	@Autowired
+	private ISrv_FCFSCore srv_FCFScore;
 	
 	@Value("${trendValPeriod}")
 	private String trendValPeriod;
@@ -162,12 +167,19 @@ public class EDRCFacadeImpl implements EDRCFacade
 			double strengthWt = Precision.round((sc10Yrepo.findBySCCode(scrip).get().getValR() * strWts.getValR()
 			        + scEDRC.getEdrcScore() * strWts.getEDRC()), 1);
 			
+			FCFScore fcfscore = new FCFScore(scrip, 0, 0);
+			if (srv_FCFScore != null)
+			{
+				fcfscore = srv_FCFScore.getFCFScorebyScrip(scrip);
+			}
+			
 			if (scEDRC.getCashflowsScore() != null)
 			{
 				summary = new SC_EDRC_Summary(scrip, sector, scEDRC,
 				        Precision.round(scEDRC.getEarningsDivScore().getResValue(), 1),
 				        Precision.round(scEDRC.getReturnRatiosScore().getNettValue(), 1),
 				        Precision.round(scEDRC.getCashflowsScore().getNettValue(), 1),
+				        Precision.round(fcfscore.getFcfYield(), 1), Precision.round(fcfscore.getCfoYield(), 1),
 				        Precision.round(scEDRC.getEdrcScore(), 1),
 				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getValR(), 1),
 				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getCFOPATR(), 1), strengthWt, strengthWt,
@@ -176,7 +188,7 @@ public class EDRCFacadeImpl implements EDRCFacade
 			{
 				summary = new SC_EDRC_Summary(scrip, sector, scEDRC,
 				        Precision.round(scEDRC.getEarningsDivScore().getResValue(), 1),
-				        Precision.round(scEDRC.getReturnRatiosScore().getNettValue(), 1), 0,
+				        Precision.round(scEDRC.getReturnRatiosScore().getNettValue(), 1), 0, 0, 0,
 				        Precision.round(scEDRC.getEdrcScore(), 1),
 				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getValR(), 1),
 				        Precision.round(sc10Yrepo.findBySCCode(scrip).get().getCFOPATR(), 1), strengthWt, strengthWt,
@@ -349,6 +361,66 @@ public class EDRCFacadeImpl implements EDRCFacade
 				
 			}
 			
+			//FCF Yield Calibration
+			if (clrConfig.getFCFYieldConfigL() != null)
+			{
+				
+				double fcfYield = srv_FCFScore.getFCFYield(scrip);
+				if (fcfYield != 0)
+				{
+					
+					Optional<CalibrationItem> currFCFYieldConfig = this.clrConfig.getFCFYieldConfigL().stream()
+					        .filter(x -> x.getMinm() <= fcfYield && x.getMaxm() >= fcfYield).findFirst();
+					if (currFCFYieldConfig.isPresent())
+					{
+						SCCalibrationItem calItem = new SCCalibrationItem();
+						calItem.setCalHeader(
+						        SCSScoreCalibrationHeaders.FCFYieldCalibration);
+						calItem.setTriggerVal(Precision.round(fcfYield, 1));
+						calItem.setValB4(summary.getStrengthScore());
+						
+						summary.setStrengthScore(
+						        Precision.round((summary.getStrengthScore() * currFCFYieldConfig.get().getSf()), 1));
+						
+						calItem.setValAfter(summary.getStrengthScore());
+						calItem.setDelta(
+						        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+						summary.getCalibrations().add(calItem);
+					}
+				}
+				
+			}
+			
+			//CFO Yield Calibration
+			if (clrConfig.getCFOYieldConfigL() != null)
+			{
+				
+				double cfoYield = srv_FCFScore.getCFOYield(scrip);
+				if (cfoYield != 0)
+				{
+					
+					Optional<CalibrationItem> currCFOYieldConfig = this.clrConfig.getCFOYieldConfigL().stream()
+					        .filter(x -> x.getMinm() <= cfoYield && x.getMaxm() >= cfoYield).findFirst();
+					if (currCFOYieldConfig.isPresent())
+					{
+						SCCalibrationItem calItem = new SCCalibrationItem();
+						calItem.setCalHeader(
+						        SCSScoreCalibrationHeaders.CFOYieldCalibration);
+						calItem.setTriggerVal(Precision.round(cfoYield, 1));
+						calItem.setValB4(summary.getStrengthScore());
+						
+						summary.setStrengthScore(
+						        Precision.round((summary.getStrengthScore() * currCFOYieldConfig.get().getSf()), 1));
+						
+						calItem.setValAfter(summary.getStrengthScore());
+						calItem.setDelta(
+						        MathUtilities.getPercentageDelta(calItem.getValB4(), calItem.getValAfter()));
+						summary.getCalibrations().add(calItem);
+					}
+				}
+				
+			}
+			
 		}
 		
 		else //Adjust Financial Scrips FOR WC + UPH + CFP/PAT adherence to a tune of 8 + 8 +3 = 19% for a level playfield
@@ -360,7 +432,7 @@ public class EDRCFacadeImpl implements EDRCFacade
 				calItem.setTriggerVal(Precision.round(0, 1));
 				calItem.setValB4(summary.getStrengthScore());
 				
-				double booster = cfFinancials.getBoostBase();
+				double booster = 1 + cfFinancials.getBoostBase();
 				double UPH     = scExSrv.Get_ScripExisting_DB(scrip).getUPH();
 				if (UPH >= cfFinancials.getUPH() && summary.getAvWtRR() >= cfFinancials.getROE())
 				{

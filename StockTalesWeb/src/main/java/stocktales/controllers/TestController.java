@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
+import stocktales.basket.allocations.autoAllocation.interfaces.ISrv_FCFSCore;
+import stocktales.basket.allocations.autoAllocation.pojos.FCFScore;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
+import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.interfaces.IStgyRebalanceSrv;
+import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.StgyRebalance;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
@@ -48,6 +52,12 @@ public class TestController
 	
 	@Autowired
 	private SCValuationSrv scValSrv;
+	
+	@Autowired
+	private ISrv_FCFSCore cfScoreSrv;
+	
+	@Autowired
+	private IStgyRebalanceSrv stgyRblSrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -199,6 +209,70 @@ public class TestController
 			
 		}
 		
+		return "success";
+	}
+	
+	@GetMapping("/cfyields/{scCode}")
+	public String testcfYieldsbyScrip(
+	        @PathVariable String scCode
+	
+	)
+	{
+		FCFScore fcfScore = cfScoreSrv.getFCFScorebyScrip(scCode);
+		if (fcfScore != null)
+		{
+			System.out.println("Scrip Code:  " + fcfScore.getScCode() + " | FCF Yield | " + fcfScore.getFcfYield()
+			        + " | CFO Yield | " + fcfScore.getCfoYield());
+			
+		}
+		return "success";
+	}
+	
+	@GetMapping("/cfyields")
+	public String testcfYields(
+	
+	)
+	{
+		
+		List<String> scrips;
+		try
+		{
+			scrips = scExSrv.getAllScripNames();
+			
+			for (String scCode : scrips)
+			{
+				FCFScore fcfScore = cfScoreSrv.getFCFScorebyScrip(scCode);
+				if (fcfScore != null)
+				{
+					System.out.println("Scrip Code:  " + fcfScore.getScCode() + " | FCF Yield | "
+					        + fcfScore.getFcfYield() + " | CFO Yield | " + fcfScore.getCfoYield());
+					
+				}
+			}
+		} catch (EX_General e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/stgyRebal/{stgId}")
+	public String testStgyRebalancing(
+	        @PathVariable("stgId") String stgId, Model model
+	)
+	{
+		
+		int stgyId = new Integer(stgId);
+		if (stgyId > 0)
+		{
+			StgyRebalance rblPoJo = stgyRblSrv.triggerReBalancingforStgy(stgyId);
+			if (rblPoJo != null)
+			{
+				model.addAttribute("rblPOJO", rblPoJo);
+			}
+		}
 		return "success";
 	}
 	

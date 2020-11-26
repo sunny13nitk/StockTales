@@ -67,6 +67,8 @@
                                  <th data-cls-column="text-center">Number
                                     of Scrips</th>
 
+
+                                 <th data-cls-column=" text-center"></th>
                               </tr>
                            </thead>
 
@@ -84,6 +86,17 @@
 
                               <td th:text="${stgyI.numScrips}">11</td>
 
+                              <!--Buttons - OCA  -->
+                              <td style="text-align: center;"><a
+                                 class="button warning cycle  outline"
+                                 th:href="@{'/stratergy/rebal/' + ${stgyI.id}}"
+                                 data-role="hint"
+                                 data-hint-text="Re-Balance Strategy"
+                                 data-cls-hint="bg-lightyellow fg-black drop-shadow"
+                                 data-hint-position="bottom"><span
+                                    class="mif-balance-scale mif-2x fg-red"></span></a>
+                              </td>
+                              <!--Buttons - OCA  -->
 
                            </tr>
 

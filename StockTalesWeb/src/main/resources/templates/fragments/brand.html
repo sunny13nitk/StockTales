@@ -4,7 +4,7 @@
 </head>
 <body>
    <div th:fragment="STBrand" class="row">
-      <div class="colspan-10 bg-white fg-red">
+      <div class="colspan-7 bg-white fg-red">
 
          <h1 style="margin-left: 15px;">
             <img th:src="@{/images/dice.png}"
@@ -13,8 +13,18 @@
             Tales
          </h1>
       </div>
+      <div class="colspan-2 " style="margin-top: 30px">
+         <!--  <input type="text" data-role="input" data-search-button="true"
+            data-autocomplete="Ukraine, USA, Canada, Marokko, Singapur"
+            data-search-button-click="submit"> -->
 
-      <div class="colspan-2 bg-white fg-red align-end"
+         <div class="info-button bg-red fg-white bd-red small">
+            </span> <a th:href="@{/qnav/site}" class="info"> Site Section</a> <a
+               href="#" class="info">Scrip</a>
+         </div>
+      </div>
+
+      <div class="colspan-2 offset-1 bg-white fg-red align-end"
          ; style="margin-top: 15px;">
          <small> <img th:src="@{/images/bicycle.png}"
             src="../../static/images/bicycle.png" width="30" height="30"

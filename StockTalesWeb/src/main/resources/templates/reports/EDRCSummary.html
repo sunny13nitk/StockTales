@@ -143,31 +143,35 @@
 
                                  <th class="sortable-column sort-asc"
                                     data-format="number"
-                                    data-cls-column=" text-center">EDRC
+                                    data-cls-column=" text-center">FCF
+                                    Yield</th>
+
+                                 <th class="sortable-column sort-asc"
+                                    data-format="number"
+                                    data-cls-column=" text-center">CFO
+                                    Yield</th>
+
+                                 <th data-cls-column=" text-center">EDRC
                                     Score</th>
 
                                  <th class="sortable-column sort-asc"
                                     data-format="number"
-                                    data-cls-column=" text-center">%</th>
+                                    data-cls-column=" text-center"></th>
 
 
-                                 <th class="sortable-column sort-asc"
-                                    data-format="number"
-                                    data-cls-column=" text-center">Value
+                                 <th data-cls-column=" text-center">Value
                                     Ratio</th>
 
                                  <th class="sortable-column sort-asc"
                                     data-format="number"
-                                    data-cls-column=" text-center">VR</th>
+                                    data-cls-column=" text-center"></th>
 
-                                 <th class="sortable-column sort-asc"
-                                    data-format="number"
-                                    data-cls-column=" text-center">Strength
+                                 <th data-cls-column=" text-center">Strength
                                     Score</th>
 
                                  <th class="sortable-column sort-asc"
                                     data-format="number"
-                                    data-cls-column=" text-center">Score</th>
+                                    data-cls-column=" text-center"></th>
 
                                  <th data-cls-column=" text-center"></th>
 
@@ -192,6 +196,10 @@
                                     th:text="${EDRCSummaryI.avWtCF}">73.5</td>
                                  <td style="text-align: center"
                                     th:text="${EDRCSummaryI.patCFOAdh}">73.5</td>
+                                 <td style="text-align: center"
+                                    th:text="${EDRCSummaryI.FCFYield}">73.5</td>
+                                 <td style="text-align: center"
+                                    th:text="${EDRCSummaryI.CFOYield}">73.5</td>
 
                                  <td style="text-align: center">
                                     <div data-role="progress"
@@ -233,7 +241,7 @@
                                     data-cls-hint="bg-lightyellow fg-black drop-shadow"
                                     data-hint-position="bottom"><span
                                        class="mif-money fg-orange"></span></a>
-                                    </li></td>
+                                 </td>
                                  <!--Buttons - OCA  -->
                               </tr>
 

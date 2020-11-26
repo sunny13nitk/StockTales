@@ -7,15 +7,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(
-        name = "TB_SC_10YData"
-)
+@Table(name = "TB_SC_10YData")
 public class EN_SC_10YData
 {
 	@Id
-	@GeneratedValue(
-	        strategy = GenerationType.IDENTITY
-	)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int ID_10YData;
 	
 	private String SCCode;
