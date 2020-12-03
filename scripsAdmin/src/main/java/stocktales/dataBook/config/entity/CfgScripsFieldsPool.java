@@ -12,6 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/*
+ * Scrip Specific Field Pools
+ */
 @Entity
 @Table(name = "scripsFieldsPool")
 @Getter
