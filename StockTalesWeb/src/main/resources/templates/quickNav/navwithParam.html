@@ -23,7 +23,7 @@
 
                <!-- Select Site Panel Row - Starts  -->
 
-               <div class="colspan-10 offset-1" style="margin-top: 5px">
+               <div class="colspan-10 offset-1">
 
                   <div class="card" style="padding: 10px">
 
@@ -50,6 +50,7 @@
                         <div class="colspan-7 offset-1"
                            style="margin-top: 5px; margin-bottom: 10px">
                            <select data-role="select" name="param"
+                              th:field="*{param}"
                               data-add-empty-value="true" class="input">
                               <!-- Params list to be pushed via Model -->
                               <option th:each="paramVal : ${paramList}"

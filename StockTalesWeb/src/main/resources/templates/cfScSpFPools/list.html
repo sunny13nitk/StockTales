@@ -21,7 +21,7 @@
 
                <!-- your Code Starts from Here  -->
 
-               <div class="grid" style="padding: 20px">
+               <div class="grid">
 
 
 
@@ -29,7 +29,8 @@
                   <div class="row">
 
                      <div class="colspan-9 " style="margin-left: 10px">
-                        <h3 style="color: #4465a1">Site Paths</h3>
+                        <h3 style="color: #4465a1">Scrip Specific
+                           Field Pools</h3>
                      </div>
 
                      <!-- Create Strategy Button - Col Start -->
@@ -38,13 +39,14 @@
 
 
                         <a href="#" class="button alert rounded outline"
-                           th:href="@{/siteconfig/qvsp}" role="button"
-                           data-role="hint" data-hint-position="bottom"
+                           th:href="@{/ScSpFPools/newConfig}"
+                           role="button" data-role="hint"
+                           data-hint-position="bottom"
                            data-cls-hint="bg-Lightgreen fg-black"
-                           data-hint-text="Create New Navigation Path">
-                           <span class="mif-link icon"
+                           data-hint-text="Create New Scrip Specific Field Pools Configuration">
+                           <span class="mif-add icon"
                            style="margin-left: 0px"></span> <span
-                           style="margin-left: 3px">Add Path</span>
+                           style="margin-left: 3px">New Config.</span>
 
 
                         </a>
@@ -69,12 +71,12 @@
                         <table
                            class="table striped compact table-border row-hover mt-4"
                            data-show-search="true"
-                           data-table-search-title="Search By Title/Path :"
+                           data-table-search-title="Search By Sector :"
                            data-show-rows-steps="false" id="t-inspector"
                            data-showPagination="false" data-role="table"
                            data-search-min-length="1"
                            data-search-threshold="300"
-                           data-search-fields="title"
+                           data-search-fields="scrip"
                            data-horizontal-scroll="true" data-rows="-1"
                            data-info-wrapper=".my-info-wrapper"
                            data-thousand-separator=","
@@ -83,48 +85,33 @@
                            <thead>
                               <tr>
 
-                                 <th data-name="title"
-                                    data-cls-column="text-center">Title</th>
+                                 <th data-name="scrip"
+                                    data-cls-column="text-center">Scrip</th>
 
-                                 <th data-name="url"
-                                    data-cls-column="text-center">Url
-                                    - Site Path</th>
+                                 <th data-cls-column="text-center">Field
+                                    Pool Entity - Qualified Name</th>
 
 
-                                 <th data-name="param"
-                                    data-cls-column="text-center">Param.
-                                    Desc.</th>
-                                 <th data-cls-column=" text-center">
-                                    Is Admin?</th>
+                                 <th data-cls-column="text-center">Service
+                                    Bean Name</th>
 
-                                 <th data-cls-column=" text-center"></th>
+
                               </tr>
                            </thead>
 
 
 
 
-                           <tr th:each="pathI : ${sitepaths}">
+                           <tr th:each="cfg : ${cfgs}">
                               <td><a
-                                 th:href="@{'/siteconfig/qvsp/' + ${pathI.pathid}}"
-                                 th:text="${pathI.title}"> </a></td>
+                                 th:href="@{'/ScSpFPools/cfg/' + ${cfg.fpid}}"
+                                 th:text="${cfg.sccode}"> </a></td>
 
-                              <td th:text="${pathI.url}"></td>
+                              <td th:text="${cfg.fPoolEntityQName}"></td>
 
-                              <td th:text="${pathI.paramdesc}"></td>
+                              <td th:text="${cfg.srvbean}"></td>
 
-                              <td><input type="checkbox"
-                                 data-role="switch"
-                                 th:checked="${pathI.isadmin}"
-                                 disabled="true"></td>
-                              <td style="text-align: center;"><a
-                                 class="button orange cycle small outline"
-                                 th:href="@{'/siteconfig/qvsp/delete/' + ${pathI.pathid}}"
-                                 data-role="hint"
-                                 data-hint-text="Delete Url Config"
-                                 data-cls-hint="bg-lightyellow fg-black drop-shadow"
-                                 data-hint-position="bottom"><span
-                                    class="mif-bin fg-orange"></span></a>
+
                            </tr>
 
                         </table>

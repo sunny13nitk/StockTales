@@ -5,30 +5,26 @@ import java.util.Optional;
 
 import stocktales.dataBook.model.pojo.PJIntervalSimple;
 
-public interface ISecSpFieldPoolSrv<T> extends IFieldPoolsShortData
+public interface IScripSpFieldPoolSrv<T> extends IFieldPoolsShortDataSimple
 {
 	public List<T> getAnnualData(
-	        String scCode
+	
 	);
 	
 	public List<T> getQuarterlyData(
-	        String scCode
+	
 	);
 	
 	public Optional<T> getFieldPoolDataById(
 	        long fpid
 	);
 	
-	public Optional<T> getFieldPoolDataByDuration(
-	        PJIntervalSimple interval, String scCode
+	public List<T> getFieldPoolDataByDuration(
+	        PJIntervalSimple interval
 	);
 	
 	public boolean isDataExistingforDuration(
-	        PJIntervalSimple interval, String scCode
-	);
-	
-	public List<T> getFieldPoolDataforScrip(
-	        String scCode
+	        PJIntervalSimple interval
 	);
 	
 	public T saveorUpdate(

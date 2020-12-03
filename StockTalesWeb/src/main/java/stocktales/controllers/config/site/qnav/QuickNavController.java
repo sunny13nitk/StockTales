@@ -1,4 +1,4 @@
-package stocktales.controllers;
+package stocktales.controllers.config.site.qnav;
 
 import java.util.List;
 import java.util.Optional;

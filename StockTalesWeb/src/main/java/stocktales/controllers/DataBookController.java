@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import stocktales.dataBook.config.entity.CfgScripsFieldsPool;
 import stocktales.dataBook.config.entity.CfgSectorsFieldsPool;
 import stocktales.dataBook.enums.EnumInterval;
+import stocktales.dataBook.fpSrv.interfaces.IScripSpFieldPoolSrv;
 import stocktales.dataBook.fpSrv.interfaces.ISecSpFieldPoolSrv;
 import stocktales.dataBook.helperPojo.IdNotes;
 import stocktales.dataBook.model.entity.FPFinancialSector;
+import stocktales.dataBook.model.repo.RepoCfgScripFP;
 import stocktales.dataBook.model.repo.RepoCfgSecFP;
 import stocktales.dataBook.model.repo.RepoFPFinancialSector;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
@@ -36,6 +39,8 @@ public class DataBookController
 	private ISCExistsDB_Srv       scExSrv;
 	@Autowired
 	private RepoCfgSecFP          repocfgsecFP;
+	@Autowired
+	private RepoCfgScripFP        repocfgscFp;
 	@Autowired
 	private RepoFPFinancialSector repoFPFinancials;
 	
@@ -92,6 +97,50 @@ public class DataBookController
 					model.addAttribute("QtrylList", fpSrv.findAllByInterval(EnumInterval.Quarterly));
 					
 					desurl = "scrips/dataBook/secSpFPoolDataList";
+				}
+				
+			} else
+			{
+				//No Config Found webpage in case of bean not found
+				desurl = "scrips/dataBook/NoConfigFound";
+			}
+			
+		}
+		//REdirect to Sector Specific List Page 
+		return desurl;
+	}
+	
+	@GetMapping("/scsp/{scCode}")
+	public String triggerNav_ScSp_DataMaintain_Base(
+	        @PathVariable("scCode") String scCode, Model model
+	)
+	{
+		String desurl = null;
+		
+		//Get the BeanSrv for Scrip Sector
+		if (scCode != null)
+		{
+			Optional<CfgScripsFieldsPool> cfgscFPO = repocfgscFp.findBySccode(scCode);
+			if (cfgscFPO.isPresent())
+			{
+				CfgScripsFieldsPool cfgscFp = cfgscFPO.get();
+				//Get the bean from AppCtxt
+				@SuppressWarnings("unchecked")
+				IScripSpFieldPoolSrv<T> fpSrv = (IScripSpFieldPoolSrv<T>) appCtxt.getBean(cfgscFp.getSrvbean());
+				if (fpSrv != null)
+				{
+					
+					//Load the Model for Scrip Sector Sp. Data - in case bean found
+					/*
+					 * Scrip Code, List<Annual & Quarterly>
+					 */
+					
+					model.addAttribute("scCode", scCode);
+					
+					model.addAttribute("AnnualList", fpSrv.findAllByInterval(EnumInterval.Annual));
+					model.addAttribute("QtrylList", fpSrv.findAllByInterval(EnumInterval.Quarterly));
+					
+					desurl = "scrips/dataBook/scSpFPoolDataList";
 				}
 				
 			} else

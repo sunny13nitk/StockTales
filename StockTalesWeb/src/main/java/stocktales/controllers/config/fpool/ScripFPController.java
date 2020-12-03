@@ -1,4 +1,4 @@
-package stocktales.controllers;
+package stocktales.controllers.config.fpool;
 
 import java.util.Optional;
 
@@ -11,47 +11,46 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import stocktales.dataBook.config.entity.CfgSectorsFieldsPool;
-import stocktales.dataBook.model.repo.RepoCfgSecFP;
+import stocktales.dataBook.config.entity.CfgScripsFieldsPool;
+import stocktales.dataBook.model.repo.RepoCfgScripFP;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
-import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
+import stocktales.services.interfaces.ScripService;
 
 @Controller
-@RequestMapping("/fpconfig")
-public class SecFPController
+@RequestMapping("/ScSpFPools")
+public class ScripFPController
 {
 	@Autowired
-	private RepoCfgSecFP repoCfgsecFP;
+	private RepoCfgScripFP repo_cfgScSp;
 	
 	@Autowired
-	private ISCExistsDB_Srv scExisSrv;;
+	private ScripService scSrv;
 	
 	@GetMapping("/list")
-	public String showFPConfigList(
+	public String showlist(
 	        Model model
 	)
 	{
-		model.addAttribute("cfgs", repoCfgsecFP.findAll());
-		return "sectorFieldPools/config/list";
+		model.addAttribute("cfgs", repo_cfgScSp.findAll());
+		return "cfScSpFPools/list";
 	}
 	
-	@GetMapping("/newSecConfig")
-	public String showNewSecSpConfig(
+	@GetMapping("/newConfig")
+	public String showNewScSpConfig(
 	        Model model
 	)
 	{
-		model.addAttribute("cfg", new CfgSectorsFieldsPool());
-		
+		model.addAttribute("cfg", new CfgScripsFieldsPool());
 		try
 		{
-			model.addAttribute("sectors", scExisSrv.getAllSectors());
+			model.addAttribute("scrips", scSrv.getAllScripNames());
 		} catch (EX_General e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		return "sectorFieldPools/config/secFPConfig_Edit";
+		return "cfScSpFPools/scFPConfig_Edit";
 	}
 	
 	@GetMapping("/cfg/{fpid}")
@@ -64,13 +63,13 @@ public class SecFPController
 			int fp_id = new Integer(fpid);
 			if (fp_id > 0)
 			{
-				Optional<CfgSectorsFieldsPool> cfgO = repoCfgsecFP.findById(fp_id);
+				Optional<CfgScripsFieldsPool> cfgO = repo_cfgScSp.findById(fp_id);
 				if (cfgO.isPresent())
 				{
 					model.addAttribute("cfg", cfgO.get());
 					try
 					{
-						model.addAttribute("sectors", scExisSrv.getAllSectors());
+						model.addAttribute("scrips", scSrv.getAllScripNames());
 					} catch (EX_General e)
 					{
 						// TODO Auto-generated catch block
@@ -80,7 +79,7 @@ public class SecFPController
 			}
 		}
 		
-		return "sectorFieldPools/config/secFPConfig_Edit";
+		return "cfScSpFPools/scFPConfig_Edit";
 	}
 	
 	/*
@@ -92,24 +91,24 @@ public class SecFPController
 	
 	@PostMapping("/save")
 	public String saveConfig(
-	        @ModelAttribute("cfg") CfgSectorsFieldsPool config, Model model
+	        @ModelAttribute("cfg") CfgScripsFieldsPool config, Model model
 	)
 	{
 		
 		String desurl = null;
 		if (config != null)
 		{
-			//Check for Duplicate by Sector
-			Optional<CfgSectorsFieldsPool> exisCfgO = repoCfgsecFP.findBySector(config.getSector());
+			//Check for Duplicate by Scrip Code
+			Optional<CfgScripsFieldsPool> exisCfgO = repo_cfgScSp.findBySccode(config.getSccode());
 			if (exisCfgO.isPresent() && exisCfgO.get().getFpid() == 0)
 			{
 				model.addAttribute("formError",
-				        "Field Pool Config for Sector - " + config.getSector() + " already Exists!");
-				desurl = "sectorFieldPools/config/secFPConfig_Edit"; //Stay Here
+				        "Field Pool Config for Scrip - " + config.getSccode() + " already Exists!");
+				desurl = "cfScSpFPools/scFPConfig_Edit"; //Stay Here
 			} else
 			{
-				repoCfgsecFP.save(config);
-				desurl = "redirect:/fpconfig/list";
+				repo_cfgScSp.save(config);
+				desurl = "redirect:/ScSpFPools/list";
 			}
 			
 		}

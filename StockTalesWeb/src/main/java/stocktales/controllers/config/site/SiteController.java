@@ -1,4 +1,4 @@
-package stocktales.controllers;
+package stocktales.controllers.config.site;
 
 import java.util.Optional;
 
@@ -32,6 +32,7 @@ public class SiteController
 	{
 		SitePaths newPath = new SitePaths();
 		model.addAttribute("sitepath", newPath);
+		model.addAttribute("paramBeanNames", paramMgrSrv.getAllParamBeansNames());
 		return "siteConfig/sitePath_Edit";
 	}
 	
@@ -54,9 +55,11 @@ public class SiteController
 			Optional<SitePaths> sitePathfound = repoSites.findById(new Integer(pathid));
 			if (sitePathfound.isPresent())
 			{
-				model.addAttribute("paramBeanNames", paramMgrSrv.getAllParamBeansNames());
+				
 				model.addAttribute("sitepath", sitePathfound.get());
 			}
+			
+			model.addAttribute("paramBeanNames", paramMgrSrv.getAllParamBeansNames());
 			
 		}
 		return "siteConfig/sitePath_Edit";

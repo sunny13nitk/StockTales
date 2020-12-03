@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import stocktales.dataBook.enums.EnumInterval;
 import stocktales.dataBook.fpSrv.interfaces.ISecSpFieldPoolSrv;
 import stocktales.dataBook.model.entity.FPFinancialSector;
-import stocktales.dataBook.model.pojo.PJInterval;
+import stocktales.dataBook.model.pojo.PJIntervalSimple;
 import stocktales.dataBook.model.repo.RepoFPFinancialSector;
 import stocktales.dataBook.model.repo.repoIntf.IFieldPoolShort;
 
@@ -49,7 +49,7 @@ public class FPFinancialSectorSrv implements ISecSpFieldPoolSrv<FPFinancialSecto
 	
 	@Override
 	public Optional<FPFinancialSector> getFieldPoolDataByDuration(
-	        PJInterval interval, String scCode
+	        PJIntervalSimple interval, String scCode
 	)
 	{
 		return repoFPFinSec.findAlLBySccodeAndIntervalAndValmAndVald(scCode, interval.getInterval(), interval.getValm(),
@@ -58,7 +58,7 @@ public class FPFinancialSectorSrv implements ISecSpFieldPoolSrv<FPFinancialSecto
 	
 	@Override
 	public boolean isDataExistingforDuration(
-	        PJInterval interval, String scCode
+	        PJIntervalSimple interval, String scCode
 	)
 	{
 		
