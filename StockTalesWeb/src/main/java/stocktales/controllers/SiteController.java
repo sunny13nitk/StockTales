@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import stocktales.siteconfig.interfaces.IParamListManager;
 import stocktales.siteconfig.model.entity.SitePaths;
 import stocktales.siteconfig.repo.RepoSitePaths;
 
@@ -20,6 +21,9 @@ public class SiteController
 {
 	@Autowired
 	private RepoSitePaths repoSites;
+	
+	@Autowired
+	private IParamListManager paramMgrSrv;
 	
 	@GetMapping("/qvsp")
 	public String showQuickSiteUrlConfig(
@@ -50,6 +54,7 @@ public class SiteController
 			Optional<SitePaths> sitePathfound = repoSites.findById(new Integer(pathid));
 			if (sitePathfound.isPresent())
 			{
+				model.addAttribute("paramBeanNames", paramMgrSrv.getAllParamBeansNames());
 				model.addAttribute("sitepath", sitePathfound.get());
 			}
 			

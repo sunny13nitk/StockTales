@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,21 +27,33 @@ public class FPFinancialSector extends PJInterval
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long     id;
-	private String   scCode;
+	private String   sccode;
 	@Enumerated(EnumType.STRING)
 	private EnumUnit unit;
-	private double   totalIncome;
-	private double   feeCommIncome;
-	private double   feeCommExpenses;
+	private double   aum;
+	private double   totalincome;
+	private double   feecommincome;
+	private double   feecommexpenses;
 	private double   provisions;
-	private double   GNPA;
-	private double   NNPA;
-	private double   CAR;
-	private double   tier1CAR;
-	private double   PCR;
+	private double   casheq;
+	@Max(value = 100)
+	private double   gnpa;
+	@Max(value = 100)
+	private double   nnpa;
+	@Max(value = 100)
+	private double   car;
+	@Max(value = 100)
+	private double   tier1car;
+	@Max(value = 100)
+	private double   pcr;
 	private double   deposits;
-	private double   retailDepPercentage;
-	private double   corpDepPercentage;
-	private double   opexToNII;
+	@Max(value = 100)
+	private double   deptoconsborrow;
+	@Max(value = 100)
+	private double   retaildeppercentage;
+	@Max(value = 100)
+	private double   corpdeppercentage;
+	@Max(value = 100)
+	private double   opextonii;
 	
 }

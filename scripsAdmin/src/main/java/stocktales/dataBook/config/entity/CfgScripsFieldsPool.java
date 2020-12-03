@@ -13,22 +13,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "secFieldsPool")
+@Table(name = "scripsFieldsPool")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CfgSectorsFieldsPool
+public class CfgScripsFieldsPool
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int    fpid;
 	@NotNull
-	private String sector;
+	private String sccode;
 	@NotNull
 	private String fPoolEntityQName; //Qualified Entity Pojo for Field Pool
 	
 	@NotNull
 	private String srvbean;
-	
 }

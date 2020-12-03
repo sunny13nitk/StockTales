@@ -59,54 +59,51 @@
                   <div class="card">
 
                      <h6 style="color: #4465a1; margin-left: 10px">Maintain
-                        Site Navigation Paths</h6>
+                        Sector(s) Specific Field Pool Configuration</h6>
 
-                     <form th:object="${sitepath}"
-                        th:action="@{'/siteconfig/path'} " method="post">
+                     <form th:object="${cfg}"
+                        th:action="@{'/fpconfig/save'} " method="post">
 
                         <!--Hidden SitePath Id field to be passed on to   -->
-                        <input type="hidden" th:field="*{pathid}" />
-
-                        <div class="colspan-7 offset-1"
-                           style="margin-top: 10px; margin-bottom: 10px;">
-                           <label>Title</label> <input type="text"
-                              class="metro-input" th:field="*{title}" />
-                        </div>
-
-                        <div class="colspan-7 offset-1"
-                           style="margin-top: 10px; margin-bottom: 10px;">
-                           <label>Mapped to Site Url</label> <input
-                              type="text" class="metro-input"
-                              th:field="*{url}" />
-                        </div>
-
-                        <div class="colspan-7 offset-1"
-                           style="margin-top: 10px; margin-bottom: 10px;">
-                           <label>Parameter Description</label> <input
-                              type="text" class="metro-input"
-                              th:field="*{paramdesc}" />
-                        </div>
-
+                        <input type="hidden" th:field="*{fpid}" />
 
                         <div class="colspan-7 offset-1"
                            style="margin-top: 5px; margin-bottom: 10px">
-                           <label>Parameters List Bean</label> <select
-                              data-role="select" name="paramslistbean"
-                              th:field="*{paramslistbean}"
+                           <label> Sector Name</label> <select
+                              data-role="select" name="sector"
+                              th:field="*{sector}"
                               data-add-empty-value="true" class="input">
-                              <!-- Param List Beans -->
-                              <option th:each="name : ${paramBeanNames}"
-                                 th:value="${name}"
-                                 th:selected="${name}" th:text="${name}"></option>
+                              <!-- Sectors list to be pushed via Model -->
+                              <option th:each="sector : ${sectors}"
+                                 th:value="${sector}"
+                                 th:selected="${sector}"
+                                 th:text="${sector}"></option>
                            </select>
                         </div>
 
                         <div class="colspan-7 offset-1"
                            style="margin-top: 10px; margin-bottom: 10px;">
-                           <input type="checkbox" data-role="switch"
-                              th:field="*{isadmin}"
-                              data-caption="Is Admin Url?">
+                           <label>Entity Name - Fully Qualified</label>
+                           <input type="text" class="metro-input"
+                              th:field="*{fPoolEntityQName}" /> <small
+                              class="text-muted">Copy the Fully
+                              Qualified Field Pool Entity Class. e.g.
+                              "stocktales.dataBook.model.entity.FPFinancialSector"</small>
                         </div>
+
+                        <div class="colspan-7 offset-1"
+                           style="margin-top: 10px; margin-bottom: 10px;">
+                           <label>Service Bean Name - Fully
+                              Qualified</label> <input type="text"
+                              class="metro-input" th:field="*{srvbean}" />
+                           <small class="text-muted">Copy the
+                              Sector Specific Field Pool Service Bean
+                              Name. e.g. "FPFinancialSectorSrv"</small>
+                        </div>
+
+
+
+
 
 
                         <div class="colspan-1 offset-10"
@@ -116,7 +113,7 @@
                               data-role="hint"
                               data-hint-position="bottom"
                               data-cls-hint="bg-LightGreen fg-black"
-                              data-hint-text="Save Site Path">
+                              data-hint-text="Save Configuration">
                               <span class="mif-floppy-disk"
                                  style="margin-left: 0px"> </span> <span
                                  style="margin-left: 3px">Save</span>

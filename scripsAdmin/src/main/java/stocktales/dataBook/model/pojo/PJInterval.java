@@ -3,6 +3,7 @@ package stocktales.dataBook.model.pojo;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 
 import lombok.AllArgsConstructor;
@@ -27,5 +28,9 @@ public class PJInterval
 	
 	@Column
 	private int vald; //Details Value e.g. 3 - for Quarter 3
+	
+	@Column
+	@Lob
+	private String notes; //Notes for Any Comments for Particular Interval
 	
 }

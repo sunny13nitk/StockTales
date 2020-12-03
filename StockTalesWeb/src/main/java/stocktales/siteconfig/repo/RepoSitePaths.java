@@ -13,4 +13,8 @@ public interface RepoSitePaths extends JpaRepository<SitePaths, Integer>
 	public Optional<SitePaths> findByTitleIgnoreCase(
 	        String title
 	);
+	
+	public Optional<SitePaths> findByUrlIgnoreCase(
+	        String title
+	);
 }
