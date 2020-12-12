@@ -12,5 +12,7 @@ import lombok.Setter;
 public class IdNotes
 {
 	private long   id;
+	private String sector;
 	private String notes;
+	
 }

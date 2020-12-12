@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import stocktales.dataBook.config.entity.CfgSectorsFieldsPool;
-import stocktales.dataBook.model.repo.RepoCfgSecFP;
+import stocktales.dataBook.model.repo.config.RepoCfgSecFP;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
 

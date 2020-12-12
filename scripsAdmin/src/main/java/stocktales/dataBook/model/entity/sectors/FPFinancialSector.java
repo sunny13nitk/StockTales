@@ -1,4 +1,4 @@
-package stocktales.dataBook.model.entity;
+package stocktales.dataBook.model.entity.sectors;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;

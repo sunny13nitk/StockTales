@@ -43,7 +43,7 @@
 
 
                         <a href="#" class="button alert rounded outline"
-                           th:href="@{/databook/scrip/secsp/new/{sectorId}/{scCode} (sectorId=${sector}, scCode=${scCode})}"
+                           th:href="@{/{sectorId}/newfp/{scCode} (sectorId=${sector}, scCode=${scCode})}"
                            role="button" data-role="hint"
                            data-hint-position="right"
                            data-cls-hint="bg-red fg-white"
@@ -127,6 +127,9 @@
                                                 <th
                                                    data-cls-column="text-center"></th>
 
+                                                <th
+                                                   data-cls-column="text-center"></th>
+
 
                                              </tr>
                                           </thead>
@@ -135,7 +138,7 @@
                                              th:each="qtrItem : ${QtrylList}">
                                              <td><a
                                                 style="font-weight: bold; font-size: large;"
-                                                th:href="@{/databook/scrip/fpdata/{sector}/{fpid} (sector=${sector}, fpid=${qtrItem.id})}"
+                                                th:href="@{/{sector}/{fpid} (sector=${sector}, fpid=${qtrItem.id})}"
                                                 th:text="${qtrItem.intervalText}">
                                              </a></td>
                                              <td><textarea
@@ -146,7 +149,7 @@
                                              <td
                                                 style="text-align: center;"><a
                                                 class="button rounded yellow"
-                                                th:href="@{/databook/scrip/fpdata/Notes/{fpid} (fpid=${qtrItem.id})}"
+                                                th:href="@{/{sector}/Notes/{fpid} (sector=${sector}, fpid=${qtrItem.id})}"
                                                 data-role="hint"
                                                 data-hint-position="top"
                                                 data-cls-hint="bg-LightGreen fg-black"
@@ -156,6 +159,22 @@
                                                 </span> <span
                                                    style="margin-left: 3px">Notes</span></a>
                                              </td>
+
+
+                                             <td
+                                                style="text-align: center;"><a
+                                                class="button rounded"
+                                                style="color: black; background: #c5e9fa"
+                                                th:href="@{/{scrip}/{interval}/{valM}/{valD}  (scrip=${scCode}, interval=${qtrItem.interval}, valM=${qtrItem.valm},valD=${qtrItem.vald} )}"
+                                                data-role="hint"
+                                                data-hint-position="top"
+                                                data-cls-hint="bg-LightGreen fg-black"
+                                                data-hint-text="View/Edit Scrip Sp. Data"><span
+                                                   class="mif-news"
+                                                   style="margin-left: 0px">
+                                                </span> <span
+                                                   style="margin-left: 3px">Scrip
+                                                      Sp. Data</span></a></td>
                                              <!--Buttons - OCA  -->
 
 
@@ -174,6 +193,7 @@
                                  <!-- Not Null Case- Ends -->
 
                               </div>
+
                               <!-- Qtrly Data Content - Ends -->
                            </div>
                         </div>
@@ -191,6 +211,115 @@
                                  </div>
                               </div>
                               <!-- Null Case- Ends -->
+
+                              <!-- Not Null Case- Starts -->
+                              <div th:if="${AnnualList.size() > 0}">
+
+                                 <div class="colspan-12 ">
+
+                                    <!-- Table Row - Starts  -->
+
+
+                                    <div class="row">
+                                       <!--   Here goes your table -->
+
+                                       <table
+                                          class="table striped compact table-border row-hover mt-4"
+                                          data-show-search="true"
+                                          data-table-search-title="Search By Interval :"
+                                          data-show-rows-steps="false"
+                                          id="t-inspector"
+                                          data-showPagination="false"
+                                          data-role="table"
+                                          data-search-min-length="1"
+                                          data-search-threshold="300"
+                                          data-search-fields="year, qtr"
+                                          data-horizontal-scroll="true"
+                                          data-rows="-1"
+                                          data-info-wrapper=".my-info-wrapper"
+                                          data-thousand-separator=","
+                                          data-pagination-wrapper=".my-pagination-wrapper">
+
+                                          <thead>
+                                             <tr>
+
+                                                <th data-name="year"
+                                                   data-cls-column="text-center">Period</th>
+                                                <th
+                                                   data-cls-column="text-center"
+                                                   data-size="1100">
+                                                   Notes</th>
+
+                                                <th
+                                                   data-cls-column="text-center"></th>
+
+                                                <th
+                                                   data-cls-column="text-center"></th>
+
+
+                                             </tr>
+                                          </thead>
+
+                                          <tr
+                                             th:each="annItem : ${AnnualList}">
+                                             <td><a
+                                                style="font-weight: bold; font-size: large;"
+                                                th:href="@{/{sector}/{fpid} (sector=${sector}, fpid=${annItem.id})}"
+                                                th:text="${annItem.intervalText}">
+                                             </a></td>
+                                             <td><textarea
+                                                   th:text="${annItem.notes}"
+                                                   data-auto-size="true"
+                                                   disabled="disabled"></textarea>
+                                             </td>
+                                             <td
+                                                style="text-align: center;"><a
+                                                class="button rounded yellow"
+                                                th:href="@{/{sector}/Notes/{fpid} (sector=${sector}, fpid=${annItem.id})}"
+                                                data-role="hint"
+                                                data-hint-position="top"
+                                                data-cls-hint="bg-LightGreen fg-black"
+                                                data-hint-text="View/Edit Notes"><span
+                                                   class="mif-clipboard"
+                                                   style="margin-left: 0px">
+                                                </span> <span
+                                                   style="margin-left: 3px">Notes</span></a>
+                                             </td>
+
+
+                                             <td
+                                                style="text-align: center;"><a
+                                                class="button rounded"
+                                                style="color: black; background: #c5e9fa"
+                                                th:href="@{/{scrip}/{interval}/{valM}/{valD}  (scrip=${scCode}, interval=${annItem.interval}, valM=${annItem.valm},valD=${annItem.vald} )}"
+                                                data-role="hint"
+                                                data-hint-position="top"
+                                                data-cls-hint="bg-LightGreen fg-black"
+                                                data-hint-text="View/Edit Scrip Sp. Data"><span
+                                                   class="mif-news"
+                                                   style="margin-left: 0px">
+                                                </span> <span
+                                                   style="margin-left: 3px">Scrip
+                                                      Sp. Data</span></a></td>
+                                             <!--Buttons - OCA  -->
+
+
+
+                                          </tr>
+
+                                       </table>
+
+
+                                    </div>
+
+                                    <!--Table Row - Ends  -->
+
+                                 </div>
+
+                                 <!-- Not Null Case- Ends -->
+
+                              </div>
+
                            </div>
                            <!-- Annual Data Content - Ends -->
                         </div>

@@ -1,5 +1,5 @@
 package stocktales.dataBook.enums;
 
 public enum EnumInterval {
-	Quarterly, Annual
+	Quarterly, Annual, NA
 }

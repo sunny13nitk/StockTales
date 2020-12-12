@@ -9,6 +9,12 @@ public interface IFieldPoolShortSimple
 	Long getId(
 	);
 	
+	Integer getValm(
+	);
+	
+	Integer getVald(
+	);
+	
 	EnumInterval getInterval(
 	);
 	

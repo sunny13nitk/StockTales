@@ -24,4 +24,8 @@ public interface ScripService
 	
 	public List<SC_EDRC_Summary> getEDRCSummaryforAll(
 	);
+	
+	public String getSectorforScrip(
+	        String scCode
+	);
 }

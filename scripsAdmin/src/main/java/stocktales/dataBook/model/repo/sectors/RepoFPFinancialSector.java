@@ -1,4 +1,4 @@
-package stocktales.dataBook.model.repo;
+package stocktales.dataBook.model.repo.sectors;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import stocktales.dataBook.enums.EnumInterval;
 import stocktales.dataBook.fpSrv.interfaces.IFieldPoolsShortData;
-import stocktales.dataBook.model.entity.FPFinancialSector;
+import stocktales.dataBook.model.entity.sectors.FPFinancialSector;
 import stocktales.dataBook.model.repo.repoIntf.IFieldPoolShort;
 
 @Repository

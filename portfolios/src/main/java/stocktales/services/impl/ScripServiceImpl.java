@@ -120,4 +120,18 @@ public class ScripServiceImpl implements ScripService
 		return edrcFacSrv.getEDRCforSCripsList(scrips);
 	}
 	
+	public String getSectorforScrip(
+	        String scCode
+	)
+	{
+		String sector = null;
+		
+		EN_SC_GeneralQ scGenQ = this.getScripHeader(scCode);
+		if (scGenQ != null)
+		{
+			sector = scGenQ.getSector();
+		}
+		
+		return sector;
+	}
 }

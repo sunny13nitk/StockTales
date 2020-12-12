@@ -1,4 +1,4 @@
-package stocktales.dataBook.model.repo;
+package stocktales.dataBook.model.repo.config;
 
 import java.util.Optional;
 

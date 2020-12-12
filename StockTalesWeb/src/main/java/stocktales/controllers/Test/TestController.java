@@ -1,5 +1,6 @@
-package stocktales.controllers;
+package stocktales.controllers.Test;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
@@ -21,6 +24,13 @@ import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.S
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
+import stocktales.controllers.Test.entity.MultiTest;
+import stocktales.controllers.Test.pojo.TestMulti;
+import stocktales.controllers.Test.repo.RepoMultiTest;
+import stocktales.dataBook.helperPojo.scjournal.dbproc.NumandLastEntry;
+import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.PlaceHolderLong;
+import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.ScJSummary;
+import stocktales.dataBook.model.repo.scjournal.RepoScJournal;
 import stocktales.helperPOJO.ScValFormPOJO;
 import stocktales.predicates.manager.PredicateManager;
 import stocktales.repository.SC10YearRepository;
@@ -58,6 +68,12 @@ public class TestController
 	
 	@Autowired
 	private IStgyRebalanceSrv stgyRblSrv;
+	
+	@Autowired
+	private RepoMultiTest repoMultiTest;
+	
+	@Autowired
+	private RepoScJournal repoSCJ;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -276,4 +292,155 @@ public class TestController
 		return "success";
 	}
 	
+	@GetMapping("/multi")
+	public String showTestMulti(
+	        Model model
+	)
+	{
+		model.addAttribute("multipojo", new TestMulti());
+		return "test/testMulti";
+	}
+	
+	@PostMapping("/multi")
+	public String handlePostMulti(
+	        @ModelAttribute("multipojo") TestMulti multiPojo, Model model
+	)
+	{
+		if (multiPojo != null)
+		{
+			System.out.println(multiPojo.getTag());
+			System.out.println(multiPojo.getOthertag());
+			System.out.println(multiPojo.getCatg());
+			
+			//--Persist in DB
+			MultiTest multitest = new MultiTest();
+			multitest.setCatg(multiPojo.getCatg());
+			
+			if (multiPojo.getOthertag() != null)
+			{
+				multitest.setTag(multiPojo.getTag() + ',' + multiPojo.getOthertag());
+			} else
+			{
+				multitest.setTag(multiPojo.getTag());
+			}
+			repoMultiTest.save(multitest);
+		}
+		return "success";
+	}
+	
+	@GetMapping("/multi/tag/{tagtext}")
+	public String scanTestMulti(
+	        @PathVariable("tagtext") String tagtext, Model model
+	)
+	{
+		if (tagtext != null)
+		{
+			if (tagtext.trim().length() > 0)
+			{
+				List<MultiTest> list = repoMultiTest.findAllByTagContainingIgnoreCase(tagtext);
+				for (MultiTest multiTest : list)
+				{
+					System.out.println(multiTest.getTag());
+					
+					System.out.println(multiTest.getCatg());
+				}
+			}
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/dq/{scCode}")
+	public String testdqbyScrip(
+	        @PathVariable String scCode
+	
+	)
+	{
+		
+		if (repoSCJ != null)
+		{
+			List<Object[]> vals = repoSCJ.findByAsArray("BAJFINANCE");
+			if (vals != null)
+			{
+				if (vals.size() > 0)
+				{
+					
+					NumandLastEntry snippet = new NumandLastEntry();
+					snippet.setLastEntryDate((Date) vals.get(0)[0]);
+					snippet.setNumEntries((Long) vals.get(0)[1]);
+					
+					System.out.println("Total Entries - " + snippet.getNumEntries() + " & Last Entry On -  "
+					        + snippet.getLastEntryDate());
+				}
+			}
+		}
+		return "success";
+	}
+	
+	@GetMapping("/dqGCatg/{scCode}")
+	public String testdqGbyScrip(
+	        @PathVariable String scCode
+	
+	)
+	{
+		
+		if (repoSCJ != null)
+		{
+			List<PlaceHolderLong> vals = repoSCJ.countEntriesByCategory("BAJFINANCE");
+			if (vals != null)
+			{
+				if (vals.size() > 0)
+				{
+					for (PlaceHolderLong placeHolderLong : vals)
+					{
+						System.out.println(
+						        placeHolderLong.getPlaceholder() + " : Entries - " + placeHolderLong.getNumEntries());
+						;
+					}
+				}
+			}
+		}
+		return "success";
+	}
+	
+	@GetMapping("/dqGTag/{scCode}")
+	public String testdqGTbyScrip(
+	        @PathVariable String scCode
+	
+	)
+	{
+		
+		if (repoSCJ != null)
+		{
+			
+		}
+		return "success";
+	}
+	
+	@GetMapping("/dq_Summary/{scCode}")
+	public String testdqSummarybyScrip(
+	        @PathVariable String scCode
+	
+	)
+	{
+		
+		List<ScJSummary> vals = repoSCJ.getSummaryByScCode("BAJFINANCE");
+		if (vals != null)
+		{
+			if (vals.size() > 0)
+			{
+				for (ScJSummary summ : vals)
+				{
+					System.out.println("Categories:" + summ.getNumCatgs());
+					System.out.println("Sources:" + summ.getNumSources());
+					System.out.println("Effects:" + summ.getNumEffects());
+					System.out.println("Tags:" + summ.getNumTags());
+					
+				}
+			}
+		}
+		
+		return "success";
+		
+	}
 }

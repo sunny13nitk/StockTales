@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import stocktales.dataBook.config.entity.CfgScripsFieldsPool;
-import stocktales.dataBook.model.repo.RepoCfgScripFP;
+import stocktales.dataBook.model.repo.config.RepoCfgScripFP;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.services.interfaces.ScripService;
 

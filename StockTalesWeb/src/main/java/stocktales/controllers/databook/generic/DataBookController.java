@@ -1,4 +1,4 @@
-package stocktales.controllers;
+package stocktales.controllers.databook.generic;
 
 import java.util.Optional;
 
@@ -19,14 +19,11 @@ import stocktales.dataBook.enums.EnumInterval;
 import stocktales.dataBook.fpSrv.interfaces.IScripSpFieldPoolSrv;
 import stocktales.dataBook.fpSrv.interfaces.ISecSpFieldPoolSrv;
 import stocktales.dataBook.helperPojo.IdNotes;
-import stocktales.dataBook.model.entity.FPFinancialSector;
-import stocktales.dataBook.model.repo.RepoCfgScripFP;
-import stocktales.dataBook.model.repo.RepoCfgSecFP;
-import stocktales.dataBook.model.repo.RepoFPFinancialSector;
-import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
-import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
-import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
-import stocktales.utilities.DurationUtilities;
+import stocktales.dataBook.model.entity.sectors.FPFinancialSector;
+import stocktales.dataBook.model.repo.config.RepoCfgScripFP;
+import stocktales.dataBook.model.repo.config.RepoCfgSecFP;
+import stocktales.dataBook.model.repo.sectors.RepoFPFinancialSector;
+import stocktales.services.interfaces.ScripService;
 
 /*
  * -----------------  DATA BOOK CONTROLLER FOR SCRIP DATA MAINTAINENCE  --------------
@@ -36,7 +33,7 @@ import stocktales.utilities.DurationUtilities;
 public class DataBookController
 {
 	@Autowired
-	private ISCExistsDB_Srv       scExSrv;
+	private ScripService          scSrv;
 	@Autowired
 	private RepoCfgSecFP          repocfgsecFP;
 	@Autowired
@@ -56,20 +53,9 @@ public class DataBookController
 		
 		String sector = null;
 		//Get Sector from Scrip Code
-		if (scExSrv != null)
+		if (scSrv != null)
 		{
-			try
-			{
-				EN_SC_GeneralQ entSc = scExSrv.Get_ScripExisting_DB(scCode);
-				if (entSc != null)
-				{
-					sector = entSc.getSector();
-				}
-			} catch (EX_General e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			sector = scSrv.getSectorforScrip(scCode);
 		}
 		
 		//Get the BeanSrv for Scrip Sector
@@ -116,6 +102,7 @@ public class DataBookController
 	)
 	{
 		String desurl = null;
+		String sector = null;
 		
 		//Get the BeanSrv for Scrip Sector
 		if (scCode != null)
@@ -135,8 +122,13 @@ public class DataBookController
 					 * Scrip Code, List<Annual & Quarterly>
 					 */
 					
-					model.addAttribute("scCode", scCode);
+					if (scSrv != null)
+					{
+						sector = scSrv.getSectorforScrip(scCode);
+					}
 					
+					model.addAttribute("scCode", scCode);
+					model.addAttribute("sector", sector);
 					model.addAttribute("AnnualList", fpSrv.findAllByInterval(EnumInterval.Annual));
 					model.addAttribute("QtrylList", fpSrv.findAllByInterval(EnumInterval.Quarterly));
 					
@@ -166,42 +158,7 @@ public class DataBookController
 		return "scrips/dataBook/secSpFPoolDataList";
 	}
 	
-	@GetMapping("/fpdata/Notes/{fpid}")
-	public String showNotes(
-	        @PathVariable("fpid") String fpid, Model model
-	)
-	{
-		if (fpid != null)
-		{
-			Optional<FPFinancialSector> fpDataO = repoFPFinancials.findById(new Long(fpid));
-			if (fpDataO.isPresent())
-			{
-				model.addAttribute("scCode", fpDataO.get().getSccode());
-				
-				if (fpDataO.get().getVald() > 0)
-				{
-					model.addAttribute("interval", fpDataO.get().getValm() + "-Q" + fpDataO.get().getVald());
-				} else
-				{
-					model.addAttribute("interval", fpDataO.get().getValm());
-				}
-				
-				IdNotes idNotes = new IdNotes(fpDataO.get().getId(), fpDataO.get().getNotes());
-				model.addAttribute("idNotes", idNotes);
-			}
-			
-			///Populate IdNotes POJO and navigate
-		}
-		
-		return "scrips/dataBook/NotesPanel_SS_FP";
-	}
-	
-	/*
-	 * -------------------- POST MAPPINGS -------------------------------------------------
-	 * 
-	 */
-	
-	@PostMapping("/sspfp/Notes")
+	@PostMapping("/Notes")
 	public String savesecSpFpNotes(
 	        @ModelAttribute("idNotes") IdNotes idNotes
 	)
@@ -209,74 +166,34 @@ public class DataBookController
 		FPFinancialSector fpData = null;
 		if (idNotes != null)
 		{
-			Optional<FPFinancialSector> fpDataO = repoFPFinancials.findById(new Long(idNotes.getId()));
-			if (fpDataO.isPresent())
+			if (idNotes.getSector() != null)
 			{
-				fpData = fpDataO.get();
-				//REset Notes
-				fpData.setNotes(idNotes.getNotes());
-				//Save the Entity
-				repoFPFinancials.save(fpData);
 				
+				switch (idNotes.getSector())
+				{
+					case "Financials":
+						
+						Optional<FPFinancialSector> fpDataO = repoFPFinancials.findById(new Long(idNotes.getId()));
+						if (fpDataO.isPresent())
+						{
+							fpData = fpDataO.get();
+							//REset Notes
+							fpData.setNotes(idNotes.getNotes());
+							//Save the Entity
+							repoFPFinancials.save(fpData);
+							
+						}
+						break;
+					
+					default:
+						break;
+				}
 			}
+			
 		}
 		
 		//REdirect to List for Specific Scrip 
 		return "redirect:/databook/scrip/secsp/" + fpData.getSccode();
-	}
-	
-	/*
-	 * -----------------------------------------------------------------------------
-	 *   -------------        FINANCIAL SECTOR FIELD POOL     ----------------------
-	 * -----------------------------------------------------------------------------
-	 */
-	@GetMapping("/secsp/new/Financials/{scCode}")
-	public String createFinSecFPool(
-	        @PathVariable("scCode") String scCode, Model model
-	)
-	{
-		if (scCode != null)
-		{
-			FPFinancialSector newfPool = new FPFinancialSector();
-			newfPool.setSccode(scCode);
-			model.addAttribute("fpdata", newfPool);
-			model.addAttribute("years", DurationUtilities.getYearsList(-5));
-		}
-		
-		return "scrips/dataBook/sectors/Financials";
-	}
-	
-	@GetMapping("/fpdata/Financials/{fpid}")
-	public String showFinancialsfpoolData(
-	        @PathVariable("fpid") String fpid, Model model
-	)
-	{
-		model.addAttribute("fpdata", repoFPFinancials.findById(new Long(fpid)));
-		model.addAttribute("years", DurationUtilities.getYearsList(-5));
-		return "scrips/dataBook/sectors/Financials";
-	}
-	
-	/**
-	 * ________________________________________________________________________
-	 *                       POST MAPPINGS
-	 * ________________________________________________________________________
-	 */
-	
-	@PostMapping("/sspfp/financials")
-	public String savesecSpFpData(
-	        @ModelAttribute("fpdata") FPFinancialSector fpData
-	)
-	{
-		if (fpData != null)
-		{
-			if (fpData.getSccode() != null)
-			{
-				repoFPFinancials.save(fpData);
-			}
-		}
-		//REdirect to List for Specific Scrip - /secSpData/{scCode}/list
-		return "redirect:/databook/scrip/secsp/" + fpData.getSccode();
-		
 	}
 	
 }

@@ -12,6 +12,12 @@ public interface IFieldPoolShort
 	EnumInterval getInterval(
 	);
 	
+	Integer getValm(
+	);
+	
+	Integer getVald(
+	);
+	
 	@Value("#{target.valm + '- Q' + target.vald}")
 	String getIntervalText(
 	);

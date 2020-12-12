@@ -45,8 +45,7 @@
                   <!-- Form - Starts -->
 
                   <form th:object="${fpdata}"
-                     th:action="@{'/databook/scrip/sspfp/financials'} "
-                     method="post">
+                     th:action="@{'/Financials/save'} " method="post">
 
                      <!--Hidden fieldPoolId & Scrip Code field to be passed on to   -->
                      <input type="hidden" th:field="*{id}" /> <input

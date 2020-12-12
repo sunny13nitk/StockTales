@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 
 import stocktales.dataBook.enums.EnumInterval;
 import stocktales.dataBook.fpSrv.interfaces.ISecSpFieldPoolSrv;
-import stocktales.dataBook.model.entity.FPFinancialSector;
+import stocktales.dataBook.model.entity.sectors.FPFinancialSector;
 import stocktales.dataBook.model.pojo.PJIntervalSimple;
-import stocktales.dataBook.model.repo.RepoFPFinancialSector;
 import stocktales.dataBook.model.repo.repoIntf.IFieldPoolShort;
+import stocktales.dataBook.model.repo.sectors.RepoFPFinancialSector;
 
 @Service("FPFinancialSectorSrv")
 public class FPFinancialSectorSrv implements ISecSpFieldPoolSrv<FPFinancialSector>

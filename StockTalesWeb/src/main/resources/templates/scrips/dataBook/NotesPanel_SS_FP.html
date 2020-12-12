@@ -79,7 +79,7 @@
          <!-- Form - Starts -->
 
          <form th:object="${idNotes}"
-            th:action="@{'/databook/scrip/sspfp/Notes'}" method="post">
+            th:action="@{/databook/scrip/Notes}" method="post">
 
             <div class="d-flex flex-row-r">
                <button class="button rounded yellow" data-role="hint"
@@ -93,7 +93,8 @@
             </div>
 
             <!--Hidden fieldPoolId & Scrip Code field to be passed on to   -->
-            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{id}" /> <input
+               type="hidden" th:field="*{sector}" />
 
             <div class="col-md-12 form-group">
                <p class="fg-mauve" id="chars-counter">Length- 0
