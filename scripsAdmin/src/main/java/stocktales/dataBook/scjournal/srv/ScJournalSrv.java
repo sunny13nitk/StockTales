@@ -242,4 +242,22 @@ public class ScJournalSrv implements IScJournalSrv
 		return tagDetails;
 	}
 	
+	@Override
+	public List<String> getUniqueCatgsforJournals(
+	        List<ScripJournal> je
+	)
+	{
+		List<String> catgs = null;
+		
+		if (je != null)
+		{
+			if (je.size() > 0)
+			{
+				catgs = je.stream().map(x -> x.getCategory()).distinct().collect(Collectors.toList());
+			}
+		}
+		
+		return catgs;
+	}
+	
 }

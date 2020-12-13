@@ -44,4 +44,8 @@ public interface IScJournalSrv
 	public List<PlaceHolderLongPJ> getTagDetailsOvw(
 	        String scCode
 	);
+	
+	public List<String> getUniqueCatgsforJournals(
+	        List<ScripJournal> je
+	);
 }

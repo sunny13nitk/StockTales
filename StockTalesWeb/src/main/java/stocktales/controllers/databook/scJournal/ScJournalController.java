@@ -3,6 +3,7 @@ package stocktales.controllers.databook.scJournal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.SCJImage;
+import stocktales.dataBook.model.entity.scjournal.ScripJournal;
 import stocktales.dataBook.model.pojo.ScripJournalPoJo;
 import stocktales.dataBook.model.repo.scjournal.RepoScJournal;
 import stocktales.dataBook.scjournal.intf.IScJournalSrv;
@@ -91,6 +94,35 @@ public class ScJournalController
 		}
 	}
 	
+	@GetMapping("/image/{jeid}")
+	public void showImageforJournal(
+	        @PathVariable("jeid") String jeid, HttpServletResponse response
+	) throws IOException
+	{
+		if (jeid != null)
+		{
+			SCJImage img = repoScJ.getImageforJournalId(new Long(jeid));
+			if (img != null)
+			{
+				byte[] byteArray = new byte[img.getImage().length];
+				int    i         = 0;
+				
+				for (Byte wrappedByte : img.getImage())
+				{
+					byteArray[i++] = wrappedByte; //auto unboxing
+				}
+				
+				//Images
+				response.setContentType("image/jpeg");
+				
+				InputStream is = new ByteArrayInputStream(byteArray);
+				IOUtils.copy(is, response.getOutputStream());
+				
+			}
+		}
+		
+	}
+	
 	@GetMapping("/upload")
 	public String uploadScrip(
 	
@@ -116,6 +148,26 @@ public class ScJournalController
 		}
 		
 		return "scrips/dataBook/scJournal/scJOvw";
+	}
+	
+	@GetMapping("/details/{scCode}")
+	public String showJournalDetailsByScCode(
+	        @PathVariable("scCode") String scCode, Model model
+	)
+	{
+		if (scCode != null)
+		{
+			List<ScripJournal> je = repoScJ.findAllBySccodeOrderByDateofentryDesc(scCode);
+			if (je != null)
+			{
+				model.addAttribute("scCode", scCode);
+				model.addAttribute("snippet", scJSrv.getQStats_New_ByScrip(scCode));
+				model.addAttribute("jeList", je);
+				model.addAttribute("catgs", scJSrv.getUniqueCatgsforJournals(je));
+			}
+		}
+		
+		return "scrips/dataBook/scJournal/detailsScJournal";
 	}
 	
 	/*

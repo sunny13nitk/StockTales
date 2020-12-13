@@ -12,6 +12,7 @@ import stocktales.dataBook.enums.EnumInterval;
 import stocktales.dataBook.enums.EnumSource;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.PlaceHolderLong;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.SCJID;
+import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.SCJImage;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.ScJSummary;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.Tag;
 import stocktales.dataBook.model.entity.scjournal.ScripJournal;
@@ -100,6 +101,11 @@ public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
 	//Only Scrip Journals ID list for a Scrip Code and a Tag Containing
 	public List<SCJID> findAllBySccodeAndTagContaining(
 	        String scCode, String tagtext
+	);
+	
+	@Query("select s.image as image from ScripJournal s WHERE s.id = ?1")
+	public SCJImage getImageforJournalId(
+	        long id
 	);
 	
 }

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<div th:replace="fragments/header :: STHeader"></div>
+
+</head>
+<body>
+
+   <div class="grid" style="margin: 20px">
+
+      <!-- Top Row - Starts -->
+      <div class="row">
+
+         <div class="colspan-2" style="margin-top: -10px">
+            <h5 style="margin-left: 40px;">
+               <img th:src="@{/images/dice.png}"
+                  src="../../static/images/dice.png" width="40"
+                  height="40"
+                  style="margin-left: 5px; margin-right: 10px">
+               Stock Tales
+            </h5>
+
+         </div>
+         <!--ICOn - Ends -->
+
+         <!-- Text -->
+         <div class="colspan-6 offset-1">
+
+            <h4 style="font-weight: medium; color: #4465a1">
+               Journal Log for - <span style="color: #B1365B"
+                  th:text="${scCode}"></span>
+            </h4>
+
+
+
+            <blockquote class="right-side">
+               <h6 style="color: #000058">
+
+                  <span th:text="${snippet.lastEntryDate}"></span> <small><cite>
+                        <span style="color: black">Last Update</span>
+                  </cite> </small> <span th:text="${snippet.numEntries}"></span> <small><cite>
+                        <span style="color: black">Entries</span>
+                  </cite> </small>
+
+               </h6>
+            </blockquote>
+
+
+         </div>
+         <!-- Text  -->
+
+         <!--Buttons - Start  -->
+         <div class="colspan-2">
+
+            <div class="multi-action">
+               <button
+                  class="action-button rotate-minus bg-red fg-white"
+                  onclick="$(this).toggleClass('active')"
+                  data-role="hint"
+                  data-hint-text="Click to View Actions"
+                  data-cls-hint="bg-red fg-white drop-shadow"
+                  data-hint-position="top">
+                  <span class="icon"><span class="mif-plus"></span></span>
+               </button>
+               <ul class="actions drop-right">
+
+
+                  <li class="bg-orange"><a th:href="@{/}"
+                     data-role="hint" data-hint-text="Home"
+                     data-cls-hint="bg-orange fg-white drop-shadow"
+                     data-hint-position="bottom"><span
+                        class="mif-home"></span></a></li>
+
+
+                  <li class="bg-blue"><a
+                     th:href="@{/scJournal/ovw/{scCode}(scCode=${scCode})}"
+                     data-role="hint" data-hint-text="Journal Overview"
+                     data-cls-hint="bg-cyan fg-white drop-shadow"
+                     data-hint-position="bottom"><span
+                        class="mif-satellite"></span></a></li>
+
+                  <li class="bg-steel"><a
+                     th:href="@{/scJournal/new/{scCode}(scCode=${scCode})}"
+                     data-role="hint" data-hint-text="Add Journal Entry"
+                     data-cls-hint="bg-steel fg-white drop-shadow"
+                     data-hint-position="bottom"><span
+                        class="mif-note-add"></span></a></li>
+
+
+               </ul>
+            </div>
+
+         </div>
+
+         <!--Buttons - End -->
+
+
+
+
+      </div>
+      <!-- Top Row - Ends -->
+
+
+      <!-- Content Row - Starts -->
+
+      <div class="row" style="padding: 5px">
+
+         <div class="colspan-12" th:if="${catgs != null}">
+
+
+            <div th:each="catg : ${catgs}">
+
+               <!--Category Heading - Starts  -->
+               <h1
+                  style="font-weight: medium; margin-left: 50px; color: #4465a1"
+                  th:text="${catg}"></h1>
+               <!--Category Heading - Ends  -->
+
+               <!-- Journals Iterations - Begin -->
+               <div th:each="je: ${jeList}">
+
+                  <!-- Journal Category Matched to Current Category -->
+                  <div th:if="${je.category == catg }">
+
+                     <!-- Tag - Begins -->
+
+
+                     <div style="margin-left: 90px; margin-right: 50px"
+                        th:if="${je.effect == T(stocktales.dataBook.enums.EnumEffect).Positive}">
+
+                        <h6 class="text-upper"
+                           style="color: #62920d; background-color: #edfad7; padding: 15px; padding-left: 20px">
+                           <span
+                              style="color: #3D0D92; margin-left: 10px"
+                              class="mif-tags"></span> <strong
+                              style="margin-left: 10px"
+                              th:text="${je.tag}"> </strong>
+                        </h6>
+
+                        <!-- Interval Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.valm > 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} + ' : '"></span> <span
+                                 th:if="${je.vald > 0 }"
+                                 th:text="'Q' + ${je.vald} + '-'"></span>
+                              <span th:text="${je.valm}"></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <blockquote class="right-side"
+                           th:if="${je.valm == 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} "></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <!-- Interval Block Quote - Ends -->
+
+
+
+                        <!-- Image container - Starts -->
+                        <div th:if="${je.image != null}">
+                           <div
+                              class="img-container rounded drop-shadow">
+                              <img
+                                 th:src="@{/scJournal/image/{jeid} (jeid=${je.id})}">
+                           </div>
+
+                        </div>
+
+                        <!-- Image container - Ends -->
+
+                        <!-- Notes- Starts -->
+                        <div th:if="${je.notes != null}" class="card">
+
+                           <h4>
+                              <p class='indent-letter'
+                                 th:text="${je.notes}"></p>
+
+                           </h4>
+
+                        </div>
+
+                        <!-- Notes- Ends -->
+
+
+                        <!-- Updated On Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.dateofentry != null}">
+                           <small><cite> <span
+                                 style="color: #546E7A">Updated :
+                              </span> <span style="color: #546E7A"
+                                 th:text="${je.dateofentry}"> </span>
+                           </cite> </small>
+                        </blockquote>
+
+                        <!-- Updated On Block Quote - Ends -->
+
+                     </div>
+
+                     <div style="margin-left: 90px; margin-right: 50px"
+                        th:if="${je.effect == T(stocktales.dataBook.enums.EnumEffect).Monitor}">
+
+                        <h6 class="text-upper"
+                           style="color: #f86a4b; background-color: #ffe3dd; padding: 15px; padding-left: 20px">
+                           <span
+                              style="color: #09b1d5; margin-left: 10px"
+                              class="mif-tags"></span> <strong
+                              style="margin-left: 10px"
+                              th:text="${je.tag}"> </strong>
+                        </h6>
+
+                        <!-- Interval Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.valm > 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} + ' : '"></span> <span
+                                 th:if="${je.vald > 0 }"
+                                 th:text="'Q' + ${je.vald} + '-'"></span>
+                              <span th:text="${je.valm}"></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <blockquote class="right-side"
+                           th:if="${je.valm == 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} "></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <!-- Interval Block Quote - Ends -->
+
+
+
+                        <!-- Image container - Starts -->
+                        <div th:if="${je.image != null}">
+                           <div
+                              class="img-container rounded drop-shadow">
+                              <img
+                                 th:src="@{/scJournal/image/{jeid} (jeid=${je.id})}">
+                           </div>
+
+                        </div>
+
+                        <!-- Image container - Ends -->
+
+                        <!-- Notes- Starts -->
+                        <div th:if="${je.notes != null}" class="card">
+
+                           <h4>
+                              <p class='indent-letter'
+                                 th:text="${je.notes}"></p>
+
+                           </h4>
+
+                        </div>
+
+                        <!-- Notes- Ends -->
+
+
+                        <!-- Updated On Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.dateofentry != null}">
+                           <small><cite> <span
+                                 style="color: #546E7A">Updated :
+                              </span> <span style="color: #546E7A"
+                                 th:text="${je.dateofentry}"> </span>
+                           </cite> </small>
+                        </blockquote>
+
+                        <!-- Updated On Block Quote - Ends -->
+                     </div>
+
+                     <div style="margin-left: 90px; margin-right: 50px"
+                        th:if="${je.effect == T(stocktales.dataBook.enums.EnumEffect).Information}">
+
+                        <h6 class="text-upper"
+                           style="color: #00558f; background-color: #e2f3fe; padding: 15px; padding-left: 20px">
+                           <span
+                              style="color: #8F3A00; margin-left: 10px"
+                              class="mif-tags"></span> <strong
+                              style="margin-left: 10px"
+                              th:text="${je.tag}"> </strong>
+                        </h6>
+
+                        <!-- Interval Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.valm > 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} + ' : '"></span> <span
+                                 th:if="${je.vald > 0 }"
+                                 th:text="'Q' + ${je.vald} + '-'"></span>
+                              <span th:text="${je.valm}"></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <blockquote class="right-side"
+                           th:if="${je.valm == 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} "></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <!-- Interval Block Quote - Ends -->
+
+
+
+                        <!-- Image container - Starts -->
+                        <div th:if="${je.image != null}">
+                           <div
+                              class="img-container rounded drop-shadow">
+                              <img
+                                 th:src="@{/scJournal/image/{jeid} (jeid=${je.id})}">
+                           </div>
+
+                        </div>
+
+                        <!-- Image container - Ends -->
+
+                        <!-- Notes- Starts -->
+                        <div th:if="${je.notes != null}" class="card">
+
+                           <h4>
+                              <p class='indent-letter'
+                                 th:text="${je.notes}"></p>
+
+                           </h4>
+
+                        </div>
+
+                        <!-- Notes- Ends -->
+
+
+                        <!-- Updated On Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.dateofentry != null}">
+                           <small><cite> <span
+                                 style="color: #546E7A">Updated :
+                              </span> <span style="color: #546E7A"
+                                 th:text="${je.dateofentry}"> </span>
+                           </cite> </small>
+                        </blockquote>
+
+                        <!-- Updated On Block Quote - Ends -->
+                     </div>
+
+                     <div style="margin-left: 90px; margin-right: 50px"
+                        th:if="${je.effect == T(stocktales.dataBook.enums.EnumEffect).Observation}">
+
+                        <h6 class="text-upper"
+                           style="color: #A7AA07; background-color: #fbfcc3; padding: 15px; padding-left: 20px">
+                           <span
+                              style="color: #0A07AA; margin-left: 10px"
+                              class="mif-tags"></span> <strong
+                              style="margin-left: 10px"
+                              th:text="${je.tag}"> </strong>
+                        </h6>
+
+                        <!-- Interval Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.valm > 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} + ' : '"></span> <span
+                                 th:if="${je.vald > 0 }"
+                                 th:text="'Q' + ${je.vald} + '-'"></span>
+                              <span th:text="${je.valm}"></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <blockquote class="right-side"
+                           th:if="${je.valm == 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} "></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <!-- Interval Block Quote - Ends -->
+
+
+
+                        <!-- Image container - Starts -->
+                        <div th:if="${je.image != null}">
+                           <div
+                              class="img-container rounded drop-shadow">
+                              <img
+                                 th:src="@{/scJournal/image/{jeid} (jeid=${je.id})}">
+                           </div>
+
+                        </div>
+
+                        <!-- Image container - Ends -->
+
+                        <!-- Notes- Starts -->
+                        <div th:if="${je.notes != null}" class="card">
+
+                           <h4>
+                              <p class='indent-letter'
+                                 th:text="${je.notes}"></p>
+
+                           </h4>
+
+                        </div>
+
+                        <!-- Notes- Ends -->
+
+
+                        <!-- Updated On Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.dateofentry != null}">
+                           <small><cite> <span
+                                 style="color: #546E7A">Updated :
+                              </span> <span style="color: #546E7A"
+                                 th:text="${je.dateofentry}"> </span>
+                           </cite> </small>
+                        </blockquote>
+
+                        <!-- Updated On Block Quote - Ends -->
+                     </div>
+
+                     <div style="margin-left: 90px; margin-right: 50px"
+                        th:if="${je.effect == T(stocktales.dataBook.enums.EnumEffect).Negative}">
+
+                        <h6 class="text-upper"
+                           style="color: white; background-color: #f52800; padding: 15px; padding-left: 20px">
+                           <span style="color: white; margin-left: 10px"
+                              class="mif-tags"></span> <strong
+                              style="margin-left: 10px"
+                              th:text="${je.tag}"> </strong>
+                        </h6>
+
+
+                        <!-- Interval Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.valm > 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} + ' : '"></span> <span
+                                 th:if="${je.vald > 0 }"
+                                 th:text="'Q' + ${je.vald} + '-'"></span>
+                              <span th:text="${je.valm}"></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <blockquote class="right-side"
+                           th:if="${je.valm == 0 }">
+                           <h6 style="color: #000058">
+                              <span style="color: #585800"
+                                 th:text=" ${catg} "></span>
+
+                           </h6>
+                        </blockquote>
+
+                        <!-- Interval Block Quote - Ends -->
+
+
+
+                        <!-- Image container - Starts -->
+                        <div th:if="${je.image != null}">
+                           <div
+                              class="img-container rounded drop-shadow">
+                              <img
+                                 th:src="@{/scJournal/image/{jeid} (jeid=${je.id})}">
+                           </div>
+
+                        </div>
+
+                        <!-- Image container - Ends -->
+
+                        <!-- Notes- Starts -->
+                        <div th:if="${je.notes != null}" class="card">
+
+                           <h4>
+                              <p class='indent-letter'
+                                 th:text="${je.notes}"></p>
+
+                           </h4>
+
+                        </div>
+
+                        <!-- Notes- Ends -->
+
+
+                        <!-- Updated On Block Quote - Starts -->
+                        <blockquote class="right-side"
+                           th:if="${je.dateofentry != null}">
+                           <small><cite> <span
+                                 style="color: #546E7A">Updated :
+                              </span> <span style="color: #546E7A"
+                                 th:text="${je.dateofentry}"> </span>
+                           </cite> </small>
+                        </blockquote>
+
+                        <!-- Updated On Block Quote - Ends -->
+                     </div>
+
+
+
+
+
+                     <!-- Tag- Ends -->
+                  </div>
+                  <!-- Journal Category Matched to Current Category - ENDS -->
+               </div>
+               <!-- Journals Iterations - End -->
+
+
+
+            </div>
+
+
+         </div>
+      </div>
+
+
+      <!-- Content Row - Ends -->
+
+   </div>
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+</html>
