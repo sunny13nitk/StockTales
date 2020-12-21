@@ -55,7 +55,7 @@
                         class="text-small"
                         th:text="${numLast.lastEntryDate}"></span> <a
                         href="#"
-                        th:href="@{/scJournal/ovw/{scCode} (scCode=${scJP.sccode})}"
+                        th:href="@{/scJournalM/ovw/{scCode} (scCode=${scJP.sccode})}"
                         class="text-small fg-white"
                         style="margin-left: 30px; align-content: flex-end;">
                         More info <span class="mif-arrow-right"></span>
@@ -93,8 +93,8 @@
 
             <!-- Form - Starts -->
 
-            <form th:object="${scJP}" th:action="@{'/scJournal/save'}"
-               method="post">
+            <form th:object="${scJP}"
+               th:action="@{/scJournalM/initialize}" method="post">
 
                <!-- Place for messages: error, alert etc ... -->
                <div class="form-group">
@@ -132,40 +132,17 @@
                <!--  Image & Notes Row Starts  -->
                <div class="mx-auto" data-role="panel"
                   style="margin-top: 5px"
-                  data-title-caption="Image and Notes"
-                  data-title-icon="<span class='mif-file-picture'></span>"
+                  data-title-caption="Select Category"
+                  data-title-icon="<span class='mif-reddit'></span>"
                   data-collapsible="true" data-cls-panel="shadow-3"
                   data-cls-title="bg-lightRed fg-white"
                   data-cls-title-icon="bg-white fg-red"
                   data-cls-collapse-toggle="bg-darkRed fg-white marker-light  ">
 
 
-                  <div th:if="${scJP.image != null}">
-                     <div class="img-container drop-shadow">
-                        <img th:src="@{'/scJournal/image'}">
-                     </div>
-
-                  </div>
-
-                  <div th:if="${scJP.image == null}"
-                     style="margin: 20px">
-
-                     <a href="#" class="button alert rounded outline"
-                        th:href="@{/scJournal/upload}" role="button"
-                        data-role="hint" data-hint-position="right"
-                        data-cls-hint=" fg-black"
-                        data-hint-text="Upload Image"> <span
-                        class="mif-add icon" style="margin-left: 0px"></span>
-                        <span style="margin-left: 3px">Upload
-                           Image</span>
 
 
-                     </a>
-
-                  </div>
-
-
-                  <!-- Tags Row- Starts -->
+                  <!-- Catg Row- Starts -->
 
                   <div class="row">
 
@@ -205,59 +182,8 @@
 
                   </div>
 
-                  <div class="row">
-                     <div class="cell-md-1">
-                        <h2 class="fg-grayMouse"
-                           style="margin: 10px; margin-top: 20px">1:n</h2>
-                     </div>
-
-                     <div class="cell-md-5" th:if="${tags != null}">
-                        <label class="fg-mauve"> Tag(s) - Choose
-                           From Current</label> <select name="tag"
-                           data-role="select" multiple th:field="*{tag}"
-                           data-cls-option="fg-grayMouse"
-                           data-cls-selected-item="bg-teal fg-white"
-                           data-cls-selected-item-remover="bg-darkTeal fg-white">
-
-
-                           <option th:each="tag : ${tags}"
-                              th:value="${tag}" th:selected="${tag}"
-                              th:text="${tag}"></option>
-
-                        </select>
-
-                     </div>
-
-                     <div class="cell-md-6">
-                        <label class="fg-mauve"><strong>OR/AND
-                        </strong> (Add New) Tag(s) - Tag your Observations </label> <span
-                           style="margin: 30px" class="text-small">
-                           Use <kbd>,</kbd> to add tags
-                        </span> <input type="text" data-role="taginput"
-                           th:field="*{tagOther}"
-                           data-random-color="true">
-
-
-                     </div>
-
-                     <div class="col-md-12 form-group">
-                        <p class="fg-mauve" id="chars-counter">Length-
-                           0 char(s)</p>
-                        <textarea data-role="textarea"
-                           data-auto-size="true"
-                           data-chars-counter="#chars-counter"
-                           style="width: 1300px; min-height: 500px"
-                           data-chars-counter-template="Length- $1 char(s)"
-                           th:field="*{notes}"></textarea>
-                     </div>
-
-
-                  </div>
-                  <!-- Tag Row - Ends -->
-
-
                </div>
-               <!--  Image & Notes Row Ends  -->
+               <!--  Catg Row Ends  -->
 
 
 
@@ -356,31 +282,6 @@
                   </div>
                   <!-- Interval Row - Ends -->
 
-
-                  <!-- URL Row- Starts -->
-                  <div class="row">
-                     <div style="margin: 5px">
-                        <p class="text-left text-upper bg-white fg-red">
-                           <strong><u>References</u></strong>
-                        </p>
-
-                     </div>
-                  </div>
-
-                  <div class="row">
-
-                     <div class="cell-md-11">
-                        <label class="fg-mauve">Maintain
-                           Reference URL - If Any</label> <input type="text"
-                           class="metro-input" th:field="*{url}" />
-                     </div>
-                  </div>
-                  <!-- URL Row - Ends -->
-
-
-
-
-
                </div>
 
                <!--Identification Row Ends -->
@@ -388,12 +289,13 @@
 
                <div class="d-flex flex-row-r"
                   style="margin-top: 30px; margin-bottom: 50px;">
-                  <button class="button rounded yellow" data-role="hint"
-                     data-hint-position="left" data-cls-hint="fg-black"
-                     data-hint-text="Save Journal entry">
-                     <span class="mif-floppy-disk"
-                        style="margin-left: 0px"> </span> <span
-                        style="margin-left: 3px">Save</span>
+                  <button class="button rounded"
+                     style="color: #004466; background: #00ffb3"
+                     data-role="hint" data-hint-position="left"
+                     data-cls-hint="fg-black"
+                     data-hint-text="Click Next to Proceed">
+                     <span class="mif-next" style="margin-left: 0px">
+                     </span> <span style="margin-left: 3px">Next</span>
                   </button>
 
                </div>

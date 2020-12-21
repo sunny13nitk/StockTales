@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import stocktales.dataBook.helperPojo.scjournal.dbproc.NumandLastEntry;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.PlaceHolderLongPJ;
+import stocktales.dataBook.helperPojo.scjournal.edit.ScJEdit;
 import stocktales.dataBook.model.entity.scjournal.ScripJournal;
 import stocktales.dataBook.model.pojo.PJIntervalSimple;
 import stocktales.dataBook.model.pojo.ScripJournalPoJo;
@@ -19,6 +20,9 @@ public interface IScJournalSrv
 	public ScripJournalPoJo getScJournal(
 	);
 	
+	public ScJEdit getScJEdit(
+	);
+	
 	public ScripJournalPoJo createNewJournalforScripandInterval(
 	        String scCode, PJIntervalSimple intervalPoJo
 	);
@@ -29,7 +33,7 @@ public interface IScJournalSrv
 	
 	public void refreshScJournal(
 	        ScripJournalPoJo scJP
-	);
+	) throws Exception;
 	
 	public ScripJournal saveJournal(
 	);
@@ -48,4 +52,16 @@ public interface IScJournalSrv
 	public List<String> getUniqueCatgsforJournals(
 	        List<ScripJournal> je
 	);
+	
+	public List<String> getUniqueTagsforscCode(
+	        String scCode
+	);
+	
+	public List<String> getUniqueCatgsforscCode(
+	        String scCode
+	);
+	
+	public void saveEditSCJ(
+	        ScJEdit scJEdit
+	) throws Exception;
 }

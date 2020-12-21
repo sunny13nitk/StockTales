@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.context.support.ResourceBundleMessageSource;
 
 import stocktales.basket.allocations.config.pojos.AllocationWeights;
 import stocktales.basket.allocations.config.pojos.DurationWeights;
@@ -21,7 +22,9 @@ import stocktales.basket.allocations.config.pojos.StrengthWeights;
 
 @Configuration
 @PropertySources(
-    { @PropertySource("classpath:weights.properties"), @PropertySource("classpath:application.properties") }
+    { @PropertySource("classpath:weights.properties"), @PropertySource(
+        "classpath:application.properties"
+    ), @PropertySource("classpath:messages.properties") }
 )
 public class PropertyConfig
 {
@@ -111,6 +114,18 @@ public class PropertyConfig
 		MCapAllocations mCapAlloc = new MCapAllocations(MCap, allocMax);
 		
 		return mCapAlloc;
+	}
+	
+	@Bean
+	public ResourceBundleMessageSource messageSource(
+	)
+	{
+		
+		ResourceBundleMessageSource source = new ResourceBundleMessageSource();
+		source.addBasenames("messages");
+		source.setUseCodeAsDefaultMessage(true);
+		
+		return source;
 	}
 	
 }

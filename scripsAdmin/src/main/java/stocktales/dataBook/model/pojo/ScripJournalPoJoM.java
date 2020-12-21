@@ -14,7 +14,7 @@ import stocktales.dataBook.enums.EnumSource;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ScripJournalPoJo extends PJInterval
+public class ScripJournalPoJoM extends PJIntervalSimple
 {
 	private String sccode;
 	
@@ -33,5 +33,4 @@ public class ScripJournalPoJo extends PJInterval
 	
 	private String url;
 	
-	private Byte[] image;
 }

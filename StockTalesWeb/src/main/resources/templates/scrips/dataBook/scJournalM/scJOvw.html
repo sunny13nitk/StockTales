@@ -88,7 +88,7 @@
                         </div>
 
                         <a href="#"
-                           th:href="@{/scJournal/details/{scCode}(scCode=${scCode})}"
+                           th:href="@{/scJournalM/details/{scCode}(scCode=${scCode})}"
                            class="more"> View Journal <span
                            class="mif-arrow-right"></span></a>
 
@@ -107,7 +107,7 @@
                      style="margin-top: 13px; margin-left: 50px">
                      <a href="#"
                         class="button alert cycle large outline "
-                        th:href="@{/scJournal/new/{scCode} (scCode=${scCode}) }"
+                        th:href="@{/scJournalM/new/{scCode} (scCode=${scCode}) }"
                         role="button" data-role="hint"
                         data-hint-position="top"
                         data-cls-hint="bg-yellow fg-black"
@@ -142,7 +142,7 @@
                         </div>
                         <ul class="skills">
                            <li th:each="category : ${catgClass}"><a
-                              th:href="@{/scJournal/detailsByCatg/{scCode}/{catg} ((scCode=${scCode}), catg=${category.placeholder})}"
+                              th:href="@{/scJournalM/detailsByCatg/{scCode}/{catg} ((scCode=${scCode}), catg=${category.placeholder})}"
                               data-role="hint"
                               data-hint-text="View Journal Entries."
                               data-cls-hint="bg-steel fg-white drop-shadow"
@@ -175,7 +175,7 @@
                         </div>
                         <ul class="skills">
                            <li th:each="tag : ${tagDetails}"><a
-                              th:href="@{/scJournal/detailsByTag/{scCode}/{tag} ((scCode=${scCode}), tag=${tag.placeholder})}"
+                              th:href="@{/scJournalM/detailsByTag/{scCode}/{tag} ((scCode=${scCode}), tag=${tag.placeholder})}"
                               data-role="hint"
                               data-hint-text="View Journal Entries."
                               data-cls-hint="bg-steel fg-white drop-shadow"
@@ -207,7 +207,7 @@
                         </div>
                         <ul class="skills">
                            <li th:each="source : ${srcClass}"><a
-                              th:href="@{/scJournal/detailsBySource/{scCode}/{source} ((scCode=${scCode}), source=${source.placeholder})}"
+                              th:href="@{/scJournalM/detailsBySource/{scCode}/{source} ((scCode=${scCode}), source=${source.placeholder})}"
                               data-role="hint"
                               data-hint-text="View Journal Entries."
                               data-cls-hint="bg-steel fg-white drop-shadow"
@@ -241,7 +241,7 @@
                         </div>
                         <ul class="skills">
                            <li th:each="effect : ${effectClass}"><a
-                              th:href="@{/scJournal/detailsByEffect/{scCode}/{effect} ((scCode=${scCode}), effect=${effect.placeholder})}"
+                              th:href="@{/scJournalM/detailsByEffect/{scCode}/{effect} ((scCode=${scCode}), effect=${effect.placeholder})}"
                               data-role="hint"
                               data-hint-text="View Journal Entries."
                               data-cls-hint="bg-steel fg-white drop-shadow"

@@ -1,4 +1,4 @@
-package stocktales.dataBook.model.repo.scjournal;
+package stocktales.dataBook.model.repo.scJournalM;
 
 import java.util.List;
 
@@ -12,48 +12,47 @@ import stocktales.dataBook.enums.EnumInterval;
 import stocktales.dataBook.enums.EnumSource;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.PlaceHolderLong;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.SCJID;
-import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.SCJImage;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.ScJSummary;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.Tag;
-import stocktales.dataBook.model.entity.scjournal.ScripJournal;
+import stocktales.dataBook.model.entity.scJournalM.ScripJournalM;
 
 @Repository
-public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
+public interface RepoScJournalM extends JpaRepository<ScripJournalM, Long>
 {
-	public List<ScripJournal> findAllBySccodeOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeOrderByDateofentryDesc(
 	        String scCode
 	);
 	
-	public List<ScripJournal> findAllBySccodeAndTagContainingOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeAndTagContainingOrderByDateofentryDesc(
 	        String scCode, String tagtext
 	);
 	
-	public List<ScripJournal> findAllBySccodeAndCategoryAndTagContainingOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeAndCategoryAndTagContainingOrderByDateofentryDesc(
 	        String scCode, EnumCategory category, String tagtext
 	);
 	
-	public List<ScripJournal> findAllBySccodeAndEffectOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeAndEffectOrderByDateofentryDesc(
 	        String scCode, EnumEffect effect
 	);
 	
-	public List<ScripJournal> findAllBySccodeAndCategoryOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeAndCategoryOrderByDateofentryDesc(
 	        String scCode, String category
 	);
 	
-	public List<ScripJournal> findAllBySccodeAndCategoryAndEffectAndTagContainingOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeAndCategoryAndEffectAndTagContainingOrderByDateofentryDesc(
 	        String scCode, EnumCategory category, EnumEffect effect, String tagtext
 	);
 	
-	public List<ScripJournal> findAllBySccodeAndIntervalAndValdAndValmAndCategoryOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeAndIntervalAndValdAndValmAndCategoryOrderByDateofentryDesc(
 	        String scCode, EnumInterval interval, int valm, int vald, String category
 	);
 	
-	public List<ScripJournal> findAllBySccodeAndSourceOrderByDateofentryDesc(
+	public List<ScripJournalM> findAllBySccodeAndSourceOrderByDateofentryDesc(
 	        String scCode, EnumSource source
 	);
 	
 	@Query(
-	    "select MAX(s.dateofentry) as lastEntryDate, COUNT(s.id) as numEntries from ScripJournal s where s.sccode = ?1"
+	    "select MAX(s.dateofentry) as lastEntryDate, COUNT(s.id) as numEntries from ScripJournalM s where s.sccode = ?1"
 	)
 	//Put it in List of Numand LastENtry in Service
 	public List<Object[]> findByAsArray(
@@ -61,7 +60,7 @@ public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
 	);
 	
 	@Query(
-	    "select COUNT(s.id) as numEntries, category as placeholder from ScripJournal s  "
+	    "select COUNT(s.id) as numEntries, category as placeholder from ScripJournalM s  "
 	            + "WHERE s.sccode = ?1 GROUP BY s.category "
 	)
 	
@@ -70,7 +69,7 @@ public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
 	);
 	
 	@Query(
-	    "select COUNT(s.id) as numEntries, source as placeholder from ScripJournal s  "
+	    "select COUNT(s.id) as numEntries, source as placeholder from ScripJournalM s  "
 	            + "WHERE s.sccode = ?1 GROUP BY s.source "
 	)
 	
@@ -79,7 +78,7 @@ public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
 	);
 	
 	@Query(
-	    "select COUNT(s.id) as numEntries, effect as placeholder from ScripJournal s  "
+	    "select COUNT(s.id) as numEntries, effect as placeholder from ScripJournalM s  "
 	            + "WHERE s.sccode = ?1 GROUP BY s.effect"
 	)
 	
@@ -89,7 +88,7 @@ public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
 	
 	@Query(
 	    "select COUNT(DISTINCT category) as numCatgs, COUNT(DISTINCT source) as numSources,"
-	            + " COUNT(DISTINCT effect) as numEffects, COUNT(DISTINCT tag) as numTags from ScripJournal s  "
+	            + " COUNT(DISTINCT effect) as numEffects, COUNT(DISTINCT tag) as numTags from ScripJournalM s  "
 	            + "WHERE s.sccode = ?1"
 	)
 	
@@ -102,7 +101,7 @@ public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
 	        String scCode
 	);
 	
-	@Query("select DISTINCT(s.category)  from ScripJournal s WHERE s.sccode = ?1")
+	@Query("select DISTINCT(s.category)  from ScripJournalM s WHERE s.sccode = ?1")
 	public List<String> findCatgsBySccode(
 	        String scCode
 	);
@@ -110,11 +109,6 @@ public interface RepoScJournal extends JpaRepository<ScripJournal, Long>
 	//Only Scrip Journals ID list for a Scrip Code and a Tag Containing
 	public List<SCJID> findAllBySccodeAndTagContaining(
 	        String scCode, String tagtext
-	);
-	
-	@Query("select s.image as image from ScripJournal s WHERE s.id = ?1")
-	public SCJImage getImageforJournalId(
-	        long id
 	);
 	
 }
