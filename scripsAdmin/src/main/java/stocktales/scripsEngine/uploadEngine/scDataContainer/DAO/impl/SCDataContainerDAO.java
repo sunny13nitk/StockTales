@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import stocktales.scripsEngine.aspects.SheetName;
 import stocktales.scripsEngine.uploadEngine.Metadata.definitions.SCSheetMetadata;
+import stocktales.scripsEngine.uploadEngine.Metadata.definitions.SCWBMetadata;
 import stocktales.scripsEngine.uploadEngine.Metadata.services.interfaces.ISCWBMetadataSrv;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.DAO.interfaces.ISCDataContainerDAO;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.DAO.types.scDataContainer;
@@ -58,15 +59,21 @@ public class SCDataContainerDAO implements ISCDataContainerDAO
 			if (scCode.trim().length() >= 3) // Min'm 3 char Scrip Code
 			{
 				this.scCode = scCode;
-				ArrayList<SCSheetMetadata> sheetsMdt = wbMdtSrv.getWbMetadata().getSheetMetadata();
-				if (sheetsMdt != null)
+				
+				SCWBMetadata wbMdt = wbMdtSrv.getWbMetadata();
+				if (wbMdt != null)
 				{
-					scDC = new scDataContainer();
-					for (SCSheetMetadata shMdt : sheetsMdt)
+					ArrayList<SCSheetMetadata> sheetsMdt = wbMdt.getSheetMetadata();
+					if (sheetsMdt != null)
 					{
-						loadDataforSheet(shMdt, scDC);
+						scDC = new scDataContainer();
+						for (SCSheetMetadata shMdt : sheetsMdt)
+						{
+							loadDataforSheet(shMdt, scDC);
+						}
 					}
 				}
+				
 			}
 		}
 		

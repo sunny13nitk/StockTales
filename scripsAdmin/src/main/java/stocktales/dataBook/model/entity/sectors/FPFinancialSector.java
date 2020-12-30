@@ -17,7 +17,7 @@ import stocktales.dataBook.enums.EnumUnit;
 import stocktales.dataBook.model.pojo.PJInterval;
 
 @Entity
-@Table(name = "FPFinancialSector")
+@Table(name = "fpfinancial_sector")
 @Getter
 @Setter
 @AllArgsConstructor

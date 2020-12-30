@@ -1,5 +1,6 @@
 package stocktales.scripsEngine.uploadEngine.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -10,9 +11,7 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(
-        name = "TB_SC_General"
-)
+@Table(name = "TB_SC_General")
 public class EN_SC_GeneralQ
 {
 	@Id
@@ -23,13 +22,18 @@ public class EN_SC_GeneralQ
 	private double CMP;
 	private double CurrPE;
 	private double CurrPB;
+	@Column(name = "div_yield")
 	private double DivYield;
+	@Column(name = "mkt_cap")
 	private double MktCap;
+	@Column(name = "mcap_to_sales")
 	private double MCapToSales;
 	private double EPS;
 	private double PEG;
 	private double CPS;
+	@Column(name = "sgto_capex")
 	private double SGToCapex;
+	@Column(name = "num_shares")
 	private double NumShares;
 	private double DERatio;
 	private double TTMSales;

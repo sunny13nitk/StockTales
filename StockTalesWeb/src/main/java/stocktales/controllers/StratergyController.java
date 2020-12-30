@@ -299,6 +299,7 @@ public class StratergyController
 					// Load on Allocations
 					stgySrv.loadAllocationItems(allocList);
 				}
+				
 			}
 		}
 		return "redirect:/stratergy/staging_2";

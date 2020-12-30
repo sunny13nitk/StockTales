@@ -134,4 +134,12 @@ public class ScripServiceImpl implements ScripService
 		
 		return sector;
 	}
+	
+	@Override
+	public List<String> getAllScripNamesforSector(
+	        String sector
+	) throws EX_General
+	{
+		return repoSCGen.getAllScripNamesforSector(sector);
+	}
 }

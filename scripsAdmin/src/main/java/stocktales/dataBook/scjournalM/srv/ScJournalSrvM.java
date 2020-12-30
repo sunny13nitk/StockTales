@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -138,9 +139,10 @@ public class ScJournalSrvM implements ISCJournalSrvM
 	        String scCode
 	)
 	{
-		List<String>            tagsInd    = new ArrayList<String>();
-		List<String>            tagsUnique = null;
-		List<PlaceHolderLongPJ> tagDetails = null;
+		List<String>            tagsInd       = new ArrayList<String>();
+		List<String>            tagsUnique    = null;
+		List<PlaceHolderLongPJ> tagDetails    = null;
+		List<PlaceHolderLongPJ> tagDetailsRet = null;
 		
 		//1. Get the Tags as Such First from DB for the Scrip
 		
@@ -181,8 +183,10 @@ public class ScJournalSrvM implements ISCJournalSrvM
 				}
 			}
 		}
-		
-		return tagDetails;
+		tagDetailsRet = tagDetails.stream()
+		        .sorted(Comparator.comparingLong(PlaceHolderLongPJ::getNumEntries).reversed())
+		        .collect(Collectors.toList());
+		return tagDetailsRet;
 	}
 	
 	@Override

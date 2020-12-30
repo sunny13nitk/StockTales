@@ -209,8 +209,8 @@
 
 
                            <!-- Notes- Starts -->
-                           <div th:if="${je.notes != null}" class="card"
-                              style="white-space: pre-line">
+                           <div th:if="${je.notes.trim().length() > 0}"
+                              class="card" style="white-space: pre-line">
                               <h5 style="page-break-inside: avoid;">
                                  <p class='indent-letter'
                                     style="margin-left: 12px; page-break-inside: avoid;"
@@ -320,7 +320,8 @@
                            <!-- Image container - Ends -->
 
                            <!-- Notes- Starts -->
-                           <div th:if="${je.notes != null}" class="card"
+                           <div th:if="${je.notes.trim().length() > 0}"
+                              class="card"
                               style="white-space: pre-lines; page-break-inside: avoid;">
 
                               <h5>
@@ -434,7 +435,8 @@
                            <!-- Image container - Ends -->
 
                            <!-- Notes- Starts -->
-                           <div th:if="${je.notes != null}" class="card"
+                           <div th:if="${je.notes.trim().length() > 0}"
+                              class="card"
                               style="white-space: pre-line; page-break-inside: avoid;">
 
                               <h5 style="page-break-inside: avoid;">
@@ -548,7 +550,8 @@
                            <!-- Image container - Ends -->
 
                            <!-- Notes- Starts -->
-                           <div th:if="${je.notes != null}" class="card"
+                           <div th:if="${je.notes.trim().length() > 0}"
+                              class="card"
                               style="white-space: pre-line; page-break-inside: avoid;">
 
                               <h5 style="page-break-inside: avoid;">
@@ -662,7 +665,8 @@
                            <!-- Image container - Ends -->
 
                            <!-- Notes- Starts -->
-                           <div th:if="${je.notes != null}" class="card"
+                           <div th:if="${je.notes.trim().length() > 0}"
+                              class="card"
                               style="white-space: pre-line; page-break-inside: avoid;">
 
                               <h5 style="page-break-inside: avoid;">

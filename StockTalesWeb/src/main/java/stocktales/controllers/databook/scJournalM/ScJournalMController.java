@@ -247,6 +247,50 @@ public class ScJournalMController
 		return "scrips/dataBook/scJournalM/detailsScJournal";
 	}
 	
+	@GetMapping("woTags/{scCode}")
+	public String showJournalDetailsByScCodewoTags(
+	        @PathVariable("scCode") String scCode, Model model
+	)
+	{
+		if (scCode != null)
+		{
+			List<ScripJournalM> je = repoScJ.findAllBySccodeOrderByDateofentryAsc(scCode);
+			
+			if (je != null)
+			{
+				model.addAttribute("scCode", scCode);
+				model.addAttribute("stats", scJSrv.getQStats_New_ByScrip(scCode));
+				
+				model.addAttribute("jeList", je);
+				model.addAttribute("catgs", scJSrv.getUniqueCatgsforJournals(je));
+			}
+		}
+		
+		return "scrips/dataBook/scJournalM/detailsScJournal_wo_tags";
+	}
+	
+	@GetMapping("/pf/{scCode}")
+	public String showJournalDetailsByScCodePrinterFriendly(
+	        @PathVariable("scCode") String scCode, Model model
+	)
+	{
+		if (scCode != null)
+		{
+			List<ScripJournalM> je = repoScJ.findAllBySccodeOrderByDateofentryAsc(scCode);
+			
+			if (je != null)
+			{
+				model.addAttribute("scCode", scCode);
+				model.addAttribute("stats", scJSrv.getQStats_New_ByScrip(scCode));
+				
+				model.addAttribute("jeList", je);
+				model.addAttribute("catgs", scJSrv.getUniqueCatgsforJournals(je));
+			}
+		}
+		
+		return "scrips/dataBook/scJournalM/detailsScJournalPF";
+	}
+	
 	@GetMapping("/save")
 	public String saveSCJournalfromBuffer(
 	        Model model

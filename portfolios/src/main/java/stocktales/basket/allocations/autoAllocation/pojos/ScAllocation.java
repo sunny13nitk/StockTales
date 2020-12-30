@@ -14,6 +14,8 @@ public class ScAllocation extends ScValuation
 {
 	private double allocation;
 	
+	//Lock feature Extension for reCalibrating Allocations
+	
 	public ScAllocation(
 	        ScValuation scVal
 	)

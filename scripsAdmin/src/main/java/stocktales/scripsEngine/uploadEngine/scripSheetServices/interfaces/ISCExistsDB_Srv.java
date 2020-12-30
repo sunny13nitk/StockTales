@@ -39,4 +39,13 @@ public interface ISCExistsDB_Srv
 	
 	public List<String> getAllSectors(
 	) throws EX_General;
+	
+	public String getScripCodeByCodeorDescSW(
+	        String searchTerm
+	) throws Exception;
+	
+	public List<String> getAllScripNamesforSector(
+	        String sector
+	) throws EX_General;
+	
 }

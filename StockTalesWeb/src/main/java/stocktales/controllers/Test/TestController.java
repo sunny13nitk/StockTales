@@ -1,6 +1,7 @@
 package stocktales.controllers.Test;
 
 import java.sql.Date;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +36,10 @@ import stocktales.helperPOJO.ScValFormPOJO;
 import stocktales.predicates.manager.PredicateManager;
 import stocktales.repository.SC10YearRepository;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
+import stocktales.scripsEngine.uploadEngine.entities.EN_SC_BalSheet;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
+import stocktales.scripsEngine.uploadEngine.scDataContainer.DAO.types.scDataContainer;
+import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
 
 @Controller
@@ -74,6 +78,9 @@ public class TestController
 	
 	@Autowired
 	private RepoScJournal repoSCJ;
+	
+	@Autowired
+	private ISCDataContainerSrv scContSrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -440,6 +447,70 @@ public class TestController
 			}
 		}
 		
+		return "success";
+		
+	}
+	
+	@GetMapping("/scload/{scCode}")
+	public String loadSCripData(
+	        @PathVariable String scCode
+	
+	)
+	{
+		if (scCode != null)
+		{
+			try
+			{
+				scContSrv.load(scCode);
+				scDataContainer scDC = scContSrv.getScDC();
+				if (scDC != null)
+				{
+					if (scDC.getBalSheet_L() != null)
+					{
+						Optional<EN_SC_BalSheet> balMin = scDC.getBalSheet_L().stream()
+						        .min(Comparator.comparing(EN_SC_BalSheet::getYear));
+						if (balMin.isPresent())
+						{
+							int ymin = balMin.get().getYear();
+							System.out.println("Min Year : " + ymin);
+						}
+						
+					}
+					System.out.println("Scrip loaded!");
+				}
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/scripsBysector/{sector}")
+	public String listScripsBySector(
+	        @PathVariable String sector
+	
+	)
+	{
+		if (sector != null)
+		{
+			try
+			{
+				List<String> scrips = scExSrv.getAllScripNamesforSector(sector);
+				
+				for (String string : scrips)
+				{
+					System.out.println(string);
+				}
+			} catch (EX_General e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 		return "success";
 		
 	}

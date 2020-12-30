@@ -55,8 +55,15 @@ public class FinancialsSectorController
 	        @PathVariable("fpid") String fpid, Model model
 	)
 	{
-		model.addAttribute("fpdata", repoFPFinancials.findById(new Long(fpid)));
+		FPFinancialSector           fpData  = null;
+		Optional<FPFinancialSector> fpDataO = repoFPFinancials.findById(new Long(fpid));
+		if (fpDataO.isPresent())
+		{
+			fpData = fpDataO.get();
+		}
+		model.addAttribute("fpdata", fpData);
 		model.addAttribute("years", DurationUtilities.getYearsList(-5));
+		model.addAttribute("scCode", fpData.getSccode());
 		return "scrips/dataBook/sectors/Financials";
 	}
 	

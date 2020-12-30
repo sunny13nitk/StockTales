@@ -1,5 +1,6 @@
 package stocktales.scripsEngine.uploadEngine.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,11 +25,14 @@ public class EN_SC_Trends
 	private int    DebtGR;
 	private int    BVGR;
 	private double AvgPE;
+	@Column(name = "div_pay_avg")
 	private double DivPayAvg;   // Renamed
 	private double ROCEAvg;     // Renamed
 	private double ROEAvg;      // Added
+	@Column(name = "fcf_cfo_avg")
 	private int    FCF_CFO_Avg; // Renamed
 	private int    SSGRAvg;     // Added
+	@Column(name = "fviab_avg")
 	private int    FViabAvg;    // Added
 	private double WCCAvg;      // Added
 	

@@ -23,6 +23,10 @@ public interface RepoScJournalM extends JpaRepository<ScripJournalM, Long>
 	        String scCode
 	);
 	
+	public List<ScripJournalM> findAllBySccodeOrderByDateofentryAsc(
+	        String scCode
+	);
+	
 	public List<ScripJournalM> findAllBySccodeAndTagContainingOrderByDateofentryDesc(
 	        String scCode, String tagtext
 	);
@@ -61,7 +65,7 @@ public interface RepoScJournalM extends JpaRepository<ScripJournalM, Long>
 	
 	@Query(
 	    "select COUNT(s.id) as numEntries, category as placeholder from ScripJournalM s  "
-	            + "WHERE s.sccode = ?1 GROUP BY s.category "
+	            + "WHERE s.sccode = ?1 GROUP BY s.category ORDER BY numEntries DESC"
 	)
 	
 	public List<PlaceHolderLong> countEntriesByCategory(
@@ -70,7 +74,7 @@ public interface RepoScJournalM extends JpaRepository<ScripJournalM, Long>
 	
 	@Query(
 	    "select COUNT(s.id) as numEntries, source as placeholder from ScripJournalM s  "
-	            + "WHERE s.sccode = ?1 GROUP BY s.source "
+	            + "WHERE s.sccode = ?1 GROUP BY s.source ORDER BY numEntries DESC"
 	)
 	
 	public List<PlaceHolderLong> countEntriesBySource(
@@ -79,7 +83,7 @@ public interface RepoScJournalM extends JpaRepository<ScripJournalM, Long>
 	
 	@Query(
 	    "select COUNT(s.id) as numEntries, effect as placeholder from ScripJournalM s  "
-	            + "WHERE s.sccode = ?1 GROUP BY s.effect"
+	            + "WHERE s.sccode = ?1 GROUP BY s.effect ORDER BY numEntries DESC"
 	)
 	
 	public List<PlaceHolderLong> countEntriesByEffect(

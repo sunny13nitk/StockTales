@@ -16,7 +16,7 @@ import lombok.Setter;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.enums.ERebalType;
 
 @Entity
-@Table(name = "StgyRebalancingTxts")
+@Table(name = "stgy_rebalancing_txts")
 @Getter
 @Setter
 @NoArgsConstructor

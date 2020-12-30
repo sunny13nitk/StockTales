@@ -10,28 +10,34 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SCWBMetadata
 {
-	private ArrayList<SCSheetMetadata> sheetMetadata;
-
-	public ArrayList<SCSheetMetadata> getSheetMetadata()
+	private ArrayList<SCSheetMetadata> sheetMetadata = new ArrayList<SCSheetMetadata>();
+	
+	public ArrayList<SCSheetMetadata> getSheetMetadata(
+	)
 	{
-		return sheetMetadata;
+		return this.sheetMetadata;
 	}
-
-	public void setSheetMetadata(ArrayList<SCSheetMetadata> sheetMetadata)
+	
+	public void setSheetMetadata(
+	        ArrayList<SCSheetMetadata> sheetMetadata
+	)
 	{
 		this.sheetMetadata = sheetMetadata;
 	}
-
-	public SCWBMetadata(ArrayList<SCSheetMetadata> sheetMetadata)
+	
+	public SCWBMetadata(
+	        ArrayList<SCSheetMetadata> sheetMetadata
+	)
 	{
 		super();
 		this.sheetMetadata = sheetMetadata;
 	}
-
-	public SCWBMetadata()
+	
+	public SCWBMetadata(
+	)
 	{
 		super();
 		this.sheetMetadata = new ArrayList<SCSheetMetadata>();
 	}
-
+	
 }

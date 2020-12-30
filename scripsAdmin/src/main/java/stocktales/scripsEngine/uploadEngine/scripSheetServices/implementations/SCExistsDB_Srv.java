@@ -296,4 +296,46 @@ public class SCExistsDB_Srv implements ISCExistsDB_Srv
 		return sectors;
 	}
 	
+	@Override
+	public String getScripCodeByCodeorDescSW(
+	        String searchTerm
+	) throws Exception
+	{
+		
+		String         scCode = null;
+		EN_SC_GeneralQ scG    = this.Get_ScripExisting_DB(searchTerm);
+		
+		if (scG == null)
+		{
+			scG = this.Get_ScripExisting_DB_DescSW(searchTerm);
+			
+		}
+		
+		if (scG != null)
+		{
+			scCode = scG.getSCCode();
+		}
+		
+		return scCode;
+	}
+	
+	@Override
+	public List<String> getAllScripNamesforSector(
+	        String sector
+	) throws EX_General
+	{
+		List<String> scripinSector = null;
+		
+		if (sector != null && entityManager != null)
+		{
+			
+			scripinSector = entityManager.createQuery(
+			        "SELECT distinct SCCode FROM EN_SC_General where Sector =: lv_sector", String.class)
+			        .setParameter("lv_sector", sector).getResultList();
+			
+		}
+		
+		return scripinSector;
+	}
+	
 }

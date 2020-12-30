@@ -1,5 +1,6 @@
 package stocktales.dataBook.config.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "secFieldsPool")
+@Table(name = "sec_fields_pool")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,6 +27,7 @@ public class CfgSectorsFieldsPool
 	@NotNull
 	private String sector;
 	@NotNull
+	@Column(name = "f_pool_entityqname")
 	private String fPoolEntityQName; //Qualified Entity Pojo for Field Pool
 	
 	@NotNull

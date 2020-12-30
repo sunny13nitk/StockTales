@@ -22,6 +22,10 @@ public interface ScripService
 	public List<String> getAllScripNames(
 	) throws EX_General;
 	
+	public List<String> getAllScripNamesforSector(
+	        String sector
+	) throws EX_General;
+	
 	public List<SC_EDRC_Summary> getEDRCSummaryforAll(
 	);
 	

@@ -147,6 +147,7 @@ public class SCWBMetadataSrv implements ISCWBMetadataSrv
 		if (this.wbMdt == null)
 		{
 			Initialize();
+			return this.wbMdt;
 		} else
 		{
 			wbMdt = this.wbMdt;

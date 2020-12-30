@@ -1,5 +1,6 @@
 package stocktales.scripsEngine.uploadEngine.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -7,11 +8,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "TB_SC_BalSheet")
+@Table(name = "tb_sc_bal_sheet")
 public class EN_SC_BalSheet
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "bal_sheet_id")
 	private long BalSheet_ID;
 	
 	private int    year;          //REnamed
@@ -25,6 +27,7 @@ public class EN_SC_BalSheet
 	private int    Depreciation;
 	private int    PBT;
 	private int    Tax;
+	@Column(name = "tax_per")
 	private int    TaxPer;
 	private int    PAT;
 	private int    NPM;
@@ -41,13 +44,18 @@ public class EN_SC_BalSheet
 	private int    ITR;
 	private int    NFA;
 	private int    CWIP;
+	@Column(name = "share_capital")
 	private int    ShareCapital;
+	@Column(name = "dividend_paid")
 	private int    DividendPaid;
+	@Column(name = "dividend_payout")
 	private int    DividendPayout;
 	private int    RE;
 	private double PE;
 	private int    MCap;
+	@Column(name = "face_value")
 	private double FaceValue;
+	@Column(name = "book_value")
 	private double BookValue;
 	private int    Equity;
 	private double DERatio;
@@ -55,11 +63,17 @@ public class EN_SC_BalSheet
 	private int    CFI;
 	private int    CFF;
 	private int    NCF;
+	@Column(name = "rawmto_sales")
 	private double RawMToSales;
+	@Column(name = "empcto_sales")
 	private double EmpCToSales;
+	@Column(name = "powfto_sales")
 	private double PowFToSales;
+	@Column(name = "mktg_to_sales")
 	private double MktgToSales;
+	@Column(name = "other_to_sales")
 	private double OtherToSales;
+	@Column(name = "dep_to_sales")
 	private double DepToSales;
 	
 	public long getBalSheet_ID(
