@@ -21,6 +21,7 @@
 		<module>scripsAdmin</module>
 		<module>StockTalesWeb</module>
 		<module>portfolios</module>
+		<module>DataMining</module>
 	</modules>
 
 	<properties>

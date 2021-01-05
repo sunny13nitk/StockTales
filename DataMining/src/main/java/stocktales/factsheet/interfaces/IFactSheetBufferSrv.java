@@ -25,7 +25,7 @@ public interface IFactSheetBufferSrv
 	
 	//Clear the Buffer and Initialize for a Scrip
 	public void Initialize(
-	        String scCode
+	        String scCode, boolean no_peers
 	) throws Exception;
 	
 	//Clear the Buffer and Initialize for a Scrip and said Peers

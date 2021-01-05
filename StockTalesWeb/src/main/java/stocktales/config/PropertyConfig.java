@@ -24,7 +24,9 @@ import stocktales.basket.allocations.config.pojos.StrengthWeights;
 @PropertySources(
     { @PropertySource("classpath:weights.properties"), @PropertySource(
         "classpath:application.properties"
-    ), @PropertySource("classpath:messages.properties") }
+    ), @PropertySource("classpath:messages.properties"), @PropertySource(
+        "classpath:HCMessages.properties"
+    ), @PropertySource("classpath:HCRep.properties"), @PropertySource("classpath:HCTags.properties") }
 )
 public class PropertyConfig
 {
@@ -123,6 +125,9 @@ public class PropertyConfig
 		
 		ResourceBundleMessageSource source = new ResourceBundleMessageSource();
 		source.addBasenames("messages");
+		source.addBasenames("HCMessages");
+		source.addBasenames("HCRep");
+		source.addBasenames("HCTags");
 		source.setUseCodeAsDefaultMessage(true);
 		
 		return source;

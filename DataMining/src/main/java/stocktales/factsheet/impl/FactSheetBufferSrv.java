@@ -47,6 +47,7 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 	private List<scDataContainer> scripDataContainers;
 	private List<String>          peerScripNames = new ArrayList<String>();
 	private String                refScripName;
+	private boolean               modeSolo;                                //No Peer Comparison needed
 	
 	@Override
 	public scDataContainer getDataContainerforScrip(
@@ -73,7 +74,7 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 	
 	@Override
 	public void Initialize(
-	        String scCode
+	        String scCode, boolean no_peers
 	) throws Exception
 	{
 		if (scCode != null)
@@ -81,7 +82,7 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 			if (scCode.trim().length() > 0)
 			{
 				//Load the Containers
-				load(scCode, null, false);
+				load(scCode, null, false, no_peers);
 			}
 		}
 		
@@ -93,7 +94,7 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 	) throws Exception
 	{
 		//Load the Containers
-		load(scCode, peers, false);
+		load(scCode, peers, false, false);
 		
 	}
 	
@@ -103,7 +104,7 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 	) throws Exception
 	{
 		//Load the Containers
-		load(scCode, peersToExclude, true);
+		load(scCode, peersToExclude, true, false);
 		
 	}
 	
@@ -122,7 +123,7 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 	}
 	
 	private void load(
-	        String scCode, List<String> peers, Boolean excludepeers
+	        String scCode, List<String> peers, Boolean excludepeers, boolean no_peers
 	) throws Exception
 	{
 		if (scExSrv != null)
@@ -171,7 +172,14 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 			if (loadAllPeers == true)
 			{
 				this.setRefScripName(scCode);
-				this.setPeerScripNames(peers);
+				if (no_peers == true)
+				{
+					this.setPeerScripNames(null);
+					
+				} else
+				{
+					this.setPeerScripNames(peers);
+				}
 				loadDC();
 				
 			} else
@@ -233,10 +241,13 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 		scDCSrv.load(this.getRefScripName());
 		this.scripDataContainers.add(scDCSrv.getScDC());
 		
-		for (String peer : this.getPeerScripNames())
+		if (this.getPeerScripNames() != null)
 		{
-			scDCSrv.load(peer);
-			this.scripDataContainers.add(scDCSrv.getScDC());
+			for (String peer : this.getPeerScripNames())
+			{
+				scDCSrv.load(peer);
+				this.scripDataContainers.add(scDCSrv.getScDC());
+			}
 		}
 	}
 	

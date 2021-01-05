@@ -26,6 +26,12 @@
 			<artifactId>portfolios</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>sb.funprojects</groupId>
+			<artifactId>DataMining</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 
 
