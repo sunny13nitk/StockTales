@@ -35,14 +35,14 @@ public class AvgSalesGrowth implements IAvgSalesGrowth
 	
 	private List<NameVal> negativeYrs = new ArrayList<NameVal>();
 	
-	private HCBeanReturn beanReturn;
+	private HCBeanReturn beanReturn = new HCBeanReturn();
 	
 	@Override
 	public HCBeanReturn returnAfterEvaluation(
 	)
 	{
 		// TODO Auto-generated method stub
-		return null;
+		return this.beanReturn;
 	}
 	
 }

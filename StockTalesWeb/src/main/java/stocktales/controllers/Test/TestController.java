@@ -25,6 +25,9 @@ import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.S
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
+import stocktales.cagrEval.helperPoJo.YearsFromTo;
+import stocktales.cagrEval.helperPoJo.YearsRollOverResults;
+import stocktales.cagrEval.intf.IRollOverYrs;
 import stocktales.controllers.Test.entity.MultiTest;
 import stocktales.controllers.Test.pojo.TestMulti;
 import stocktales.controllers.Test.repo.RepoMultiTest;
@@ -81,6 +84,9 @@ public class TestController
 	
 	@Autowired
 	private ISCDataContainerSrv scContSrv;
+	
+	@Autowired
+	private IRollOverYrs roySrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -513,5 +519,30 @@ public class TestController
 		}
 		return "success";
 		
+	}
+	
+	@GetMapping("/ROY")
+	public String showRollOverYears(
+	
+	)
+	{
+		if (roySrv != null)
+		{
+			YearsRollOverResults royRes = roySrv.generateRollOverYrs(2010, 5, 10);
+			if (royRes != null)
+			{
+				System.out.println("Intervals");
+				for (YearsFromTo yent : royRes.getRollOverYrs())
+				{
+					System.out.println(yent.getFrom() + " | " + yent.getTo());
+					
+				}
+				
+				System.out.println("End to End Points");
+				System.out.println(royRes.getE2eYrs().getFrom() + "|" + royRes.getE2eYrs().getTo());
+			}
+		}
+		
+		return "success";
 	}
 }

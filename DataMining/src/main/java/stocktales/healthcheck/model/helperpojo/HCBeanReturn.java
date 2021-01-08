@@ -14,6 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class HCBeanReturn
 {
-	private double      valueToCmp;
-	private List<HCMsg> messages = new ArrayList<HCMsg>();
+	private double                valueToCmp;
+	private List<HCMsg>           messages       = new ArrayList<HCMsg>();
+	private List<HCDataContainer> dataContainers = new ArrayList<HCDataContainer>();
 }

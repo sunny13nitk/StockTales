@@ -3,6 +3,7 @@ package stocktales.healthcheck.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.catalina.core.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
@@ -27,6 +28,9 @@ public class HC_Srv implements IHC_Srv
 {
 	@Autowired
 	private ISCDataContainerSrv scDcSrv;
+	
+	@Autowired
+	private ApplicationContext appCtxt;
 	
 	@Autowired
 	private ScripService scSrv;
