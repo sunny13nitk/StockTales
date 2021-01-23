@@ -38,4 +38,11 @@ public interface IFactSheetBufferSrv
 	        String scCode, List<String> peersToExclude
 	) throws Exception;
 	
+	/*
+	 * Refer Sheet Name from SheetNames Class
+	 */
+	public void Initialize(
+	        List<String> scrips, String sheetName, boolean loadComplete
+	) throws Exception;
+	
 }

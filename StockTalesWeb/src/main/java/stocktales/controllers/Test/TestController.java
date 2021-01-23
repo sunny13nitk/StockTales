@@ -1,6 +1,7 @@
 package stocktales.controllers.Test;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +26,12 @@ import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.S
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
+import stocktales.cagrEval.helperPoJo.CAGRResult;
+import stocktales.cagrEval.helperPoJo.RollOverDurationsParam;
+import stocktales.cagrEval.helperPoJo.XIRRItems;
 import stocktales.cagrEval.helperPoJo.YearsFromTo;
 import stocktales.cagrEval.helperPoJo.YearsRollOverResults;
+import stocktales.cagrEval.intf.ICAGRCalcSrv;
 import stocktales.cagrEval.intf.IRollOverYrs;
 import stocktales.controllers.Test.entity.MultiTest;
 import stocktales.controllers.Test.pojo.TestMulti;
@@ -35,6 +40,9 @@ import stocktales.dataBook.helperPojo.scjournal.dbproc.NumandLastEntry;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.PlaceHolderLong;
 import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.ScJSummary;
 import stocktales.dataBook.model.repo.scjournal.RepoScJournal;
+import stocktales.healthcheck.intf.IHC_Srv;
+import stocktales.healthcheck.model.helperpojo.HCComboResult;
+import stocktales.helperPOJO.NameValDouble;
 import stocktales.helperPOJO.ScValFormPOJO;
 import stocktales.predicates.manager.PredicateManager;
 import stocktales.repository.SC10YearRepository;
@@ -87,6 +95,12 @@ public class TestController
 	
 	@Autowired
 	private IRollOverYrs roySrv;
+	
+	@Autowired
+	private ICAGRCalcSrv cagrCalcSrv;
+	
+	@Autowired
+	private IHC_Srv hcSrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -528,7 +542,7 @@ public class TestController
 	{
 		if (roySrv != null)
 		{
-			YearsRollOverResults royRes = roySrv.generateRollOverYrs(2010, 5, 10);
+			YearsRollOverResults royRes = roySrv.generateRollOverYrs(2010, 3, 10);
 			if (royRes != null)
 			{
 				System.out.println("Intervals");
@@ -545,4 +559,191 @@ public class TestController
 		
 		return "success";
 	}
+	
+	@GetMapping("/cagrsim")
+	public String showCAGRCalc(
+	)
+	{
+		List<String> scrips = new ArrayList<String>();
+		scrips.add("BAJFINANCE");
+		/*scrips.add("ALKYLAMINE");
+		scrips.add("ABBOTTINDIA");
+		scrips.add("BRITANNIA");*/
+		/*	scrips.add("LTI");
+			scrips.add("LTTS");*/
+		
+		if (cagrCalcSrv != null)
+		{
+			try
+			{
+				cagrCalcSrv.Initialize(scrips, false);
+				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2010, 3, 10));
+				if (cagrCalcSrv.getCagrResults() != null)
+				{
+					for (CAGRResult cagrResult : cagrCalcSrv.getCagrResults())
+					{
+						System.out.println("----- Duration Details ------");
+						System.out.println(
+						        cagrResult.getDurationH().getFrom() + " : " + cagrResult.getDurationH().getTo());
+						System.out.println(cagrResult.getDurationH().getDurationType().toString());
+						
+						System.out.println("---------- Constituent Details ---------");
+						for (XIRRItems xirrItem : cagrResult.getItems())
+						{
+							System.out.println(xirrItem.getScCode() + " | " + xirrItem.getAllocation() + " | "
+							        + xirrItem.getCAGR() + " | " + xirrItem.getWtCAGR());
+						}
+						
+						System.out.println("---------- Summary ---------");
+						
+						System.out
+						        .println("Zero CAGR Allocation Sum : " + cagrResult.getSummary().getSumzeroCAGRAlloc());
+						System.out.println("Boost Factor : " + cagrResult.getSummary().getBoostFactor());
+						System.out.println("NETT. CAGR ------->>   " + cagrResult.getSummary().getNettCAGR());
+					}
+				}
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/cagrsim/{stgyId}")
+	public String showCAGRCalcforStrategy(
+	        @PathVariable String stgyId
+	)
+	{
+		
+		if (cagrCalcSrv != null)
+		{
+			try
+			{
+				cagrCalcSrv.Initialize(new Integer(stgyId), false);
+				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2010, 5, 10));
+				if (cagrCalcSrv.getCagrResults() != null)
+				{
+					for (CAGRResult cagrResult : cagrCalcSrv.getCagrResults())
+					{
+						System.out.println("--------------------------------");
+						System.out.println("----- Duration Details ------");
+						System.out.println("--------------------------------");
+						System.out.println(
+						        cagrResult.getDurationH().getFrom() + " : " + cagrResult.getDurationH().getTo());
+						System.out.println(cagrResult.getDurationH().getDurationType().toString());
+						
+						System.out.println("---------- Constituent Details ---------");
+						for (XIRRItems xirrItem : cagrResult.getItems())
+						{
+							System.out.println(xirrItem.getScCode() + " | " + xirrItem.getAllocation() + " | "
+							        + xirrItem.getCAGR() + " | " + xirrItem.getWtCAGR());
+						}
+						
+						System.out.println("---------- Summary ---------");
+						
+						System.out
+						        .println("Zero CAGR Allocation Sum : " + cagrResult.getSummary().getSumzeroCAGRAlloc());
+						System.out.println("Boost Factor : " + cagrResult.getSummary().getBoostFactor());
+						System.out.println("NETT. CAGR ------->>   " + cagrResult.getSummary().getNettCAGR());
+						System.out.println("----------------------------------------------------------------");
+						System.out.println("NIFTY CAGR ------->>   " + cagrResult.getSummary().getNiftyCAGR());
+					}
+				}
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/topNEDRC/{numScrips}")
+	public String showTopNEDRC(
+	        @PathVariable String numScrips
+	)
+	{
+		
+		if (edrcFacSrv != null)
+		{
+			List<NameValDouble> topN   = edrcFacSrv.getTopNED(new Integer(numScrips));
+			List<String>        Scrips = new ArrayList<String>();
+			for (NameValDouble nameVal : topN)
+			{
+				Scrips.add(nameVal.getName());
+				System.out.println(nameVal.getName() + " - ED Score: " + nameVal.getValue());
+			}
+			
+			try
+			{
+				cagrCalcSrv.Initialize(Scrips, true);
+				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2015, 3, 5));
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if (cagrCalcSrv.getCagrResults() != null)
+			{
+				for (CAGRResult cagrResult : cagrCalcSrv.getCagrResults())
+				{
+					System.out.println("----- Duration Details ------");
+					System.out.println(
+					        cagrResult.getDurationH().getFrom() + " : " + cagrResult.getDurationH().getTo());
+					System.out.println(cagrResult.getDurationH().getDurationType().toString());
+					
+					System.out.println("---------- Constituent Details ---------");
+					for (XIRRItems xirrItem : cagrResult.getItems())
+					{
+						System.out.println(xirrItem.getScCode() + " | " + xirrItem.getAllocation() + " | "
+						        + xirrItem.getCAGR() + " | " + xirrItem.getWtCAGR());
+					}
+					
+					System.out.println("---------- Summary ---------");
+					
+					System.out.println("Zero CAGR Allocation Sum : " + cagrResult.getSummary().getSumzeroCAGRAlloc());
+					System.out.println("Boost Factor : " + cagrResult.getSummary().getBoostFactor());
+					System.out.println("NETT. CAGR ------->>   " + cagrResult.getSummary().getNettCAGR());
+				}
+			}
+			
+		}
+		return "success";
+	}
+	
+	@GetMapping("/shc/{scCode}")
+	public String performSCHealthCheck(
+	        @PathVariable String scCode
+	)
+	{
+		
+		if (hcSrv != null)
+		{
+			try
+			{
+				hcSrv.Initialize(scCode);
+				hcSrv.processScripHealthCheck();
+				List<HCComboResult> results = hcSrv.getResults();
+				if (results != null)
+				{
+					
+				}
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return "success";
+	}
+	
 }

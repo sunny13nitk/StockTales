@@ -1,5 +1,6 @@
 package stocktales.healthcheck.intf;
 
+import stocktales.healthcheck.enums.EnumHCCriteria;
 import stocktales.healthcheck.model.helperpojo.HCBeanReturn;
 
 /*
@@ -7,6 +8,11 @@ import stocktales.healthcheck.model.helperpojo.HCBeanReturn;
  */
 public interface IHC_GetEvaluationResults
 {
+	
 	public HCBeanReturn returnAfterEvaluation(
+	        String scCode
+	);
+	
+	public EnumHCCriteria getCriteria(
 	);
 }

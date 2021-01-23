@@ -16,4 +16,7 @@ public interface IHC_Srv
 	public List<HCComboResult> getResults(
 	);
 	
+	public String getScCode(
+	);
+	
 }

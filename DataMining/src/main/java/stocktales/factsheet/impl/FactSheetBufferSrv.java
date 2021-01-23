@@ -41,8 +41,13 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 	@Autowired
 	private MessageSource msgSrc;
 	
+	private List<String> allDBscrips;
+	
 	@Value("${NO_PEER}")
 	private String noPeer_error;
+	
+	@Value("${INVALID_SCRIP}")
+	private String invalidSCrip;
 	
 	private List<scDataContainer> scripDataContainers;
 	private List<String>          peerScripNames = new ArrayList<String>();
@@ -108,11 +113,47 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 		
 	}
 	
+	@Override
+	public void Initialize(
+	        List<String> scrips, String sheetName, boolean loadComplete
+	) throws Exception
+	{
+		load(scrips, sheetName, loadComplete);
+	}
+	
 	/*
 	 * -----------------------------------------------------------------------------------------------
 	 *                                  PRIVATE SECTION
 	 * -----------------------------------------------------------------------------------------------                                  
 	 */
+	
+	private void load(
+	        List<String> scrips, String sheetName, boolean loadComplete
+	) throws Exception
+	{
+		clear();
+		this.allDBscrips = scExSrv.getAllScripNames(); //Load for Validation
+		
+		this.scripDataContainers = new ArrayList<scDataContainer>();
+		for (String scrip : scrips)
+		{
+			if (isScripValid(scrip))
+			{
+				
+				if (loadComplete != true)
+				{
+					
+					scDCSrv.load(scrip, sheetName);
+					this.scripDataContainers.add(scDCSrv.getScDC());
+					
+				} else //Load Complete
+				{
+					scDCSrv.load(scrip);
+					this.scripDataContainers.add(scDCSrv.getScDC());
+				}
+			}
+		}
+	}
 	
 	private void clear(
 	)
@@ -130,6 +171,9 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 		{
 			//clear the Buffer
 			clear();
+			
+			this.allDBscrips = scExSrv.getAllScripNames();
+			
 			boolean loadAllPeers = false;
 			
 			//First Get the Sector of All Scrips
@@ -238,17 +282,51 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 	) throws Exception
 	{
 		this.scripDataContainers = new ArrayList<scDataContainer>();
-		scDCSrv.load(this.getRefScripName());
-		this.scripDataContainers.add(scDCSrv.getScDC());
+		if (isScripValid(this.getRefScripName()))
+		{
+			
+			scDCSrv.load(this.getRefScripName());
+			this.scripDataContainers.add(scDCSrv.getScDC());
+		}
 		
 		if (this.getPeerScripNames() != null)
 		{
 			for (String peer : this.getPeerScripNames())
 			{
-				scDCSrv.load(peer);
-				this.scripDataContainers.add(scDCSrv.getScDC());
+				if (isScripValid(peer))
+				{
+					scDCSrv.load(peer);
+					this.scripDataContainers.add(scDCSrv.getScDC());
+				}
 			}
 		}
+	}
+	
+	private boolean isScripValid(
+	        String scCode
+	) throws Exception
+	{
+		boolean isValid = false;
+		
+		if (allDBscrips != null)
+		{
+			if (allDBscrips.size() > 0)
+			{
+				Optional<String> scFoundO = allDBscrips.stream().filter(x -> x.equals(scCode)).findFirst();
+				if (scFoundO.isPresent())
+				{
+					isValid = true;
+				}
+			}
+		}
+		
+		if (isValid == false)
+		{
+			throw new Exception(msgSrc.getMessage("INVALID_SCRIP", new Object[]
+			{ scCode }, Locale.ENGLISH));
+		}
+		
+		return isValid;
 	}
 	
 }

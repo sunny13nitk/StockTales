@@ -2,6 +2,7 @@ package stocktales;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
@@ -9,6 +10,8 @@ import org.springframework.context.annotation.PropertySources;
 @PropertySources(
     { @PropertySource("classpath:weights.properties"), @PropertySource("classpath:application.properties") }
 )
+@EnableAspectJAutoProxy
+
 public class MainApplication
 {
 	

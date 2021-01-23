@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -18,9 +19,7 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(
-        name = "TB_SC_General"
-)
+@Table(name = "TB_SC_General")
 public class EN_SC_General
 {
 	@Id
@@ -31,6 +30,7 @@ public class EN_SC_General
 	private double CMP;
 	private double CurrPE;
 	private double CurrPB;
+	@Column(name = "div_yield")
 	private double DivYield;
 	private double MktCap;
 	private double MCapToSales;
@@ -42,44 +42,24 @@ public class EN_SC_General
 	private double DERatio;
 	private double TTMSales;
 	
-	@OneToMany(
-	        cascade = CascadeType.ALL, fetch = FetchType.LAZY
-	)
-	@JoinColumn(
-	        name = "SCCode"
-	)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "SCCode")
 	private List<EN_SC_BalSheet> balSheetEntList;
 	
-	@OneToMany(
-	        cascade = CascadeType.ALL, fetch = FetchType.LAZY
-	)
-	@JoinColumn(
-	        name = "SCCode"
-	)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "SCCode")
 	private List<EN_SC_Trends> trendsEntList;
 	
-	@OneToMany(
-	        cascade = CascadeType.ALL, fetch = FetchType.LAZY
-	)
-	@JoinColumn(
-	        name = "SCCode"
-	)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "SCCode")
 	private List<EN_SC_Quarters> qtrEntList;
 	
-	@OneToOne(
-	        cascade = CascadeType.ALL, fetch = FetchType.LAZY
-	)
-	@JoinColumn(
-	        name = "SCCode"
-	)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "SCCode")
 	private EN_SC_10YData tenYrEnt;
 	
-	@OneToOne(
-	        cascade = CascadeType.ALL, fetch = FetchType.LAZY
-	)
-	@JoinColumn(
-	        name = "SCCode"
-	)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "SCCode")
 	private EN_SC_Last4QData last4QEnt;
 	
 	public List<EN_SC_Trends> getTrendsEntList(

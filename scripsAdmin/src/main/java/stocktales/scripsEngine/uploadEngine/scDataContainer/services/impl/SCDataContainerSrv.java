@@ -1,7 +1,6 @@
 package stocktales.scripsEngine.uploadEngine.scDataContainer.services.impl;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 import javax.transaction.Transactional;
 
@@ -34,12 +33,15 @@ public class SCDataContainerSrv implements ISCDataContainerSrv
 	}
 	
 	@Override
-	public <T> ArrayList<T> load(
-	        String scCode, String bobjName
-	)
+	public void load(
+	        String scCode, String sheetName
+	) throws Exception
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if (scDCDao != null)
+		{
+			this.scDC = scDCDao.load(scCode, sheetName);
+		}
+		
 	}
 	
 	@Override

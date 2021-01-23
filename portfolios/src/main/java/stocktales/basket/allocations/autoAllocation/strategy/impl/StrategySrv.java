@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -146,15 +147,21 @@ public class StrategySrv implements IStrategySrv
 		List<StrategyListPOJO> strategies = null;
 		
 		List<Strategy> stgyDB = repoStgy.findAll();
+		
+		List<Strategy> stgyDBActive = null;
+		
 		if (stgyDB != null)
 		{
 			if (stgyDB.size() > 0)
 			{
+				
+				stgyDBActive = stgyDB.stream().filter(x -> x.isActive() == true).collect(Collectors.toList());
+				
 				strategies = new ArrayList<StrategyListPOJO>();
-				for (Strategy strategy : stgyDB)
+				for (Strategy strategy : stgyDBActive)
 				{
 					StrategyListPOJO strategyI = new StrategyListPOJO(strategy.getStid(), strategy.getName(),
-					        strategy.getConcept(), strategy.getAllocItems().size());
+					        strategy.getConcept(), strategy.getAllocItems().size(), strategy.isRebalanceallowed());
 					strategies.add(strategyI);
 				}
 			}

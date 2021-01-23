@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import stocktales.scripsEngine.aspects.SheetName;
+import stocktales.scripsEngine.pojos.helperObjs.SheetNames;
 import stocktales.scripsEngine.uploadEngine.Metadata.definitions.SCSheetMetadata;
 import stocktales.scripsEngine.uploadEngine.Metadata.definitions.SCWBMetadata;
 import stocktales.scripsEngine.uploadEngine.Metadata.services.interfaces.ISCWBMetadataSrv;
@@ -80,13 +82,51 @@ public class SCDataContainerDAO implements ISCDataContainerDAO
 		return scDC;
 	}
 	
+	/**
+	 * Load Root Always in Conjunction
+	 */
 	@Override
-	public <T> ArrayList<T> load(
-	        String scCode, String bobjName
-	)
+	public scDataContainer load(
+	        String scCode, String sheetName
+	) throws Exception
 	{
-		// TODO Auto-generated method stub
-		return null;
+		scDC = null;
+		
+		if (wbMdtSrv != null && scCode != null)
+		{
+			if (scCode.trim().length() >= 3) // Min'm 3 char Scrip Code
+			{
+				this.scCode = scCode;
+				
+				SCWBMetadata wbMdt = wbMdtSrv.getWbMetadata();
+				if (wbMdt != null)
+				{
+					ArrayList<SCSheetMetadata> sheetsMdt = wbMdt.getSheetMetadata();
+					if (sheetsMdt != null)
+					{
+						scDC = new scDataContainer();
+						Optional<SCSheetMetadata> shMdtO = sheetsMdt.stream()
+						        .filter(x -> x.getSheetName().equals(sheetName)).findFirst();
+						if (shMdtO.isPresent())
+						{
+							loadDataforSheet(shMdtO.get(), scDC);
+						}
+						
+						//Also Load Root Container by DEfault if not requested to Distinguish Containers
+						if (!sheetName.equals(SheetNames.General))
+						{
+							
+							SCSheetMetadata shMdtRoot = wbMdtSrv.getMetadataforBaseSheet();
+							loadDataforSheet(shMdtRoot, scDC);
+						}
+						
+					}
+				}
+				
+			}
+		}
+		
+		return scDC;
 	}
 	
 	public scDataContainer getScDC(
@@ -159,14 +199,6 @@ public class SCDataContainerDAO implements ISCDataContainerDAO
 		sFac = sess.getSessionFactory();
 		if (sFac != null)
 		{
-			/*Session sess;
-			try
-			{
-				sess = sFac.getCurrentSession();
-			} catch (HibernateException e)
-			{
-				sess = sFac.openSession();
-			}*/
 			
 			if (sess != null)
 			{

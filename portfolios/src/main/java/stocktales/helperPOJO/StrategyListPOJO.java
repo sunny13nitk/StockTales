@@ -11,8 +11,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StrategyListPOJO
 {
-	private int    id;
-	private String name;
-	private String concept;
-	private int    numScrips;
+	private int     id;
+	private String  name;
+	private String  concept;
+	private int     numScrips;
+	private boolean rebalanceallowed;
+	
 }

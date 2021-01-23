@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<div th:replace="fragments/header :: STHeader"></div>
+
+</head>
+<body>
+
+   <div style="min-height: 600px; overflow: hidden;">
+      <div data-role="navview" data-compact="md" data-expand="false"
+         data-active-state="true">
+         <div th:replace="fragments/navbar :: STNavbar"></div>
+
+
+
+         <div class="navview-content pl-4-md pr-4-md">
+
+            <div class="grid">
+
+               <div th:replace="fragments/brand :: STBrand"></div>
+
+               <!-- your Code Starts from Here  -->
+
+
+               <div class="grid">
+
+                  <!--Top Row - Starts  -->
+                  <div class="row">
+
+                     <div class="colspan-3 " style="margin-left: 10px">
+                        <h1 style="color: #4465a1; margin-left: 30px"
+                           th:text="${details.getName()}"></h1>
+                     </div>
+
+                     <div class="colspan-8" style="margin-left: 10px">
+                        <div class="remark primary"
+                           style="padding-top: 10px; margin: 2px; color: #4465a1; font-weight: bolder;">
+                           <h6 th:text="${details.getConcept()}"></h6>
+
+                           <a
+                              th:href="@{'/stratergy/' + ${details.getStid()}}">
+                              Details</a>
+
+                        </div>
+
+                     </div>
+
+
+                  </div>
+                  <!--Top Row - Ends  -->
+
+
+                  <!--Cards Row - Starts  -->
+                  <div class="row">
+
+                     <!-- E2E Card -->
+                     <div class="colspan-6" style="margin-top: 20px">
+                        <div>
+                           <!-- Title - Starts  -->
+                           <div>
+
+                              <blockquote class="right-side">
+                                 <h4
+                                    style="padding-top: 10px; margin: 2px; color: #4465a1; font-weight: bolder; text-align: center;">
+                                    <span
+                                       style="color: #c30a31; margin-right: 10px"
+                                       th:text="${E2E.getDurationH().from}"></span>
+                                    to <span
+                                       style="color: #c30a31; margin-left: 10px"
+                                       th:text="${E2E.getDurationH().to}"></span>
+                                 </h4>
+                                 <small style="color: #F30C3E"
+                                    th:text="${E2E.getDurationH().durationType}">
+                                 </small>
+                              </blockquote>
+
+
+
+                           </div>
+                           <!-- Title - Ends  -->
+                           <!-- Info Box Starts  -->
+                           <div class="row">
+
+                              <!--Info Box - Starts  -->
+                              <div class="colspan-6 offset-1"
+                                 style="margin-top: 5px">
+                                 <div
+                                    th:if="${E2E.getSummary().nettCAGR > E2E.getSummary().niftyCAGR }"
+                                    class="more-info-box bg-green fg-white">
+                                    <div class="content">
+                                       <h2 class="text-bold mb-0"
+                                          th:text="${E2E.getSummary().nettCAGR}">
+                                          <label> %</label>
+                                       </h2>
+
+                                       <div class="text-medium">
+                                          <label> v/s Nifty</label> <span
+                                             th:text="${E2E.getSummary().niftyCAGR}"></span>
+                                          <label> %</label>
+                                       </div>
+                                       <div class="text-small">CAGR
+                                          Returns</div>
+                                       <div></div>
+
+
+                                    </div>
+                                    <div class="icon">
+                                       <span class="mif-chart-bars"></span>
+                                    </div>
+
+                                    <a href="#"
+                                       th:href="@{/cagrcalc/e2edetails}"
+                                       class="more"> Details <span
+                                       class="mif-arrow-right"></span></a>
+
+
+
+                                 </div>
+
+                                 <div
+                                    th:if="${E2E.getSummary().nettCAGR < E2E.getSummary().niftyCAGR }"
+                                    class="more-info-box bg-green fg-white">
+                                    <div class="content">
+                                       <h2 class="text-bold mb-0"
+                                          th:text="${E2E.getSummary().nettCAGR}">
+                                          <label> %</label>
+                                       </h2>
+
+                                       <div class="text-medium">
+                                          <label> v/s Nifty</label> <span
+                                             th:text="${E2E.getSummary().niftyCAGR}"></span>
+                                          <label> %</label>
+                                       </div>
+                                       <div class="text-small">CAGR
+                                          Returns</div>
+                                       <div></div>
+
+
+                                    </div>
+                                    <div class="icon">
+                                       <span class="mif-chart-bars"></span>
+                                    </div>
+
+                                    <a href="#"
+                                       th:href="@{/cagrcalc/e2edetails}"
+                                       class="more"> Details <span
+                                       class="mif-arrow-right"></span></a>
+
+
+
+                                 </div>
+
+
+
+                              </div>
+                              <!--Info Box - Ends  -->
+
+                           </div>
+                           <!-- Info Box Ends  -->
+
+                        </div>
+                     </div>
+
+                     <!-- RollOver Card -->
+                     <div class="colspan-6 "></div>
+                     <!--Cards Row - Ends  -->
+
+
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- Metro 4 -->
+         <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+</html>

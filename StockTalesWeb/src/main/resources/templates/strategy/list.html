@@ -88,13 +88,23 @@
 
                               <!--Buttons - OCA  -->
                               <td style="text-align: center;"><a
-                                 class="button warning cycle  outline"
+                                 th:if="${stgyI.rebalanceallowed == true }"
+                                 class="button alert outline cycle"
                                  th:href="@{'/stratergy/rebal/' + ${stgyI.id}}"
                                  data-role="hint"
                                  data-hint-text="Re-Balance Strategy"
-                                 data-cls-hint="bg-lightyellow fg-black drop-shadow"
+                                 data-cls-hint="fg-white bg-red"
                                  data-hint-position="bottom"><span
-                                    class="mif-balance-scale mif-2x fg-red"></span></a>
+                                    class="mif-balance-scale mif-2x "></span></a>
+
+                                 <a style="margin-left: 3px"
+                                 class="button alert outline cycle"
+                                 th:href="@{'/cagrcalc/show/' + ${stgyI.id}}"
+                                 data-role="hint"
+                                 data-hint-text="Calculate CAGR Returns"
+                                 data-cls-hint="fg-white bg-red"
+                                 data-hint-position="bottom"><span
+                                    class="mif-calculator2 mif-2x "></span></a>
                               </td>
                               <!--Buttons - OCA  -->
 

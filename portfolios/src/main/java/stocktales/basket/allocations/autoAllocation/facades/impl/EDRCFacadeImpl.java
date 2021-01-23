@@ -1,6 +1,7 @@
 package stocktales.basket.allocations.autoAllocation.facades.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -24,6 +25,7 @@ import stocktales.basket.allocations.config.pojos.FinancialsConfig;
 import stocktales.basket.allocations.config.pojos.StrengthWeights;
 import stocktales.basket.allocations.config.services.CLRConfig;
 import stocktales.enums.SCSScoreCalibrationHeaders;
+import stocktales.helperPOJO.NameValDouble;
 import stocktales.repository.SC10YearRepository;
 import stocktales.repository.TrendsRepository;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
@@ -99,6 +101,42 @@ public class EDRCFacadeImpl implements EDRCFacade
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public List<NameValDouble> getTopNED(
+	        int numScrips
+	)
+	{
+		List<ScripEDRCScore> edAllSc  = null;
+		List<NameValDouble>  scEdAll  = new ArrayList<NameValDouble>();
+		List<NameValDouble>  edSorted = null;
+		List<NameValDouble>  topN     = null;
+		try
+		{
+			List<String> scrips = scExSrv.getAllScripNames();
+			if (scrips != null)
+			{
+				for (String string : scrips)
+				{
+					ScripEDRCScore edrcScore = edrcSrv.getEDRCforScrip(string);
+					scEdAll.add(
+					        new NameValDouble(edrcScore.getScCode(), edrcScore.getEarningsDivScore().getResValue()));
+				}
+				
+				edSorted = scEdAll.stream().sorted(Comparator.comparingDouble(NameValDouble::getValue).reversed())
+				        .collect(Collectors.toList());
+				topN     = edSorted.stream().limit(numScrips).collect(Collectors.toList());
+				
+			}
+			
+		} catch (EX_General e)
+		{
+			
+			e.printStackTrace();
+		}
+		
+		return topN;
 	}
 	
 	private void loadScripsandSectors(

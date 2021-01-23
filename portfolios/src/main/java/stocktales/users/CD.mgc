@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ClassDiagram>
+    <Class name="stocktales.users.model.entity.FundLine" x="595" y="38">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="stocktales.users.model.entity.SmallCaseDeployment"
+            endpointName="scdeployments" kind="Simple"/>
+        <Association
+            destinationClassName="stocktales.users.model.entity.Holdings"
+            endpointName="holdings" kind="Simple"/>
+        <Association
+            destinationClassName="stocktales.users.model.entity.UserPF"
+            endpointName="user" kind="Simple"/>
+    </Class>
+    <Class name="stocktales.users.model.entity.SmallCaseDeployment"
+        x="840" y="350">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="stocktales.users.model.entity.FundLine"
+            endpointName="fundline" kind="Simple"/>
+    </Class>
+    <Class name="stocktales.users.model.entity.UserPF" x="71" y="58">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="stocktales.users.model.entity.FundLine"
+            endpointName="fundlines" kind="Simple"/>
+    </Class>
+    <Class name="stocktales.users.model.entity.Holdings" x="178" y="317">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="stocktales.users.model.entity.FundLine"
+            endpointName="fundline" kind="Simple"/>
+    </Class>
+</ClassDiagram>
