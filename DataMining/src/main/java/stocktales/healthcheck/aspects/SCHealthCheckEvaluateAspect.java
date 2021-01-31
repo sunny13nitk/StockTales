@@ -1,5 +1,6 @@
 package stocktales.healthcheck.aspects;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +28,9 @@ public class SCHealthCheckEvaluateAspect
 	private IHC_GetEvaluationResults srvInstance;
 	
 	//- On Interface at specific Method with Argument
-	@Around("IHC_GetEvaluationResultsInterface() && returnAfterEvaluationMethodCall() && args(scCode)")
+	@Around("IHC_GetEvaluationResultsInterface() && returnAfterEvaluationMethodCall() && args(scCode,isFinancial)")
 	public Object evaluateMainSrv(
-	        ProceedingJoinPoint pjp, String scCode
+	        ProceedingJoinPoint pjp, String scCode, boolean isFinancial
 	) throws Throwable
 	{
 		// To actually get the BaseValue from Main Service - SubServices Calls are subsequent 
@@ -63,15 +64,21 @@ public class SCHealthCheckEvaluateAspect
 									IHC_SubSrvRes subSrvRef = (IHC_SubSrvRes) entry.getValue();
 									if (subSrvRef != null)
 									{
-										List<HCSubSrvRes> subSrvRes = subSrvRef.getSubServiceResults(scCode);
-										if (subSrvRes != null)
+										HealthCheckCriteria hcAnn = (HealthCheckCriteria) this
+										        .getAnnotationforObjbyAnnType(subSrvRef, HealthCheckCriteria.class);
+										if (hcAnn != null)
 										{
-											for (HCSubSrvRes hcSubSrvRes : subSrvRes)
+											if (isFinancial)
 											{
-												beanReturnResult.getMessages().addAll(hcSubSrvRes.getMessages());
-												beanReturnResult.getDataContainers()
-												        .addAll(hcSubSrvRes.getContainers());
+												if (hcAnn.isApplicableforFinancials())
+												{
+													retriveResults(subSrvRef, scCode, beanReturnResult);
+												}
+											} else
+											{
+												retriveResults(subSrvRef, scCode, beanReturnResult);
 											}
+											
 										}
 										
 									}
@@ -104,11 +111,47 @@ public class SCHealthCheckEvaluateAspect
 	 * For Method Execution returnAfterEvaluation - Argument of Type String
 	 */
 	
-	@Pointcut("execution(public stocktales.healthcheck.model.helperpojo.HCBeanReturn *.returnAfterEvaluation(String))")
+	@Pointcut(
+	    "execution(public stocktales.healthcheck.model.helperpojo.HCBeanReturn *.returnAfterEvaluation(String,boolean))"
+	)
 	public void returnAfterEvaluationMethodCall(
 	)
 	{
 		
+	}
+	
+	// PRIVATE ROUTINES
+	
+	private Annotation getAnnotationforObjbyAnnType(
+	        Object obj, final Class<? extends Annotation> annotation
+	)
+	{
+		Annotation ann = null;
+		
+		if (obj != null)
+		{
+			
+			Class<?> klass = obj.getClass();
+			ann = klass.getAnnotation(annotation);
+			
+		}
+		
+		return ann;
+	}
+	
+	private void retriveResults(
+	        IHC_SubSrvRes subSrvRef, String scCode, HCBeanReturn beanReturnResult
+	)
+	{
+		List<HCSubSrvRes> subSrvRes = subSrvRef.getSubServiceResults(scCode);
+		if (subSrvRes != null)
+		{
+			for (HCSubSrvRes hcSubSrvRes : subSrvRes)
+			{
+				beanReturnResult.getMessages().addAll(hcSubSrvRes.getMessages());
+				beanReturnResult.getDataContainers().addAll(hcSubSrvRes.getContainers());
+			}
+		}
 	}
 	
 }

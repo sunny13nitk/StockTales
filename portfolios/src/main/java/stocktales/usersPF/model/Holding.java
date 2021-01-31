@@ -1,12 +1,17 @@
-package stocktales.users.model.entity;
+package stocktales.usersPF.model;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -18,23 +23,39 @@ import lombok.Setter;
 @Table(name = "holdings")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-
-public class Holdings
+@AllArgsConstructor
+public class Holding
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long hid;
+	private int hid;
 	
 	private String sccode;
-	private double allocamnt;
-	private double depamnt;
-	private int    numunits;
+	
+	private int units;
+	
 	private double ppu;
+	
+	private double realzdiv;
+	
+	private double realzpl;
 	
 	@ManyToOne(cascade =
 	{ CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-	@JoinColumn(name = "flid")
-	private FundLine fundline;
+	@JoinColumn(name = "id")
+	private UserStrategy userStrategy;
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "holdingHeader")
+	private List<HoldingItem> holdingItem = new ArrayList<HoldingItem>();
+	
+	public Holding addItem(
+	        HoldingItem hlI
+	)
+	{
+		hlI.setHoldingHeader(this);
+		this.holdingItem.add(hlI);
+		return this;
+	}
+	
 }

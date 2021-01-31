@@ -1,4 +1,4 @@
-package stocktales.users.model.entity;
+package stocktales.usersPF.model;
 
 import java.sql.Date;
 
@@ -15,25 +15,30 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stocktales.usersPF.enums.EnumTxnType;
 
 @Entity
-@Table(name = "scdeployments")
+@Table(name = "holdingitems")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-
-public class SmallCaseDeployment
+@AllArgsConstructor
+public class HoldingItem
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long dpid;
+	private int hlid;
 	
-	private Date   date;   //Date of Deployment
-	private double amount; //Amount Deployed
+	private Date date;
+	
+	private EnumTxnType txntype;
+	
+	private int units;
+	
+	private double ppu; //Includes Brokerage
 	
 	@ManyToOne(cascade =
 	{ CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-	@JoinColumn(name = "flid")
-	private FundLine fundline;
+	@JoinColumn(name = "hid")
+	private Holding holdingHeader;
 }

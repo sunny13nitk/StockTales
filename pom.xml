@@ -22,6 +22,7 @@
 		<module>StockTalesWeb</module>
 		<module>portfolios</module>
 		<module>DataMining</module>
+		<module>Utilities</module>
 	</modules>
 
 	<properties>

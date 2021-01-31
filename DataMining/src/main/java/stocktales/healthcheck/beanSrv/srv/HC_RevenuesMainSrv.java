@@ -42,7 +42,7 @@ public class HC_RevenuesMainSrv implements IHC_GetEvaluationResults
 	
 	@Override
 	public HCBeanReturn returnAfterEvaluation(
-	        String scCode
+	        String scCode, boolean isFinancial
 	)
 	{
 		

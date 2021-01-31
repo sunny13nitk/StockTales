@@ -42,6 +42,8 @@ import stocktales.dataBook.helperPojo.scjournal.dbproc.intf.ScJSummary;
 import stocktales.dataBook.model.repo.scjournal.RepoScJournal;
 import stocktales.healthcheck.intf.IHC_Srv;
 import stocktales.healthcheck.model.helperpojo.HCComboResult;
+import stocktales.healthcheck.repo.Repo_CfgHC;
+import stocktales.healthcheck.repo.intf.IRepoCfgSrvStext;
 import stocktales.helperPOJO.NameValDouble;
 import stocktales.helperPOJO.ScValFormPOJO;
 import stocktales.predicates.manager.PredicateManager;
@@ -52,6 +54,7 @@ import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.DAO.types.scDataContainer;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
+import stocktales.usersPF.repo.RepoHoldings;
 
 @Controller
 @RequestMapping("/test")
@@ -101,6 +104,12 @@ public class TestController
 	
 	@Autowired
 	private IHC_Srv hcSrv;
+	
+	@Autowired
+	private Repo_CfgHC repoHCCfg;
+	
+	@Autowired
+	private RepoHoldings repoHoldings;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -743,6 +752,38 @@ public class TestController
 			
 		}
 		
+		return "success";
+	}
+	
+	@GetMapping("/hcSrvList")
+	public String getUnqHCSrv(
+	)
+	{
+		
+		List<IRepoCfgSrvStext> srvList = null;
+		
+		srvList = repoHCCfg.getServicesListUnique();
+		if (srvList != null)
+		{
+			for (IRepoCfgSrvStext srv : srvList)
+			{
+				System.out.println(
+				        srv.getSrvname() + "  :  " + srv.getStext() + "  - Financials " + srv.getForFinancials());
+			}
+		}
+		
+		return "success";
+		
+	}
+	
+	@GetMapping("/alloc/{usSTId}")
+	public String testTotalDeployment(
+	        @PathVariable long usSTId
+	)
+	{
+		
+		double alloc = repoHoldings.getTotalAllocation(usSTId);
+		System.out.println("Total Allocation for Strategy :  " + usSTId + " : " + alloc);
 		return "success";
 	}
 	

@@ -12,4 +12,6 @@ import stocktales.healthcheck.enums.EnumHCCriteria;
 public @interface HealthCheckCriteria
 {
 	EnumHCCriteria criteria() default EnumHCCriteria.Other;
+	
+	boolean isApplicableforFinancials() default true;
 }

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<div th:replace="fragments/header :: STHeader"></div>
+
+</head>
+<body>
+
+   <div style="min-height: 600px; overflow: hidden;">
+      <div data-role="navview" data-compact="md" data-expand="false"
+         data-active-state="true">
+         <div th:replace="fragments/navbar :: STNavbar"></div>
+
+
+
+         <div class="navview-content pl-4-md pr-4-md">
+
+            <div class="grid">
+
+               <div th:replace="fragments/brand :: STBrand"></div>
+
+               <!-- your Code Starts from Here  -->
+               <div class="grid" style="padding: 20px">
+
+                  <!--Salutation Row - Starts  -->
+                  <div class="row">
+
+                     <div class="colspan-11 " style="margin-left: 10px">
+                        <h3 style="color: #4465a1">
+                           Hi <span style="color: #B1365B"
+                              th:text="${pfConfig.username}"></span> ! <span
+                              class="mif-user-check"></span>
+                        </h3>
+                     </div>
+
+
+
+                  </div>
+                  <!-- Salutation Row - Ends  -->
+
+                  <!-- Customize button at Top ROW - Starts -->
+                  <div class="row">
+                     <!-- Customize Button - Col Start -->
+                     <div class="colspan-2"
+                        style="margin-left: 20px; margin-top: 30px">
+
+
+                        <a href="#"
+                           class="button primary rounded outline"
+                           th:href="@{/pf/cus}" role="button"> <span
+                           class="mif-cog icon" style="margin-left: 0px"></span>
+                           <span style="margin-left: 3px">Customize</span>
+                        </a>
+
+
+                     </div>
+                     <!-- Customize Button - Col End -->
+
+                  </div>
+
+                  <!-- Customize button at Top ROW - Ends-->
+
+
+
+
+               </div>
+
+            </div>
+         </div>
+      </div>
+
+      <!-- Metro 4 -->
+      <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+</html>

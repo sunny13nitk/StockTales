@@ -17,9 +17,10 @@ import lombok.NoArgsConstructor;
 import stocktales.factsheet.interfaces.IFactSheetBufferSrv;
 import stocktales.healthcheck.intf.IHC_GetEvaluationResults;
 import stocktales.healthcheck.intf.IHC_Srv;
-import stocktales.healthcheck.model.entity.Cfg_ScripHealthCheck;
 import stocktales.healthcheck.model.helperpojo.HCComboResult;
+import stocktales.healthcheck.model.helperpojo.HCEvalResult;
 import stocktales.healthcheck.repo.Repo_CfgHC;
+import stocktales.healthcheck.repo.intf.IRepoCfgSrvStext;
 import stocktales.services.interfaces.ScripService;
 
 @Getter
@@ -78,15 +79,15 @@ public class HC_Srv implements IHC_Srv
 		
 		if (repoCFG_HC != null)
 		{
-			//Get all Customizing
+			//Get all Customizing - Unique Services and Criteria List from config Repo
 			
-			List<Cfg_ScripHealthCheck> cfgList = repoCFG_HC.findAll();
+			List<IRepoCfgSrvStext> cfgList = repoCFG_HC.getServicesListUnique();
 			if (cfgList != null)
 			{
 				if (cfgList.size() > 0)
 				{
 					//for each Configuration
-					for (Cfg_ScripHealthCheck cfg : cfgList)
+					for (IRepoCfgSrvStext cfg : cfgList)
 					{
 						if (cfg.getSrvname() != null && appCtxt != null)
 						{
@@ -95,9 +96,32 @@ public class HC_Srv implements IHC_Srv
 							        .getBean(cfg.getSrvname());
 							if (mainSrv != null)
 							{
-								mainSrv.returnAfterEvaluation(this.scCode);
+								HCComboResult comboResult = new HCComboResult();
+								
+								//Prepare and Set Eval Result
+								HCEvalResult evalResult = new HCEvalResult();
+								evalResult.setStext(cfg.getStext());
+								comboResult.setEvalResult(evalResult);
+								
+								if (financialScrip)
+								{
+									//If Financial Scrip - Execute Only for Financial Services
+									if (cfg.getForFinancials())
+									{
+										
+										comboResult.setBeanProcResult(
+										        mainSrv.returnAfterEvaluation(this.scCode, financialScrip));
+									}
+								} else
+								{
+									comboResult.setBeanProcResult(
+									        mainSrv.returnAfterEvaluation(this.scCode, financialScrip));
+								}
+								
+								this.results.add(comboResult);
 							}
 						}
+						
 					}
 				}
 			}
