@@ -3,11 +3,15 @@ package stocktales.durations;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import stocktales.helperpojos.TY_YearFromTo;
 
 public class UtilDurations
 {
@@ -76,6 +80,61 @@ public class UtilDurations
 		}
 		
 		return numDays;
+	}
+	
+	public static int getCurrentQuarter(
+	)
+	{
+		int Qtr = 0;
+		
+		LocalDate currentdate  = LocalDate.now();
+		Month     currentMonth = currentdate.getMonth();
+		int       monVal       = currentMonth.getValue();
+		
+		if (monVal >= 1 && monVal <= 3)
+		{
+			Qtr = 1;
+		} else if (monVal > 3 && monVal <= 6)
+		{
+			Qtr = 2;
+		} else if (monVal > 6 && monVal <= 9)
+		{
+			Qtr = 3;
+		} else if (monVal > 9 && monVal <= 12)
+		{
+			Qtr = 4;
+		}
+		
+		return Qtr;
+	}
+	
+	/**
+	 * Get FRom and TO Years From Current Year 
+	 * @param sincelast - Positive Value of # Years to Traverse in Past
+	 * @return
+	 */
+	public static TY_YearFromTo getYearsFromHistory(
+	        int sincelast
+	)
+	{
+		TY_YearFromTo yearFromTo = new TY_YearFromTo();
+		
+		int year = Year.now().getValue();
+		
+		int currQ = getCurrentQuarter();
+		
+		if (currQ > 2) //Usually Financial Results updated after Q2
+		{
+			yearFromTo.setYearTo(year);
+		} else
+		{
+			//Results Not published and updated , consider penultimate Year
+			yearFromTo.setYearTo(year - 1);
+		}
+		
+		yearFromTo.setYearFrom(yearFromTo.getYearTo() - sincelast);
+		
+		return yearFromTo;
 	}
 	
 }

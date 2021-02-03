@@ -23,6 +23,7 @@ import stocktales.basket.allocations.autoAllocation.pojos.FCFScore;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.interfaces.IStgyRebalanceSrv;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.StgyRebalance;
+import stocktales.basket.allocations.autoAllocation.strategy.repo.RepoStgyAllocations;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCWtPESrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.scWtPE;
@@ -54,6 +55,10 @@ import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.DAO.types.scDataContainer;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
+import stocktales.strategy.helperPOJO.NiftyStgyCAGR;
+import stocktales.strategy.helperPOJO.SectorAllocations;
+import stocktales.strategy.helperPOJO.StgyStatsSummary;
+import stocktales.strategy.intf.IStrategyStatsSrv;
 import stocktales.usersPF.repo.RepoHoldings;
 
 @Controller
@@ -110,6 +115,12 @@ public class TestController
 	
 	@Autowired
 	private RepoHoldings repoHoldings;
+	
+	@Autowired
+	private RepoStgyAllocations repoStgyAlloc;
+	
+	@Autowired
+	private IStrategyStatsSrv stgyStatsSrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -784,6 +795,51 @@ public class TestController
 		
 		double alloc = repoHoldings.getTotalAllocation(usSTId);
 		System.out.println("Total Allocation for Strategy :  " + usSTId + " : " + alloc);
+		return "success";
+	}
+	
+	@GetMapping("/Strategy/{stgyId}")
+	public String testStgyAlloc(
+	        @PathVariable int stgyId
+	)
+	{
+		if (stgyId > 0)
+		{
+			try
+			{
+				StgyStatsSummary stgySummary = stgyStatsSrv.getStatsforStrategy(stgyId);
+				if (stgySummary != null)
+				{
+					if (stgySummary.getStgyNiftyCagrVals() != null)
+					{
+						for (NiftyStgyCAGR cagrItem : stgySummary.getStgyNiftyCagrVals())
+						{
+							System.out.println(cagrItem.getDurationVal() + " Strategy CAGR : " + cagrItem.getStgyCAGR()
+							        + "%" + " v/s NIFTY CAGR : " + cagrItem.getNiftyCAGR() + "%");
+						}
+					}
+				}
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return "success";
+	}
+	
+	@GetMapping("/stgySecAlloc/{stgyId}")
+	public String testStgySecAlloc(
+	        @PathVariable int stgyId
+	)
+	{
+		List<SectorAllocations> secAlloc = stgyStatsSrv.getSectorSplitUpforStrategy(stgyId);
+		for (SectorAllocations sectorAllocations : secAlloc)
+		{
+			System.out
+			        .println("Sector : " + sectorAllocations.getSector() + " ---" + sectorAllocations.getAlloc() + "%");
+		}
+		
 		return "success";
 	}
 	

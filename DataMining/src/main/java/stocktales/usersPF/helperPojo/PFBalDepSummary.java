@@ -19,6 +19,6 @@ public class PFBalDepSummary
 	
 	private String deployBalS;
 	
-	private double deployPer;
+	private int deployPer;
 	
 }

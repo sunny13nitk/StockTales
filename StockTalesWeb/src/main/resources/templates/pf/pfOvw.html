@@ -6,63 +6,239 @@
 </head>
 <body>
 
-   <div style="min-height: 600px; overflow: hidden;">
-      <div data-role="navview" data-compact="md" data-expand="false"
-         data-active-state="true">
-         <div th:replace="fragments/navbar :: STNavbar"></div>
+
+   <div data-role="navview" data-compact="md" data-expand="false"
+      data-active-state="true">
+      <div th:replace="fragments/navbar :: STNavbar"></div>
 
 
 
-         <div class="navview-content pl-4-md pr-4-md">
+      <div class="navview-content pl-4-md pr-4-md">
 
-            <div class="grid">
+         <div class="grid">
 
-               <div th:replace="fragments/brand :: STBrand"></div>
+            <div th:replace="fragments/brand :: STBrand"></div>
 
-               <!-- your Code Starts from Here  -->
-               <div class="grid" style="padding: 20px">
+            <!-- your Code Starts from Here  -->
+            <div class="grid" style="padding: 20px">
 
-                  <!--Salutation Row - Starts  -->
-                  <div class="row">
+               <!--Salutation Row - Starts  -->
+               <div class="row">
 
-                     <div class="colspan-11 " style="margin-left: 10px">
-                        <h3 style="color: #4465a1">
-                           Hi <span style="color: #B1365B"
-                              th:text="${pfConfig.username}"></span> ! <span
-                              class="mif-user-check"></span>
-                        </h3>
-                     </div>
+                  <div class="colspan-11 " style="margin-left: 10px">
+                     <h3 style="color: #4465a1">
+                        Hi <span style="color: #B1365B"
+                           th:text="${pfConfig.username}"></span> ! <span
+                           class="mif-user-check"></span>
+                     </h3>
+                  </div>
 
+
+
+               </div>
+               <!-- Salutation Row - Ends  -->
+
+               <!-- Customize button at Top ROW - Starts -->
+               <div class="row">
+                  <!-- Customize Button - Col Start -->
+                  <div style="margin-left: 20px; margin-top: 30px">
+
+
+                     <a href="#" class="button primary rounded outline"
+                        th:href="@{/pf/cus}" role="button"> <span
+                        class="mif-cog icon" style="margin-left: 0px"></span>
+                        <span style="margin-left: 3px">Customize</span>
+                     </a>
 
 
                   </div>
-                  <!-- Salutation Row - Ends  -->
+                  <!-- Customize Button - Col End -->
 
-                  <!-- Customize button at Top ROW - Starts -->
-                  <div class="row">
-                     <!-- Customize Button - Col Start -->
-                     <div class="colspan-2"
-                        style="margin-left: 20px; margin-top: 30px">
+                  <!-- Subscribe Button - Col Start -->
+                  <div th:if="${canSubscribe == true}"
+                     style="margin-left: 20px; margin-top: 30px">
 
 
-                        <a href="#"
-                           class="button primary rounded outline"
-                           th:href="@{/pf/cus}" role="button"> <span
-                           class="mif-cog icon" style="margin-left: 0px"></span>
-                           <span style="margin-left: 3px">Customize</span>
-                        </a>
+                     <a href="#"
+                        class="button secondary rounded outline"
+                        th:href="@{/pf/subscribe}" role="button"> <span
+                        class="mif-dice icon" style="margin-left: 0px"></span>
+                        <span style="margin-left: 3px">Subscribe
+                           to Strategy</span>
+                     </a>
 
+
+                  </div>
+                  <!-- Subscribe Button - Col End -->
+
+               </div>
+
+               <!-- Customize button at Top ROW - Ends-->
+
+               <!-- Deployments and Cash Summary Row - Starts -->
+
+               <div class="row">
+
+                  <div class="colspan-12 ">
+                     <div class="card" style="padding-top: -20px">
+
+                        <div class="row flex-align-center">
+                           <div class="cell">
+                              <blockquote class="right-side">
+                                 <h2 style="color: #486590"
+                                    th:text="${depSummary.cashBalS}"></h2>
+                                 <span
+                                    style="color: #907348; font-weight: medium;">Funds
+                                    Available</span>
+                              </blockquote>
+
+                           </div>
+
+
+                           <div th:if="${depSummary.deployBal > 0}"
+                              class="cell">
+                              <blockquote class="right-side">
+                                 <h2 style="color: #5D7EAE"
+                                    th:text="${depSummary.deployBalS}"></h2>
+                                 <span
+                                    style="color: #907348; font-weight: medium;">Funds
+                                    Deployed</span>
+                              </blockquote>
+                           </div>
+
+                           <div th:if="${depSummary.deployBal > 0}"
+                              class="cell">
+
+                              <blockquote class="right-side">
+                                 <div id="donut_val" data-role="donut"
+                                    style="margin-top: 10px"
+                                    data-hole=".8" data-animate="10"
+                                    data-fill="#4E76B2"
+                                    th:attr="data-value=${depSummary.deployPer}"
+                                    class="mx-auto"></div>
+                                 <div>
+                                    <span
+                                       style="color: #907348; font-weight: medium;">Funds
+                                       Deployed %</span>
+                                 </div>
+                              </blockquote>
+
+                           </div>
+
+                           <div
+                              th:if="${pfConfig.userStrategies.size() > 0}"
+                              class="cell">
+
+                              <blockquote class="right-side">
+                                 <h2 style="color: #488990"
+                                    th:text="${pfConfig.userStrategies.size()}"></h2>
+                                 <span
+                                    style="color: #2f562b; font-weight: medium;">Strategies
+                                    Subscribed</span>
+                              </blockquote>
+
+                           </div>
+
+                           <div class="cell flex-justify-end">
+
+
+                              <div class=" row d-flex flex-justify-left"
+                                 style="margin-left: 30px; margin-top: 10px">
+
+
+                                 <a href="#"
+                                    class="button success rounded outline"
+                                    th:href="@{/pf/addfunds}"
+                                    role="button"> <span
+                                    class="mif-add icon"
+                                    style="margin-left: 0px"></span> <span
+                                    style="margin-left: 3px">Add
+                                       Funds</span>
+                                 </a>
+
+
+                              </div>
+
+
+
+
+                              <div class="row d-flex flex-justify-left"
+                                 style="margin-left: 30px; margin-top: 20px">
+                                 <a href="#"
+                                    class="button alert rounded outline"
+                                    th:href="@{/pf/withdrawfunds}"
+                                    role="button"> <span
+                                    class="mif-refresh icon"
+                                    style="margin-left: 0px"></span> <span
+                                    style="margin-left: 3px">Withdraw
+                                 </span>
+                                 </a>
+
+                              </div>
+
+                              <!--Split Button - Starts  -->
+                              <div class=" row d-flex flex-justify-left"
+                                 style="margin-left: 30px; margin-top: 20px; margin-bottom: 10px">
+                                 <div class="multi-action">
+                                    <button
+                                       class="action-button rotate-minus bg-transparent fg-mauve"
+                                       onclick="$(this).toggleClass('active')"
+                                       data-role="hint"
+                                       data-hint-text="Scrip Events"
+                                       data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                                       data-hint-position="left">
+                                       <span class="icon"><span
+                                          class="mif-plus"></span></span>
+                                    </button>
+                                    <ul class="actions drop-right">
+
+
+                                       <li
+                                          class="bg-transparent fg-mauve"><a
+                                          th:href="@{/pf/dividendShow}"
+                                          data-role="hint"
+                                          data-hint-text="Dividend"
+                                          data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                                          data-hint-position="bottom"><span
+                                             class="mif-gift"></span></a></li>
+
+
+                                       <li
+                                          class="bg-transparent fg-mauve"><a
+                                          th:href="@{/pf/BonusShow}"
+                                          data-role="hint"
+                                          data-hint-text="Bonus"
+                                          data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                                          data-hint-position="bottom"><span
+                                             class="mif-magic-wand"></span></a></li>
+
+                                       <li
+                                          class="bg-transparent fg-mauve"><a
+                                          th:href="@{/pf/SplitShow}"
+                                          data-role="hint"
+                                          data-hint-text="Split"
+                                          data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                                          data-hint-position="bottom"><span
+                                             class="mif-flow-branch"></span></a></li>
+
+                                    </ul>
+                                 </div>
+
+
+
+                              </div>
+                              <!-- Split Button - Ends  -->
+                           </div>
+
+
+
+                        </div>
 
                      </div>
-                     <!-- Customize Button - Col End -->
 
                   </div>
 
-                  <!-- Customize button at Top ROW - Ends-->
-
-
-
-
+                  <!-- Deployments and Cash Summary Row - Ends -->
                </div>
 
             </div>

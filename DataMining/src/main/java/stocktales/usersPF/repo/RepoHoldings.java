@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import stocktales.usersPF.model.Holding;
+import stocktales.usersPF.repo.intf.IUserStgyNumbers;
 
 @Repository
 public interface RepoHoldings extends JpaRepository<Holding, Integer>
@@ -27,4 +28,18 @@ public interface RepoHoldings extends JpaRepository<Holding, Integer>
 	public double getTotalPandL(
 	        long userStgyId
 	);
+	
+	/**
+	 * Get User Strategy - Total Allocation, Total P&L, Total Dividends 
+	 * @param userStgyId - User Strategy ID (ID with which User is associated to a Strategy)
+	 * @return - User Strategy - Total Allocation, Total P&L, Total Dividends 
+	 */
+	
+	@Query(
+	    "select SUM( units * ppu ) as totalAllocation, SUM(realzdiv) as totalDiv, SUM(realzpl) as totalPL from Holding where userStrategy.id = ?1"
+	)
+	public IUserStgyNumbers getStgyNumbers(
+	        long userStgyId
+	);
+	
 }

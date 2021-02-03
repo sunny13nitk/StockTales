@@ -56,6 +56,8 @@ public class UserPFConfig
 	
 	private boolean confirmb4deploy; //Confirm Amount always before deployment
 	
+	private String brokerurl;
+	
 	/*
 	 * Any User(s) can subscribe to Many Strategies
 	 * One to Many Relation

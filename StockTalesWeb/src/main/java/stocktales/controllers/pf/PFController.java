@@ -1,5 +1,7 @@
 package stocktales.controllers.pf;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.validation.Valid;
@@ -11,11 +13,15 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import stocktales.strategy.helperPOJO.StgyStatsSummary;
+import stocktales.strategy.intf.IStrategyStatsSrv;
 import stocktales.usersPF.intf.ISessionUserManager;
 import stocktales.usersPF.model.UserPFConfig;
+import stocktales.usersPF.model.UserStrategy;
 import stocktales.usersPF.repo.RepoBrokers;
 import stocktales.usersPF.repo.RepoUserPFConfig;
 
@@ -34,6 +40,9 @@ public class PFController
 	private RepoUserPFConfig repoPFConfig;
 	
 	@Autowired
+	private IStrategyStatsSrv stgyStatsSrv;
+	
+	@Autowired
 	private MessageSource msgSrc;
 	
 	@GetMapping("/ovw")
@@ -50,6 +59,8 @@ public class PFController
 			{
 				//Load the model accordingly and Traverse
 				model.addAttribute("pfConfig", pfConfig);
+				model.addAttribute("depSummary", usrMgrSrv.getPFBalDepSummary());
+				model.addAttribute("canSubscribe", usrMgrSrv.CanUserSubscibeTOStrategies());
 				
 			} else
 			{
@@ -60,6 +71,7 @@ public class PFController
 				model.addAttribute("pfConfig", pfConfig);
 				model.addAttribute("message", msgSrc.getMessage("NO_PFCUS", null, Locale.ENGLISH));
 				model.addAttribute("brokers", repoBrokers.getBrokerNames());
+				
 			}
 		}
 		return vwName;
@@ -81,11 +93,69 @@ public class PFController
 					model.addAttribute("pfConfig", pfConfig);
 					model.addAttribute("message", msgSrc.getMessage("EDIT_PFCUS", null, Locale.ENGLISH));
 					model.addAttribute("brokers", repoBrokers.getBrokerNames());
+					
 				}
 			}
 		}
 		
 		return "pf/pfCusForm";
+	}
+	
+	@GetMapping("/subscribe")
+	public String showSubscribeOptions(
+	        Model model
+	)
+	{
+		List<Integer> canbeSubsStg = usrMgrSrv.getSubscribableStrategies();
+		
+		if (canbeSubsStg != null)
+		{
+			if (canbeSubsStg.size() > 0)
+			{
+				try
+				{
+					List<StgyStatsSummary> summaryList = new ArrayList<StgyStatsSummary>();
+					for (Integer stid : canbeSubsStg)
+					{
+						summaryList.add(stgyStatsSrv.getStatsforStrategy(stid));
+					}
+					
+					model.addAttribute("summaryList", summaryList);
+				} catch (Exception e)
+				{
+					model.addAttribute("formError", e.getMessage());
+				}
+			}
+		}
+		
+		return "pf/subscribe";
+	}
+	
+	@GetMapping("/addSubscription/{stid}")
+	public String addSubscription(
+	        @PathVariable String stid, Model model
+	)
+	{
+		int stgyid = new Integer(stid);
+		if (stgyid > 0)
+		{
+			usrMgrSrv.loadPFDetails();
+			UserPFConfig pfConfig = usrMgrSrv.getUserPFDetails();
+			
+			UserStrategy newStgySubs = new UserStrategy();
+			newStgySubs.setActive(true); //active
+			newStgySubs.setStid(stgyid); //Strategy ID
+			
+			//Subscribed by User PF Config
+			pfConfig.subscribeToStrategy(newStgySubs);
+			
+			//Save the User PF Config
+			repoPFConfig.save(pfConfig);
+			
+		}
+		
+		//Back to Portfolio OverView
+		return "redirect:/pf/ovw";
 	}
 	
 	@PostMapping("/saveConfig")
