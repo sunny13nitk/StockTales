@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stocktales.basket.allocations.autoAllocation.strategy.interfaces.IStgyAllocShort;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.RepoStgyAllocations;
 import stocktales.cagrEval.helperPoJo.CAGRResult;
@@ -95,13 +96,19 @@ public class StrategyStatsSrv implements IStrategyStatsSrv
 		this.stgyStatsShort.setStgyDetails(repoStgy.findByStid(strategyId));
 		
 		//Populate Allocations
-		this.stgyStats.setScripAllocations(repoStgyAlloc.findAllByStrategyStid(strategyId));
-		this.stgyStatsShort.setNumScrips(this.stgyStats.getScripAllocations().size());
-		;
+		List<IStgyAllocShort> perAllocs = repoStgyAlloc.findAllByStrategyStid(strategyId);
+		if (perAllocs != null)
+		{
+			this.stgyStatsShort.setNumScrips(perAllocs.size());
+			
+		}
 		
 		//Populate Sectors Split Up
-		this.stgyStats.setSectorAllocations(this.getSectorSplitUpforStrategy(strategyId));
-		this.stgyStatsShort.setNumSectors(this.stgyStats.getSectorAllocations().size());
+		List<SectorAllocations> secAllocs = this.getSectorSplitUpforStrategy(strategyId);
+		if (secAllocs != null)
+		{
+			this.stgyStatsShort.setNumSectors(secAllocs.size());
+		}
 		
 		return this.stgyStatsShort;
 	}

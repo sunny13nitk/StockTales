@@ -21,6 +21,7 @@ import stocktales.basket.allocations.autoAllocation.interfaces.EDRCScoreCalcSrv;
 import stocktales.basket.allocations.autoAllocation.interfaces.ISrv_FCFSCore;
 import stocktales.basket.allocations.autoAllocation.pojos.FCFScore;
 import stocktales.basket.allocations.autoAllocation.pojos.ScripEDRCScore;
+import stocktales.basket.allocations.autoAllocation.strategy.interfaces.IStgyAllocShort;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.interfaces.IStgyRebalanceSrv;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.StgyRebalance;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.RepoStgyAllocations;
@@ -840,6 +841,20 @@ public class TestController
 			        .println("Sector : " + sectorAllocations.getSector() + " ---" + sectorAllocations.getAlloc() + "%");
 		}
 		
+		return "success";
+	}
+	
+	@GetMapping("/stalloc/{stgyId}")
+	public String testStgyAllocPer(
+	        @PathVariable int stgyId
+	)
+	{
+		
+		List<IStgyAllocShort> listAlloc = repoStgyAlloc.findAllByStrategyStid(stgyId);
+		for (IStgyAllocShort alloc : listAlloc)
+		{
+			System.out.println(alloc.getSccode() + "---" + alloc.getAlloc() + "%");
+		}
 		return "success";
 	}
 	

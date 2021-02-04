@@ -17,9 +17,13 @@ import stocktales.usersPF.repo.intf.IUserStgyNumbers;
 
 public class UserStrategySnaphot
 {
+	private long usstId;
+	
 	private StgyStatsShortSummary stgyStatsShort;
 	
 	private String totalAllocation;
+	
+	private double totalAllocationPer;
 	
 	private String realzDiv;
 	

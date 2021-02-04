@@ -20,6 +20,7 @@ public interface RepoStgyAllocations extends JpaRepository<StAllocItem, Integer>
 	        int StrategyId
 	);
 	
+	//@Query(" select s.sccode as sccode, s.alloc as alloc from StAllocItem s  where s.strategy.stid = ?1 ")
 	public List<IStgyAllocShort> findAllByStrategyStid(
 	        int strategyId
 	);

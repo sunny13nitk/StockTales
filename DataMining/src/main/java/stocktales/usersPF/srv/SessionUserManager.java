@@ -20,8 +20,10 @@ import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
 import stocktales.money.UtilDecimaltoMoneyString;
 import stocktales.strategy.intf.IStrategyStatsSrv;
 import stocktales.usersPF.helperPojo.PFBalDepSummary;
+import stocktales.usersPF.helperPojo.UserHoldingStats;
 import stocktales.usersPF.helperPojo.UserStrategySnaphot;
 import stocktales.usersPF.intf.ISessionUserManager;
+import stocktales.usersPF.model.Holding;
 import stocktales.usersPF.model.UserPFConfig;
 import stocktales.usersPF.model.UserStrategy;
 import stocktales.usersPF.repo.RepoHoldings;
@@ -144,23 +146,66 @@ public class SessionUserManager implements ISessionUserManager
 			{
 				if (userPFDetails.getUserStrategies().size() > 0)
 				{
+					usStgySnapshotList = new ArrayList<UserStrategySnaphot>();
+					
 					for (UserStrategy usStgy : userPFDetails.getUserStrategies())
 					{
 						UserStrategySnaphot usStgySS = new UserStrategySnaphot();
+						
+						usStgySS.setUsstId(usStgy.getId());
 						usStgySS.setStgyStatsShort(stgyStatsSrv.getShortStatsforStrategy(usStgy.getStid()));
 						usStgySS.setStgynumbers(repoHoldings.getStgyNumbers(usStgy.getId()));
-						usStgySS.setActive(usStgy.isActive());
-						usStgySS.setTotalAllocation(UtilDecimaltoMoneyString
-						        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalAllocation(), 1));
-						usStgySS.setRealzPL(UtilDecimaltoMoneyString
-						        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalPL(), 1));
 						
-						usStgySS.setRealzDiv(UtilDecimaltoMoneyString
-						        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalDiv(), 1));
+						usStgySS.setActive(usStgy.isActive());
+						
+						if (getTotalDeployments() > 0)
+						{
+							
+							usStgySS.setTotalAllocation(UtilDecimaltoMoneyString
+							        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalAllocation(), 1));
+							usStgySS.setRealzPL(UtilDecimaltoMoneyString
+							        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalPL(), 1));
+							
+							usStgySS.setRealzDiv(UtilDecimaltoMoneyString
+							        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalDiv(), 1));
+							
+							usStgySS.setTotalAllocationPer(Precision.round(
+							        ((usStgySS.getStgynumbers().getTotalAllocation() / getTotalDeployments()) * 100),
+							        1));
+						}
 						
 						/*
 						 * Loop on Holdings and Compile
 						 */
+						
+						if (usStgy.getHoldings() != null)
+						{
+							if (usStgy.getHoldings().size() > 0)
+							{
+								for (Holding holding : usStgy.getHoldings())
+								{
+									
+									UserHoldingStats hStats = new UserHoldingStats();
+									hStats.copyfromHolding(holding);
+									
+									hStats.setTotalAlloc(hStats.getPpu() * hStats.getUnits());
+									hStats.setTotalAllocS(UtilDecimaltoMoneyString
+									        .getMoneyStringforDecimal(hStats.getTotalAlloc(), 1));
+									
+									hStats.setAllocPer(Precision.round(
+									        ((hStats.getTotalAlloc() / usStgySS.getStgynumbers().getTotalAllocation()
+									                * 100)),
+									        1));
+									hStats.setAllocPerS(hStats.getAllocPer() + " %");
+									
+									usStgySS.getHoldingsStatsList().add(hStats);
+								}
+								
+							}
+						}
+						
+						usStgySnapshotList.add(usStgySS);
+						
 					}
 				}
 			}

@@ -85,10 +85,11 @@
                         <div class="row flex-align-center">
                            <div class="cell">
                               <blockquote class="right-side">
-                                 <h2 style="color: #486590"
-                                    th:text="${depSummary.cashBalS}"></h2>
+                                 <h1
+                                    style="color: #486590; font-weight: bold"
+                                    th:text="${depSummary.cashBalS}"></h1>
                                  <span
-                                    style="color: #907348; font-weight: medium;">Funds
+                                    style="color: #907348; font-weight: bolder;">Funds
                                     Available</span>
                               </blockquote>
 
@@ -98,10 +99,11 @@
                            <div th:if="${depSummary.deployBal > 0}"
                               class="cell">
                               <blockquote class="right-side">
-                                 <h2 style="color: #5D7EAE"
-                                    th:text="${depSummary.deployBalS}"></h2>
+                                 <h1
+                                    style="color: #5D7EAE; font-weight: bold;"
+                                    th:text="${depSummary.deployBalS}"></h1>
                                  <span
-                                    style="color: #907348; font-weight: medium;">Funds
+                                    style="color: #907348; font-weight: bolder;">Funds
                                     Deployed</span>
                               </blockquote>
                            </div>
@@ -118,7 +120,7 @@
                                     class="mx-auto"></div>
                                  <div>
                                     <span
-                                       style="color: #907348; font-weight: medium;">Funds
+                                       style="color: #907348; font-weight: bolder;">Funds
                                        Deployed %</span>
                                  </div>
                               </blockquote>
@@ -130,10 +132,11 @@
                               class="cell">
 
                               <blockquote class="right-side">
-                                 <h2 style="color: #488990"
-                                    th:text="${pfConfig.userStrategies.size()}"></h2>
+                                 <h1
+                                    style="color: #488990; font-weight: bold;"
+                                    th:text="${pfConfig.userStrategies.size()}"></h1>
                                  <span
-                                    style="color: #2f562b; font-weight: medium;">Strategies
+                                    style="color: #2f562b; font-weight: bolder;">Strategies
                                     Subscribed</span>
                               </blockquote>
 
@@ -147,7 +150,7 @@
 
 
                                  <a href="#"
-                                    class="button success rounded outline"
+                                    class="button success rounded outline large"
                                     th:href="@{/pf/addfunds}"
                                     role="button"> <span
                                     class="mif-add icon"
@@ -241,11 +244,397 @@
                   <!-- Deployments and Cash Summary Row - Ends -->
                </div>
 
+
+               <!-- Strategy Details Row(s) - Starts -->
+               <!--Salutation Row - Starts  -->
+               <div class="row">
+
+                  <div th:if="${summaryStgy != null }"
+                     class="colspan-11 " style="margin-left: 10px">
+                     <h3 style="color: #4465a1">Deployment(s)</h3>
+                  </div>
+
+                  <div th:if="${summaryStgy == null }"
+                     class="colspan-11 " style="margin-left: 10px">
+                     <h3 style="color: #4465a1">Subscription(s)</h3>
+
+                  </div>
+
+
+               </div>
+               <!-- Salutation Row - Ends  -->
+
+               <div th:if="${summaryStgy!= null }"
+                  th:each="summaryStgy : ${stgySSList}">
+                  <!-- Each Strategy Row - Starts -->
+
+                  <div class="row">
+
+                     <div class="colspan-12 ">
+
+
+                        <div class="card" style="padding-top: -20px">
+
+                           <div class="row flex-align-center">
+                              <!-- Stgy Details - subscribe Button Starts -->
+                              <div class="d-flex flex-justify-center">
+                                 <blockquote class="right-side"
+                                    style="padding: 30px">
+                                    <h1 style="color: #486590"
+                                       th:text="${summaryStgy.stgyStatsShort.stgyDetails.getName()}"></h1>
+
+                                    <h2 style="color: #4F4890">
+                                       Scrips <span
+                                          style="color: #655DAE"
+                                          th:text="${summaryStgy.stgyStatsShort.numScrips}"></span>
+
+                                    </h2>
+
+
+
+                                    <h2 style="color: #904865">
+                                       Sectors <span
+                                          style="color: #659048"
+                                          th:text="${summaryStgy.stgyStatsShort.numSectors}"></span>
+
+                                    </h2>
+
+                                    <!-- Deploy Button - Col Start -->
+                                    <div class="colspan-2"
+                                       th:if="${summaryStgy.active ==true }"
+                                       style="margin-left: 20px; margin-top: 30px">
+
+                                       <a href="#"
+                                          class="button success rounded outline large"
+                                          th:href="@{/pf/deploy/{id}/{stid} ( id=${summaryStgy.usstId},stid=${summaryStgy.stgyStatsShort.stgyDetails.getStid()})}"
+                                          role="button"> <span
+                                          class="mif-thumbs-up icon"
+                                          style="margin-left: 0px"></span>
+                                          <span style="margin-left: 3px">Deploy
+                                             Funds</span>
+                                       </a>
+
+
+                                    </div>
+                                    <!-- Deploy Button - Col End -->
+
+                                    <!-- Deactivate Button - Col Start -->
+                                    <div class="colspan-2"
+                                       th:if="${summaryStgy.active ==true } "
+                                       style="margin-left: 20px; margin-top: 20px">
+
+                                       <a href="#"
+                                          class="button alert rounded outline"
+                                          th:href="@{/pf/deactivate/{id}/ ( id=${summaryStgy.usstId})}"
+                                          role="button"> <span
+                                          class="mif-flash-off icon"
+                                          style="margin-left: 0px"></span>
+                                          <span style="margin-left: 3px">Deactivate</span>
+                                       </a>
+
+
+                                    </div>
+                                    <!-- Deactivate Button - Col End -->
+
+                                    <!-- activate Button - Col Start -->
+                                    <div class="colspan-2"
+                                       th:if="${summaryStgy.active == false }"
+                                       style="margin-left: 20px; margin-top: 30px">
+
+                                       <a href="#"
+                                          class="button success rounded outline"
+                                          th:href="@{/pf/activate/{id} ( id=${summaryStgy.usstId})}"
+                                          role="button"> <span
+                                          class="mif-flash-on icon"
+                                          style="margin-left: 0px"></span>
+                                          <span style="margin-left: 3px">Activate</span>
+                                       </a>
+
+
+                                    </div>
+                                    <!-- activate Button - Col End -->
+
+                                 </blockquote>
+
+                              </div>
+
+
+                              <!-- Stgy Holdings -  Starts -->
+                              <div class="cell"
+                                 th:if="${summaryStgy.holdingsStatsList.size() > 0}">
+
+                                 <blockquote class="right-side">
+
+                                    <div
+                                       class="row d-flex flex-justify-center">
+
+                                       <h6
+                                          style="color: #000058; background: #F1F2FF; padding: 10px; margin-left: 5px center;">
+                                          <span style="color: #585800">Holdings
+                                             Factsheet</span>
+
+                                       </h6>
+                                    </div>
+                                    <hr />
+
+                                    <!-- For Each Holding Entity -->
+                                    <div
+                                       th:each="holding : ${summaryStgy.holdingsStatsList}">
+
+                                       <div
+                                          class="row d-flex flex-justify-left"
+                                          style="margin-top: 10px; margin-left: 10px; padding: 10px">
+
+                                          <span
+                                             style="color: #41729F; font-weight: bolder;"
+                                             th:text="${holding.getSccode()}"></span>
+                                          <span
+                                             style="color: #419F9D; font-weight: bolder; margin-left: 10px"
+                                             th:text="${holding.getUnits()}"></span>
+
+                                          <span
+                                             style="color: #419F9D; font-weight: bolder; margin-left: 3px">
+                                             shares</span> <span
+                                             style="color: #41439F; font-weight: bolder; margin-left: 5px">
+                                             @</span> <span
+                                             style="color: #419F9D; font-weight: bolder; margin-left: 3px"
+                                             th:text="${holding.getPpu()}"></span>
+                                          <span
+                                             class="mif-brightness mif-lg fg-orange"
+                                             style="margin-left: 15px"></span>
+                                          <span
+                                             style="color: #D86C27; font-weight: bolder; margin-left: 5px"
+                                             th:text="${holding.totalAllocS}">
+                                          </span> <span
+                                             style="color: #D86C27; font-weight: bolder; margin-left: 8px">
+                                             Invested </span>
+
+
+                                       </div>
+
+                                       <div
+                                          class="row d-flex flex-justify-left"
+                                          style="margin-left: 10px">
+
+                                          <div class="cell-5"
+                                             style="margin-top: 3px">
+                                             <span data-role="progress"
+                                                data-type="buffer"
+                                                data-cls-bar="bg-pink"
+                                                data-cls-buffer="bg-white"
+                                                data-small="true"
+                                                th:attr="data-value=${holding.allocPerS}">
+                                             </span> <span
+                                                style="color: #C26DBC; font-weight: bolder;"
+                                                th:text="${holding.allocPerS}"></span>
+                                             <span
+                                                style="color: #C26D91; font-weight: bolder;">
+                                                contribution</span>
+
+                                          </div>
+
+
+
+                                       </div>
+
+
+                                       <div
+                                          class="row d-flex flex-justify-left"
+                                          style="margin-left: 10px">
+
+                                          <span
+                                             th:if="${holding.realzpl > 0 }"
+                                             class="mif-arrow-drop-up mif-lg fg-green"></span>
+
+                                          <span
+                                             th:if="${holding.realzpl > 0 }"
+                                             style="color: #18A558; font-weight: bolder; margin-left: 5px"
+                                             th:text="${holding.realzPLS}">
+                                          </span> <span
+                                             th:if="${holding.realzpl > 0}"
+                                             style="color: #18A558; font-weight: bolder; margin-left: 8px">
+                                             Realized P/L </span> <span
+                                             th:if="${holding.realzpl < 0 }"
+                                             class="mif-arrow-drop-down mif-lg fg-red"></span>
+                                          <span
+                                             th:if="${holding.realzpl < 0 }"
+                                             style="color: #D9267B; font-weight: bolder; margin-left: 5px"
+                                             th:text="${holding.realzPLS}">
+                                          </span> <span
+                                             th:if="${holding.realzpl < 0 }"
+                                             style="color: #D9267B; font-weight: bolder; margin-left: 8px">
+                                             Realized P/L </span> <span
+                                             style="margin-left: 10px"
+                                             th:if="${holding.realzdiv > 0 }"
+                                             class="mif-arrow-drop-up mif-lg fg-green"></span>
+                                          <span
+                                             th:if="${holding.realzdiv > 0 }"
+                                             style="color: #18A558; font-weight: bolder; margin-left: 5px"
+                                             th:text="${holding.realzDivS}">
+                                          </span> <span
+                                             style="color: #18A558; font-weight: bolder; margin-left: 8px">
+                                             Dividends </span>
+
+
+                                       </div>
+
+                                       <hr />
+                                    </div>
+                                 </blockquote>
+
+                              </div>
+
+                              <!-- Stgy Holdings - Ends -->
+
+
+                              <!-- Summary -  Starts -->
+                              <div class="cell"
+                                 th:if="${summaryStgy.holdingsStatsList.size() > 0}">
+
+
+                                 <blockquote class="right-side">
+
+                                    <div
+                                       class="row d-flex flex-justify-center">
+
+                                       <h6
+                                          style="color: #000058; background: #F1F2FF; padding: 10px; margin-left: 5px; text-align: center;">
+                                          <span style="color: #585800">Deployments
+                                             Summary</span>
+
+                                       </h6>
+                                    </div>
+
+                                    <div
+                                       th:if="${summaryStgy.totalAllocationPer > 0}"
+                                       class="row d-flex flex-justify-center">
+
+                                       <div class="cell">
+                                          <blockquote class="right-side">
+                                             <div id="donut_val"
+                                                data-role="donut"
+                                                style="margin-top: 10px"
+                                                data-hole=".8"
+                                                data-animate="10"
+                                                data-fill="#4E76B2"
+                                                th:attr="data-value=${summaryStgy.totalAllocationPer}"
+                                                class="mx-auto"></div>
+
+
+                                             <span
+                                                th:if="${summaryStgy.totalAllocationPer > 0 }"
+                                                style="color: #B28A4E; font-weight: bold;"
+                                                th:text="${summaryStgy.totalAllocationPer}"></span>
+                                             <span
+                                                style="color: #B28A4E; font-weight: bold; margin-top: 10px">
+                                                % of Deployed Funds in
+                                                this Strategy</span>
+                                          </blockquote>
+                                       </div>
+
+                                       <div
+                                          class="cell flex-column-align-center">
+                                          <blockquote class="right-side">
+                                             <h1
+                                                style="color: #486590; font-weight: bold;"
+                                                th:text="${summaryStgy.totalAllocation}"></h1>
+                                             <span
+                                                style="color: #907348; font-weight: bold;">Funds
+                                                Deployed in this
+                                                Strategy</span>
+                                          </blockquote>
+
+                                       </div>
+
+                                    </div>
+                                 </blockquote>
+
+                                 <!--Invested in n of x Stgy Scrips - Row Starts  -->
+                                 <div
+                                    class="row d-flex flex-justify-center"
+                                    style="margin-left: 10px">
+
+                                    <h5 style="color: #486590">
+                                       Invested in</h5>
+
+                                    <h3
+                                       style="color: #907348; margin-left: 10px; margin-right: 10px;"
+                                       th:text="${summaryStgy.holdingsStatsList.size()}">
+                                    </h3>
+
+                                    <h3>/</h3>
+                                    <h3
+                                       style="color: #907348; margin-left: 10px; margin-right: 10px;"
+                                       th:text="${summaryStgy.stgyStatsShort.numScrips}">
+                                    </h3>
+
+
+
+                                    <h5 style="color: #486590">of
+                                       Strategy Scrips</h5>
+                                 </div>
+
+                                 <!--Invested in n of x Stgy Scrips - Row Ends -->
+
+                                 <!-- Calculate Returns button at Next ROW - Starts -->
+                                 <div
+                                    th:if="${summaryStgy.holdingsStatsList.size() > 0}"
+                                    class="row d-flex flex-justify-center">
+
+                                    <div
+                                       style="margin-left: 20px; margin-top: 30px">
+
+
+                                       <a href="#"
+                                          class="button primary rounded outline large"
+                                          th:href="@{/pf/calcReturns/{id} ( id=${summaryStgy.usstId})}"
+                                          role="button"> <span
+                                          class="mif-calculator icon"
+                                          style="margin-left: 0px"></span>
+                                          <span style="margin-left: 3px">Calculate
+                                             Returns</span>
+                                       </a>
+
+
+                                    </div>
+
+
+                                 </div>
+
+                                 <!-- Calculate Returns button at Next ROW - Ends-->
+
+                              </div>
+                              <!-- Summary -  Ends -->
+
+
+
+
+
+
+
+                           </div>
+
+
+                        </div>
+
+
+                     </div>
+
+
+
+                  </div>
+
+               </div>
+
+               <!-- Each Strategy Row - Ends -->
             </div>
+
+
          </div>
       </div>
+   </div>
 
-      <!-- Metro 4 -->
-      <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
 </body>
 </html>

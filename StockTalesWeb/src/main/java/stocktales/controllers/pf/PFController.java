@@ -55,23 +55,30 @@ public class PFController
 		{
 			usrMgrSrv.loadPFDetails();
 			UserPFConfig pfConfig = usrMgrSrv.getUserPFDetails();
-			if (pfConfig != null)
+			try
 			{
-				//Load the model accordingly and Traverse
-				model.addAttribute("pfConfig", pfConfig);
-				model.addAttribute("depSummary", usrMgrSrv.getPFBalDepSummary());
-				model.addAttribute("canSubscribe", usrMgrSrv.CanUserSubscibeTOStrategies());
-				
-			} else
+				if (pfConfig != null)
+				{
+					//Load the model accordingly and Traverse
+					model.addAttribute("pfConfig", pfConfig);
+					model.addAttribute("depSummary", usrMgrSrv.getPFBalDepSummary());
+					model.addAttribute("canSubscribe", usrMgrSrv.CanUserSubscibeTOStrategies());
+					model.addAttribute("stgySSList", usrMgrSrv.getUserStgySnapshots());
+					
+				} else
+				{
+					//Initialize and Traverse
+					vwName   = "pf/pfCusForm";
+					pfConfig = new UserPFConfig();
+					pfConfig.setUsername(usrMgrSrv.getUserName());
+					model.addAttribute("pfConfig", pfConfig);
+					model.addAttribute("message", msgSrc.getMessage("NO_PFCUS", null, Locale.ENGLISH));
+					model.addAttribute("brokers", repoBrokers.getBrokerNames());
+					
+				}
+			} catch (Exception e)
 			{
-				//Initialize and Traverse
-				vwName   = "pf/pfCusForm";
-				pfConfig = new UserPFConfig();
-				pfConfig.setUsername(usrMgrSrv.getUserName());
-				model.addAttribute("pfConfig", pfConfig);
-				model.addAttribute("message", msgSrc.getMessage("NO_PFCUS", null, Locale.ENGLISH));
-				model.addAttribute("brokers", repoBrokers.getBrokerNames());
-				
+				e.printStackTrace();
 			}
 		}
 		return vwName;
