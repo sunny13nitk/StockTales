@@ -170,7 +170,7 @@ public class PFController
 	        @Valid @ModelAttribute("pfConfig") UserPFConfig pfConfig, BindingResult bres, Model model
 	)
 	{
-		String vwName = "pf/pfOvw";
+		String vwName = "redirect:/pf/ovw";
 		if (pfConfig != null)
 		{
 			if (bres.hasErrors())

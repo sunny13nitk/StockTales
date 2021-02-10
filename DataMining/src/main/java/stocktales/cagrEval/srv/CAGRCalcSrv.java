@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stocktales.basket.allocations.autoAllocation.interfaces.IScAllocationListRepo;
+import stocktales.basket.allocations.autoAllocation.pojos.ScAllocation;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.StAllocItem;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.Strategy;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
@@ -35,9 +37,12 @@ import stocktales.cagrEval.intf.IBalSheetUtilSrv;
 import stocktales.cagrEval.intf.ICAGRCalcSrv;
 import stocktales.cagrEval.intf.INiftyCAGRSrv;
 import stocktales.cagrEval.intf.IRollOverYrs;
+import stocktales.durations.UtilDurations;
 import stocktales.factsheet.interfaces.IFactSheetBufferSrv;
 import stocktales.healthcheck.beanSrv.helperPOJO.NameVal;
+import stocktales.helperpojos.TY_YearFromTo;
 import stocktales.scripsEngine.pojos.helperObjs.SheetNames;
+import stocktales.strategy.helperPOJO.NiftyStgyCAGR;
 
 @Getter
 @Setter
@@ -62,6 +67,9 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 	@Autowired
 	private INiftyCAGRSrv niftyCAGRSrv;
 	
+	@Autowired
+	private IScAllocationListRepo scAllocListSrv;
+	
 	private EnumStgyMode stgyMode;
 	
 	private boolean e2eOnly;
@@ -70,9 +78,14 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 	
 	private List<CAGRResult> cagrResults = new ArrayList<CAGRResult>();
 	
+	private List<NiftyStgyCAGR> scAllocCAGRResults = new ArrayList<NiftyStgyCAGR>();
+	
 	private List<String> scrips = new ArrayList<String>();
 	
 	private List<NameVal> stgyAllocations = new ArrayList<NameVal>();
+	
+	private final int[] intervals = new int[]
+	{ 3, 5, 7, 10 };
 	
 	@Override
 	public void Initialize(
@@ -96,7 +109,7 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 	@Override
 	public void InitializeAdHoc(
 	        List<NameVal> scripAllocationsList, boolean calcEndToEndOnly
-	)
+	) throws Exception
 	{
 		clear();
 		if (scripAllocationsList != null)
@@ -119,6 +132,21 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 				scrips      = scripAllocationsList.stream().map(x -> x.getName()).distinct()
 				        .collect(Collectors.toList());
 				this.scrips = scrips;
+				
+				double totalAlloc = Precision.round(scripAllocationsList.stream().mapToDouble(NameVal::getValue).sum(),
+				        0);
+				if (totalAlloc == 100)
+				{
+					
+					for (NameVal nameVal : scripAllocationsList)
+					{
+						this.stgyAllocations.add(new NameVal(nameVal.getName(), nameVal.getValue()));
+					}
+					
+					//Load Fact Sheet Buffer for allocation Scrips
+					fsBuffSrv.Initialize(scrips, SheetNames.Analysis, false);
+					
+				}
 				
 			}
 		}
@@ -250,6 +278,9 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 				case DB:
 					calcWtCAGRforStrategy();
 					
+				case Adhoc: //From SC Allocation List REpo Session Bean
+					calcWtCAGRforStrategy();
+					
 				default:
 					break;
 			}
@@ -257,6 +288,67 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 		
 		//Perform Stage 3 - Adjust for No Data Found & Summarize
 		adjustNoData_Summarize();
+		
+	}
+	
+	@Override
+	public void Initialize4mSCAllocationBuffer(
+	) throws Exception
+	{
+		if (this.getScAllocListSrv() != null)
+		{
+			if (this.getScAllocListSrv().getScAllocList() != null)
+			{
+				if (this.getScAllocListSrv().getScAllocList().size() > 0)
+				{
+					List<NameVal> namevals = new ArrayList<NameVal>();
+					
+					for (ScAllocation scAllocation : this.getScAllocListSrv().getScAllocList())
+					{
+						namevals.add(new NameVal(scAllocation.getScCode(), scAllocation.getAllocation()));
+					}
+					
+					this.InitializeAdHoc(namevals, true);
+					for (int i = 0; i < intervals.length; i++)
+					{
+						//For Each Interval
+						
+						TY_YearFromTo duration = UtilDurations.getYearsFromHistory(intervals[i]);
+						if (duration != null)
+						{
+							RollOverDurationsParam durationParam = new RollOverDurationsParam(duration.getYearFrom(), 1,
+							        (duration.getYearTo() - duration.getYearFrom()));
+							this.calculateCAGR(durationParam);
+							
+							List<CAGRResult> results = this.getCagrResults();
+							
+							if (results != null)
+							{
+								if (results.size() > 0)
+								{
+									CAGRResult cagrResult = results.get(results.size() - 1);
+									if (cagrResult.getSummary() != null)
+									{
+										NiftyStgyCAGR res      = new NiftyStgyCAGR();
+										int           deltaDur = cagrResult.getDurationH().getTo()
+										        - cagrResult.getDurationH().getFrom();
+										res.setDurationVal(
+										        res.getDurationPrefix() + deltaDur + res.getDurationSuffix());
+										
+										res.setStgyCAGR(cagrResult.getSummary().getNettCAGR());
+										res.setNiftyCAGR(cagrResult.getSummary().getNiftyCAGR());
+										
+										this.scAllocCAGRResults.add(res);
+									}
+								}
+								
+							}
+						}
+					}
+				}
+			}
+			
+		}
 		
 	}
 	
@@ -366,8 +458,10 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 	private void clear(
 	)
 	{
-		this.cagrResults     = new ArrayList<CAGRResult>();
-		this.scrips          = new ArrayList<String>();
-		this.stgyAllocations = new ArrayList<NameVal>();
+		this.cagrResults        = new ArrayList<CAGRResult>();
+		this.scrips             = new ArrayList<String>();
+		this.stgyAllocations    = new ArrayList<NameVal>();
+		this.scAllocCAGRResults = new ArrayList<NiftyStgyCAGR>();
 	}
+	
 }

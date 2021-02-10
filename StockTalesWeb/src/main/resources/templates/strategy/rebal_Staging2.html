@@ -206,11 +206,11 @@
 
                         <div class="card">
 
-                           <h6 style="color: #4465a1; margin-left: 10px">Maintain
-                              below Details to Save Strategy</h6>
+                           <h6 style="color: #4465a1; margin-left: 10px">Update
+                              Strategy Details !</h6>
 
                            <form th:object="${strategy}"
-                              th:action="@{'/stratergy/save'} "
+                              th:action="@{'/stratergy/save_rebal'} "
                               method="post">
 
                               <div class="colspan-7 offset-1"
@@ -257,7 +257,7 @@
                                     data-hint-text="Save Strategy">
                                     <span class="mif-floppy-disk"
                                        style="margin-left: 0px">
-                                    </span> <span style="margin-left: 3px">Save</span>
+                                    </span> <span style="margin-left: 3px">Update</span>
                                  </button>
 
                               </div>
@@ -279,8 +279,8 @@
             </div>
          </div>
       </div>
-
    </div>
+
    <!-- Metro 4 -->
    <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
 </body>

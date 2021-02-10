@@ -17,6 +17,7 @@ import stocktales.cagrEval.helperPoJo.CAGRFormPoJo;
 import stocktales.cagrEval.helperPoJo.CAGRResult;
 import stocktales.cagrEval.helperPoJo.RollOverDurationsParam;
 import stocktales.cagrEval.intf.ICAGRCalcSrv;
+import stocktales.strategy.intf.IStrategyStatsSrv;
 
 @Controller
 @RequestMapping("/cagrcalc")
@@ -24,6 +25,9 @@ public class CAGRCalcController
 {
 	@Autowired
 	private ICAGRCalcSrv cagrCalcSrv;
+	
+	@Autowired
+	private IStrategyStatsSrv stgyStatsSrv;
 	
 	@Autowired
 	private IRepoStrategy repoStgy;
@@ -78,7 +82,8 @@ public class CAGRCalcController
 					
 					model.addAttribute("E2E", e2eresult);
 					model.addAttribute("ROList", cagrResults);
-					model.addAttribute("details", repoStgy.findByStid(pojo.getStgyId()));
+					model.addAttribute("details", repoStgy.findByStidShort(pojo.getStgyId()));
+					model.addAttribute("summaryStgy", stgyStatsSrv.getStatsforStrategy(pojo.getStgyId()));
 					
 				} catch (Exception e)
 				{

@@ -1,6 +1,7 @@
 package stocktales.basket.allocations.autoAllocation.strategy.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,8 +16,13 @@ public interface IRepoStrategy extends JpaRepository<Strategy, Integer>
 	        String concept
 	);
 	
-	public IStgyShort findByStid(
+	@Query("Select s.stid as stid, s.name as name, s.concept as concept from Strategy s")
+	public IStgyShort findByStidShort(
 	        int id
+	);
+	
+	public Optional<Strategy> findByStid(
+	        int stid
 	);
 	
 	@Query("Select DISTINCT(stid) as stid from Strategy")

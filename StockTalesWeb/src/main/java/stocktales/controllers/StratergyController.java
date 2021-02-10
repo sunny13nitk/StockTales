@@ -2,11 +2,13 @@ package stocktales.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +27,12 @@ import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.interfa
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation;
+import stocktales.cagrEval.intf.ICAGRCalcSrv;
+import stocktales.predicates.GenericSCEDRCSummaryPredicate;
+import stocktales.predicates.manager.PredicateManager;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.services.interfaces.ScripService;
+import stocktales.strategy.helperPOJO.NiftyStgyCAGR;
 
 @Controller
 @RequestMapping("/stratergy")
@@ -37,6 +43,9 @@ public class StratergyController
 	
 	@Autowired
 	private IScAllocationListRepo allocationsRepo;
+	
+	@Autowired
+	private PredicateManager predMgrSrv;
 	
 	@Autowired
 	private SCValuationSrv scValSrv;
@@ -51,9 +60,15 @@ public class StratergyController
 	private IRepoStrategy stgRepo;
 	
 	@Autowired
-	private IStgyRebalanceSrv srv_Stgy_Rebal;
+	private IStgyRebalanceSrv stgyRebal_Srv;
+	
+	@Autowired
+	private ICAGRCalcSrv cagrCalcSrv;
 	
 	private List<String> scCodes;
+	
+	@Autowired
+	private MessageSource msgSrc;
 	
 	@GetMapping("/myFilter")
 	public String showStratergyStaging(
@@ -127,21 +142,6 @@ public class StratergyController
 		return "strategy/Staging_1";
 	}
 	
-	@PostMapping("/myFilter/addScrip")
-	public String addScripToStrategy(
-	        @ModelAttribute("scCode") String scCode
-	)
-	{
-		
-		if (scCode != null)
-		{
-			this.allocationsRepo.addNew(scCode);
-		}
-		
-		return "redirect:/stratergy/staging_1";
-		
-	}
-	
 	@GetMapping("/staging_1")
 	public String showStaging_1(
 	        Model model
@@ -213,11 +213,27 @@ public class StratergyController
 	{
 		if (stgySrv != null)
 		{
-			model.addAttribute("qStats", stgySrv.getQuickStats());
-			model.addAttribute("strategy", new Strategy());
+			
+			//Calculate CAGRs for Intervals before Saving
+			List<NiftyStgyCAGR> stgyResults = new ArrayList<NiftyStgyCAGR>();
+			try
+			{
+				cagrCalcSrv.Initialize4mSCAllocationBuffer();
+				model.addAttribute("qStats", stgySrv.getQuickStats());
+				model.addAttribute("cagrResults", cagrCalcSrv.getScAllocCAGRResults());
+				model.addAttribute("strategy", new Strategy());
+			}
+			
+			catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		
 		return "strategy/Staging_2";
+		
 	}
 	
 	@GetMapping("/list")
@@ -262,9 +278,136 @@ public class StratergyController
 	        @PathVariable("stgId") String stgId, Model model
 	)
 	{
-		model.addAttribute("rblPOJO", srv_Stgy_Rebal.triggerReBalancingforStgy(new Integer(stgId)));
-		model.addAttribute("scCodes", getSCCodes());
+		Optional<Strategy> stgyO = stgRepo.findByStid(new Integer(stgId));
+		if (stgyO.isPresent())
+		{
+			
+			GenericSCEDRCSummaryPredicate predBean = predMgrSrv.getActivePredicateBean(stgyO.get().getPredicatebean());
+			if (predBean != null)
+			{
+				model.addAttribute("criteria", predBean.getNotes());
+			}
+			model.addAttribute("concept", stgyO.get().getConcept());
+			model.addAttribute("rblPOJO", stgyRebal_Srv.triggerReBalancingforStgy(new Integer(stgId)));
+			model.addAttribute("scCodes", getSCCodes());
+		}
 		return "strategy/reBalance";
+	}
+	
+	@GetMapping("/rebal/add4mProposal/{scCode}")
+	public String addScriptoCurrScrips(
+	        @PathVariable("scCode") String scCode, Model model
+	)
+	{
+		stgyRebal_Srv.addNewScrip(scCode);
+		model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
+		model.addAttribute("scCodes", getSCCodes());
+		
+		return "strategy/reBalance";
+	}
+	
+	@GetMapping("/rebal/rem4mProposal/{scCode}")
+	public String removeScripFromCurrScrips(
+	        @PathVariable("scCode") String scCode, Model model
+	)
+	{
+		stgyRebal_Srv.deleteScrip(scCode);
+		model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
+		model.addAttribute("scCodes", getSCCodes());
+		
+		return "strategy/reBalance";
+	}
+	
+	@GetMapping("/rebal/delete/{scCode}")
+	public String deleteScripFromCurrScrips(
+	        @PathVariable("scCode") String scCode, Model model
+	)
+	{
+		stgyRebal_Srv.deleteScrip(scCode);
+		model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
+		model.addAttribute("scCodes", getSCCodes());
+		
+		return "strategy/reBalance";
+	}
+	
+	@GetMapping("/rebal/staging")
+	public String showRebalancing_Stage1(
+	        Model model
+	)
+	{
+		if (stgyRebal_Srv.getRblPojo().getCurrScrips() != null)
+		{
+			if (stgyRebal_Srv.getRblPojo().getCurrScrips().size() > 0)
+			{
+				this.allocationsRepo.clearAllocations();
+				this.allocationsRepo.stageAllocationsforScrips(stgyRebal_Srv.getRblPojo().getCurrScrips());
+				ScAllocationList scAllocList = new ScAllocationList();
+				scAllocList.setScAllocations(allocationsRepo.getScAllocList());
+				//Add Allocations List
+				model.addAttribute("scStagingList", scAllocList);
+				
+			}
+		}
+		return "strategy/rebal_Staging1";
+	}
+	
+	@GetMapping("/rebal/staging_refresh")
+	public String showRebalancingRefresh_Stage1(
+	        Model model
+	)
+	{
+		if (this.allocationsRepo.getScAllocList() != null)
+		{
+			if (this.allocationsRepo.getScAllocList().size() > 0)
+			{
+				
+				ScAllocationList scAllocList = new ScAllocationList();
+				scAllocList.setScAllocations(allocationsRepo.getScAllocList());
+				//Add Allocations List
+				model.addAttribute("scStagingList", scAllocList);
+				
+			}
+		}
+		return "strategy/rebal_Staging1";
+	}
+	
+	@GetMapping("/rebal/Staging2")
+	public String showRebalancesStgyFinal(
+	        Model model
+	)
+	{
+		if (stgyRebal_Srv.getRblPojo() != null && this.allocationsRepo != null && stgySrv != null)
+		{
+			
+			if (stgyRebal_Srv.getRblPojo().getStid() > 0 && allocationsRepo.getScAllocList() != null)
+			{
+				if (
+				    stgyRebal_Srv.getRblPojo().getCurrScrips().size() > 0 && allocationsRepo.getScAllocList().size() > 0
+				)
+				{
+					//Calculate CAGRs for Intervals before Saving
+					List<NiftyStgyCAGR> stgyResults = new ArrayList<NiftyStgyCAGR>();
+					
+					try
+					{
+						cagrCalcSrv.Initialize4mSCAllocationBuffer();
+						model.addAttribute("qStats", stgySrv.getQuickStats());
+						model.addAttribute("cagrResults", cagrCalcSrv.getScAllocCAGRResults());
+						Optional<Strategy> stgyO = this.stgRepo.findByStid(stgyRebal_Srv.getRblPojo().getStid());
+						if (stgyO.isPresent())
+						{
+							model.addAttribute("strategy", stgyO.get());
+						}
+						
+					} catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					
+				}
+			}
+		}
+		return "strategy/rebal_Staging2";
 	}
 	
 	/*
@@ -273,6 +416,21 @@ public class StratergyController
 	 *                     POST MAPPINGS
 	 * _____________________________________________________________________________________
 	 */
+	
+	@PostMapping("/myFilter/addScrip")
+	public String addScripToStrategy(
+	        @ModelAttribute("scCode") String scCode
+	)
+	{
+		
+		if (scCode != null)
+		{
+			this.allocationsRepo.addNew(scCode);
+		}
+		
+		return "redirect:/stratergy/staging_1";
+		
+	}
 	
 	@PostMapping(value = "/staging_1", params = "action=validProc")
 	public String refreshStaging_1(
@@ -298,6 +456,7 @@ public class StratergyController
 					
 					// Load on Allocations
 					stgySrv.loadAllocationItems(allocList);
+					
 				}
 				
 			}
@@ -318,6 +477,76 @@ public class StratergyController
 		}
 		//redirect to stratergy/staging_1
 		return "redirect:/stratergy/staging_1";
+	}
+	
+	@PostMapping(value = "/rebal_staging_1", params = "action=refresh")
+	public String validateRebal_Staging_1(
+	        @ModelAttribute("scStagingList") ScAllocationList scAllocations, Model model
+	
+	)
+	{
+		
+		if (scAllocations != null)
+		{
+			refreshAllocations(scAllocations);
+		}
+		//redirect to stratergy/staging_1
+		return "redirect:/stratergy/rebal/staging_refresh";
+	}
+	
+	@PostMapping(value = "/rebal_staging_1", params = "action=validProc")
+	public String procRebalStaging_1(
+	        @ModelAttribute("scStagingList") ScAllocationList scAllocations, Model model
+	
+	)
+	{
+		
+		String viewName = "strategy/rebal_Staging1";
+		
+		if (scAllocations != null)
+		{
+			List<ScAllocation> allocList = new ArrayList<ScAllocation>();
+			allocList = scAllocations.getScAllocations();
+			if (allocList.size() > 0)
+			{
+				//Totals of Allocation rounded to zero places should be 100
+				double totalAllocPer = scAllocations.getScAllocations().stream()
+				        .mapToDouble(ScAllocation::getAllocation).sum();
+				totalAllocPer = Precision.round(totalAllocPer, 0);
+				
+				if (totalAllocPer == 100)
+				{
+					refreshAllocations(scAllocations);
+					
+					// Initialize Session Bean for Strategy
+					stgySrv.Initialize();
+					
+					// Load on Allocations
+					stgySrv.loadAllocationItems(allocList);
+					
+					viewName = "redirect:/stratergy/rebal/Staging2";
+				}
+				
+				else //Allocations sum != 100
+				{
+					//Reset Allocations as per Form View
+					
+					refreshAllocations(scAllocations);
+					
+					ScAllocationList scAllocList = new ScAllocationList();
+					scAllocList.setScAllocations(allocationsRepo.getScAllocList());
+					//Add Allocations List
+					model.addAttribute("scStagingList", scAllocList);
+					
+					String msgText = msgSrc.getMessage("ERR_STGY_ALLOC", new Object[]
+					{ totalAllocPer }, Locale.ENGLISH);
+					model.addAttribute("formError", msgText);
+					
+				}
+				
+			}
+		}
+		return viewName;
 	}
 	
 	@PostMapping("/save")
@@ -349,6 +578,22 @@ public class StratergyController
 		model.addAttribute("scStagingList", scAllocList);
 		
 		return "strategy/simulation";
+	}
+	
+	@PostMapping("/rebal/addNewScrip")
+	public String addAdHocScripRebal(
+	        @ModelAttribute("scCode") String scCode, Model model
+	)
+	{
+		if (scCode != null)
+		{
+			stgyRebal_Srv.addNewScrip(scCode);
+			model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
+			model.addAttribute("scCodes", getSCCodes());
+			
+		}
+		
+		return "strategy/reBalance";
 	}
 	
 	/*************************************************************************

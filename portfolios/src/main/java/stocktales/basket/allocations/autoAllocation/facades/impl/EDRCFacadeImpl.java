@@ -170,7 +170,7 @@ public class EDRCFacadeImpl implements EDRCFacade
 					edrcFilteredRepo.setEdrcFilteredList(filteredR);
 				}
 			}
-			return filteredR;
+			
 		}
 		// TODO Auto-generated method stub
 		return filteredR;

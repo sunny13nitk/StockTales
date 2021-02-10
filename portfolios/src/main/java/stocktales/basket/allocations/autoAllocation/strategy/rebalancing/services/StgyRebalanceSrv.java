@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
+import stocktales.basket.allocations.autoAllocation.interfaces.IScAllocationListRepo;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.Strategy;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.entity.StgyRebalancingTexts;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.enums.ERebalType;
@@ -56,6 +57,9 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 	@Autowired
 	private ISCExistsDB_Srv scExSrv;
 	
+	@Autowired
+	private IScAllocationListRepo scAllocRepoSrv;
+	
 	private StgyRebalance rblPojo;
 	
 	@Override
@@ -63,6 +67,8 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 	        int stgId
 	)
 	{
+		this.rblPojo = null; //Clear on Start
+		
 		// 1. Populate the Basic Data
 		
 		populateBasicData(stgId);
@@ -84,8 +90,38 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 	        String scCode
 	)
 	{
-		// TODO Auto-generated method stub
-		return false;
+		boolean added = false;
+		
+		//If coming from Proposed Additions - Remove from Proposed Additions 
+		
+		if (scCode != null)
+		{
+			if (this.rblPojo.getPropAdditions().size() > 0)
+			{
+				Optional<String> propO = this.rblPojo.getPropAdditions().stream().filter(x -> x.equals(scCode))
+				        .findFirst();
+				if (propO.isPresent())
+				{
+					this.rblPojo.getPropAdditions().remove(scCode);
+					
+					this.rblPojo.getPropwithTxtsAdd().removeIf(x -> x.getSccode().equals(scCode));
+				}
+				
+				//Add it to Current Scrips - only if already not a part of
+				//Can come from Direct Scrip Selection too - Adhoc 
+				Optional<String> currO = this.rblPojo.getCurrScrips().stream().filter(x -> x.equals(scCode))
+				        .findFirst();
+				if (!currO.isPresent())
+				{
+					this.rblPojo.getCurrScrips().add(scCode);
+					added = true;
+				}
+				
+			}
+			
+		}
+		
+		return added;
 	}
 	
 	/*
@@ -96,8 +132,46 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 	        String scCode
 	)
 	{
+		boolean removed = false;
+		
+		//If coming from Proposed Removals - Remove from Proposed Removals
+		
+		if (scCode != null)
+		{
+			if (this.rblPojo.getPropRemovals().size() > 0)
+			{
+				Optional<String> propO = this.rblPojo.getPropRemovals().stream().filter(x -> x.equals(scCode))
+				        .findFirst();
+				if (propO.isPresent())
+				{
+					this.rblPojo.getPropRemovals().remove(scCode);
+					
+					this.rblPojo.getPropwithTxtsRemove().removeIf(x -> x.getSccode().equals(scCode));
+				}
+				
+				//Remove it from Current Scrips - only if already not a part of
+				//Can come from Direct Scrip Selection too - Adhoc 
+				Optional<String> currO = this.rblPojo.getCurrScrips().stream().filter(x -> x.equals(scCode))
+				        .findFirst();
+				if (currO.isPresent())
+				{
+					this.rblPojo.getCurrScrips().remove(scCode);
+					removed = true;
+				}
+				
+			}
+			
+		}
+		
+		return removed;
+	}
+	
+	@Override
+	public Strategy saveStrategy(
+	)
+	{
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	/*

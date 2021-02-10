@@ -71,7 +71,7 @@ public class StrategyStatsSrv implements IStrategyStatsSrv
 		this.stgyStats = new StgyStatsSummary();
 		
 		//Populate basic Details
-		this.stgyStats.setStgyDetails(repoStgy.findByStid(strategyId));
+		this.stgyStats.setStgyDetails(repoStgy.findByStidShort(strategyId));
 		
 		//Populate the CAGR
 		populateCAGR(strategyId);
@@ -93,7 +93,7 @@ public class StrategyStatsSrv implements IStrategyStatsSrv
 		this.stgyStatsShort = new StgyStatsShortSummary();
 		
 		//Populate basic Details
-		this.stgyStatsShort.setStgyDetails(repoStgy.findByStid(strategyId));
+		this.stgyStatsShort.setStgyDetails(repoStgy.findByStidShort(strategyId));
 		
 		//Populate Allocations
 		List<IStgyAllocShort> perAllocs = repoStgyAlloc.findAllByStrategyStid(strategyId);
