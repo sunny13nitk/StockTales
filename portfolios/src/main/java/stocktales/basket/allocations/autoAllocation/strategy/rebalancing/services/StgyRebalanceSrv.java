@@ -1,10 +1,12 @@
 package stocktales.basket.allocations.autoAllocation.strategy.rebalancing.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import lombok.Setter;
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.interfaces.IScAllocationListRepo;
+import stocktales.basket.allocations.autoAllocation.pojos.ScAllocation;
+import stocktales.basket.allocations.autoAllocation.strategy.pojos.StAllocItem;
 import stocktales.basket.allocations.autoAllocation.strategy.pojos.Strategy;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.entity.StgyRebalancingTexts;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.enums.ERebalType;
@@ -25,6 +29,7 @@ import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.interfa
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.StgyRebalance;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.repo.RepoStgyRebalancingTexts;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
+import stocktales.events.main.EV_StrategyRebalanced;
 import stocktales.predicates.GenericSCEDRCSummaryPredicate;
 import stocktales.predicates.manager.PredicateManagerImpl;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
@@ -44,6 +49,9 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 	
 	@Autowired
 	private IRepoStrategy repoStgy;
+	
+	@Autowired
+	private ApplicationEventPublisher evPub;
 	
 	@Autowired
 	private RepoStgyRebalancingTexts repoStgyRblTxts;
@@ -106,17 +114,15 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 					
 					this.rblPojo.getPropwithTxtsAdd().removeIf(x -> x.getSccode().equals(scCode));
 				}
-				
-				//Add it to Current Scrips - only if already not a part of
-				//Can come from Direct Scrip Selection too - Adhoc 
-				Optional<String> currO = this.rblPojo.getCurrScrips().stream().filter(x -> x.equals(scCode))
-				        .findFirst();
-				if (!currO.isPresent())
-				{
-					this.rblPojo.getCurrScrips().add(scCode);
-					added = true;
-				}
-				
+			}
+			
+			//Add it to Current Scrips - only if already not a part of
+			//Can come from Direct Scrip Selection too - Adhoc 
+			Optional<String> currO = this.rblPojo.getCurrScrips().stream().filter(x -> x.equals(scCode)).findFirst();
+			if (!currO.isPresent())
+			{
+				this.rblPojo.getCurrScrips().add(scCode);
+				added = true;
 			}
 			
 		}
@@ -149,16 +155,15 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 					this.rblPojo.getPropwithTxtsRemove().removeIf(x -> x.getSccode().equals(scCode));
 				}
 				
-				//Remove it from Current Scrips - only if already not a part of
-				//Can come from Direct Scrip Selection too - Adhoc 
-				Optional<String> currO = this.rblPojo.getCurrScrips().stream().filter(x -> x.equals(scCode))
-				        .findFirst();
-				if (currO.isPresent())
-				{
-					this.rblPojo.getCurrScrips().remove(scCode);
-					removed = true;
-				}
-				
+			}
+			
+			//Remove it from Current Scrips - only if already not a part of
+			//Can come from Direct Scrip Selection too - Adhoc 
+			Optional<String> currO = this.rblPojo.getCurrScrips().stream().filter(x -> x.equals(scCode)).findFirst();
+			if (currO.isPresent())
+			{
+				this.rblPojo.getCurrScrips().remove(scCode);
+				removed = true;
 			}
 			
 		}
@@ -167,11 +172,119 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 	}
 	
 	@Override
-	public Strategy saveStrategy(
+	public void saveStrategy(
+	        Strategy Stgy
 	)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Strategy stgy = null;
+		
+		if (this.rblPojo != null && this.scAllocRepoSrv != null && Stgy != null)
+		{
+			if (this.rblPojo.getStid() > 0 && this.scAllocRepoSrv.getScAllocList() != null)
+			{
+				if (this.scAllocRepoSrv.getScAllocList().size() > 0)
+				{
+					//GEt Strategy from DB
+					Optional<Strategy> stgyO = repoStgy.findByStid(this.rblPojo.getStid());
+					if (stgyO.isPresent())
+					{
+						
+						stgy = stgyO.get();
+						
+						// Update the Header first
+						
+						stgy.setName(Stgy.getName());
+						stgy.setConcept(Stgy.getConcept());
+						stgy.setActive(Stgy.isActive());
+						stgy.setRebalanceallowed(Stgy.isRebalanceallowed());
+						stgy.setLastupdate(new java.sql.Date(System.currentTimeMillis()));
+						
+						//Now Update the Allocations
+						
+						//Start reading from Buffer
+						for (ScAllocation scAlloc : this.scAllocRepoSrv.getScAllocList())
+						{
+							//Find for Current scrip in Strategy Allocations
+							Optional<StAllocItem> allocIO = stgy.getAllocItems().stream()
+							        .filter(x -> x.getSccode().equals(scAlloc.getScCode())).findFirst();
+							
+							if (allocIO.isPresent())
+							{
+								//Found -Update
+								StAllocItem allocItem = allocIO.get();
+								allocItem.setAlloc(scAlloc.getAllocation()); //Update Allocation Percentage
+								allocItem.setMos(scAlloc.getMoS()); //Set MoS
+								
+							} else
+							{
+								//Not found - Insert
+								
+								//Create POJO
+								StAllocItem allocItem = new StAllocItem();
+								
+								//Set Properties			
+								allocItem.setSccode(scAlloc.getScCode());
+								allocItem.setMos(scAlloc.getMoS());
+								allocItem.setAlloc(scAlloc.getAllocation());
+								
+								//Add to Strategy
+								stgy.addAllocationItem(allocItem);
+								
+							}
+							
+						}
+						
+						//Also need to take care of deleting the ones that are in Dbase but not in buffer - Deleted
+						//Read DB Ones
+						
+						//Add to a seperate List the ones that need deletion
+						List<String> tobeDeleted = new ArrayList<String>();
+						
+						for (StAllocItem scAllocI : stgy.getAllocItems())
+						{
+							Optional<ScAllocation> scAllocO = this.scAllocRepoSrv.getScAllocList().stream()
+							        .filter(x -> x.getScCode().equals(scAllocI.getSccode())).findFirst();
+							if (scAllocO.isPresent())
+							{
+								//Do Nothing - already Updated as Above
+							} else
+							{
+								scAllocI.setStrategy(null); //Dis-associate the relation
+								//These needs to be deleted from DB
+								this.rblPojo.getTobeDeleted().add(scAllocI.getAllocid());
+								tobeDeleted.add(scAllocI.getSccode());
+							}
+						}
+						
+						if (tobeDeleted.size() > 0)
+						{
+							for (String scCode : tobeDeleted)
+							{
+								stgy.getAllocItems().removeIf(x -> x.getSccode().equals(scCode));
+							}
+						}
+						
+						try
+						{
+							
+							//Trigger the Event if valid Strategy REturned
+							if (stgy != null)
+							{
+								//SAve  In the event within @Transactional for Rollback in case of any error
+								EV_StrategyRebalanced event_rebalOK = new EV_StrategyRebalanced(this, stgy);
+								evPub.publishEvent(event_rebalOK);
+							}
+						} catch (Exception e)
+						{
+							e.printStackTrace();
+						}
+						
+					}
+					
+				}
+			}
+		}
+		
 	}
 	
 	/*

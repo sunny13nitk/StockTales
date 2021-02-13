@@ -1,11 +1,13 @@
 package stocktales.strategy.srv;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -21,6 +23,7 @@ import lombok.Setter;
 import stocktales.basket.allocations.autoAllocation.strategy.interfaces.IStgyAllocShort;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.RepoStgyAllocations;
+import stocktales.cagrEval.enums.EnumDurationType;
 import stocktales.cagrEval.helperPoJo.CAGRResult;
 import stocktales.cagrEval.helperPoJo.RollOverDurationsParam;
 import stocktales.cagrEval.intf.ICAGRCalcSrv;
@@ -58,6 +61,8 @@ public class StrategyStatsSrv implements IStrategyStatsSrv
 	
 	private final int[] intervals = new int[]
 	{ 3, 5, 7, 10 };
+	
+	private final int maxYr = Calendar.getInstance().get(Calendar.YEAR);
 	
 	private StgyStatsSummary      stgyStats;
 	private StgyStatsShortSummary stgyStatsShort;
@@ -147,7 +152,7 @@ public class StrategyStatsSrv implements IStrategyStatsSrv
 				if (allocsPerSector.size() > 0)
 				{
 					List<SectorAllocations> secAllocP = new ArrayList<SectorAllocations>();
-					allocsPerSector.forEach((k, v) -> secAllocP.add(new SectorAllocations(k, v)));
+					allocsPerSector.forEach((k, v) -> secAllocP.add(new SectorAllocations(k, Precision.round(v, 1))));
 					secAlloc = secAllocP;
 				}
 				
@@ -177,17 +182,30 @@ public class StrategyStatsSrv implements IStrategyStatsSrv
 				{
 					cagrCalcSrv.Initialize(stgyId, true);
 					
+					//In Strategy Statistics Service we would always compute to last update data from Previous Years
 					RollOverDurationsParam durationParam = new RollOverDurationsParam(duration.getYearFrom(), 1,
-					        (duration.getYearTo() - duration.getYearFrom()));
+					        (duration.getYearTo() - duration.getYearFrom()), true);
 					cagrCalcSrv.calculateCAGR(durationParam);
 					
 					List<CAGRResult> results = cagrCalcSrv.getCagrResults();
 					if (results != null)
 					{
-						if (results.size() > 0)
+						
+						/*
+						 * Filter for Last Update result Enum in duration Type and then the one where to val is maximum 
+						 */
+						
+						List<CAGRResult> cagrResultsLU = results.stream().filter(
+						        x -> x.getDurationH().getDurationType() == EnumDurationType.ToLastUpdate)
+						        .collect(Collectors.toList());
+						if (cagrResultsLU != null)
 						{
-							if (results.get(0).getSummary() != null)
+							
+							if (cagrResultsLU.size() > 0)
 							{
+								
+								CAGRResult cagrResult = cagrResultsLU.get(cagrResultsLU.size() - 1);
+								
 								NiftyStgyCAGR niftyStgyCagr = new NiftyStgyCAGR();
 								niftyStgyCagr.setDurationVal(niftyStgyCagr.getDurationPrefix() + intervals[i]
 								        + niftyStgyCagr.getDurationSuffix());

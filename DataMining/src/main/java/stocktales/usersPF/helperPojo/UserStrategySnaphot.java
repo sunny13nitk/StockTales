@@ -31,6 +31,8 @@ public class UserStrategySnaphot
 	
 	private boolean active;
 	
+	private boolean rebalanceneeded;
+	
 	private IUserStgyNumbers stgynumbers;
 	
 	private List<UserHoldingStats> holdingsStatsList = new ArrayList<UserHoldingStats>();

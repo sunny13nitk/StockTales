@@ -2,6 +2,7 @@ package stocktales.cagrEval.srv;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stocktales.cagrEval.helperPoJo.BalSheetSrvParam;
 import stocktales.cagrEval.helperPoJo.CAGRPoJo;
+import stocktales.cagrEval.helperPoJo.SCCurrData;
 import stocktales.cagrEval.helperPoJo.YearsFromTo;
 import stocktales.cagrEval.intf.IBalSheetUtilSrv;
 import stocktales.factsheet.interfaces.IFactSheetBufferSrv;
@@ -41,7 +43,13 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 	private Method      getMethod;
 	private YearsFromTo yearFromTo; // Balance Sheet Data maintained From to Years
 	
+	private SCCurrData scCurrData; //Current Scrip Data - From Container in case needed
+	
+	private final int maxYr = Calendar.getInstance().get(Calendar.YEAR);
+	
 	private List<EN_SC_BalSheet> balSheetEntities = new ArrayList<EN_SC_BalSheet>();
+	
+	private boolean currData = false;
 	
 	@Override
 	public double getFromBalSheetByParam(
@@ -54,7 +62,7 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 		if (isFieldValid(balSheetParam.getAttrName()))
 		{
 			//Load the Balance Sheet Entities from FactSheet Buffer of Scrip Data Containers for Current Scrip
-			loadBalSheetData(balSheetParam.getScCode());
+			loadBalSheetData(balSheetParam.getScCode(), balSheetParam.isCurrentData());
 			
 			//Populate Max and Min Years of BS Data maintained
 			populateBSDurationRange();
@@ -101,10 +109,12 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 		this.setGetMethod(null);
 		this.setYearFromTo(null);
 		this.setBalSheetEntities(new ArrayList<EN_SC_BalSheet>());
+		this.setScCurrData(null);
+		this.currData = false;
 	}
 	
 	private void loadBalSheetData(
-	        String scCode
+	        String scCode, boolean currData
 	)
 	{
 		if (scCode != null)
@@ -113,7 +123,16 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 			if (scDC != null)
 			{
 				this.balSheetEntities = scDC.getBalSheet_L();
+				this.scCurrData       = new SCCurrData();
+				scCurrData.setMCap(scDC.getSCRoot().getMktCap());
 			}
+			if (currData == true)
+			{
+				
+				this.currData = true;
+				
+			}
+			
 		}
 	}
 	
@@ -134,6 +153,7 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 		{
 			yearFromTo.setTo(balMax.get().getYear());
 		}
+		
 	}
 	
 	private double calculate(
@@ -162,21 +182,29 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 		YearsFromTo yftseek  = new YearsFromTo();
 		CAGRPoJo    cagrPoJo = new CAGRPoJo();
 		
-		if (yearFromTo.getFrom() <= yft.getFrom() && yearFromTo.getTo() >= yft.getTo())
+		if (currData == false)
+		{
+			
+			if (yearFromTo.getFrom() <= yft.getFrom() && yearFromTo.getTo() >= yft.getTo())
+			{
+				yftseek = yft;
+				
+			} else //Will fail on Min side Only - Min Data old ought not be found for certain scrips
+			{
+				if (yearFromTo.getTo() < yft.getTo())
+				{
+					yftseek.setFrom(yearFromTo.getFrom());
+					yftseek.setTo(yearFromTo.getTo());
+				} else
+				{
+					yftseek.setFrom(yearFromTo.getFrom());
+					yftseek.setTo(yft.getTo());
+				}
+			}
+			
+		} else
 		{
 			yftseek = yft;
-			
-		} else //Will fail on Min side Only - Min Data old ought not be found for certain scrips
-		{
-			if (yearFromTo.getTo() < yft.getTo())
-			{
-				yftseek.setFrom(yearFromTo.getFrom());
-				yftseek.setTo(yearFromTo.getTo());
-			} else
-			{
-				yftseek.setFrom(yearFromTo.getFrom());
-				yftseek.setTo(yft.getTo());
-			}
 		}
 		
 		if (yftseek.getFrom() > 0)
@@ -188,12 +216,26 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 			
 			else
 			{
-				
+				//Already accounted for Current Year Data
 				cagrPoJo.setInterval(yftseek.getTo() - yftseek.getFrom());
 				
 				cagrPoJo.setIniVal(getValueforAttributeByYear(yftseek.getFrom(), attrName));
 				
-				cagrPoJo.setFinVal(getValueforAttributeByYear(yftseek.getTo(), attrName));
+				if (currData == true)
+				{
+					if (cagrPoJo.getIniVal() == 0)
+					{
+						cagrPoJo.setIniVal(getValueforAttributeByYear(yearFromTo.getFrom(), attrName));
+						cagrPoJo.setInterval(maxYr - yearFromTo.getFrom());
+					}
+					//Latest data from ScCurrData - match by field name getter - Always compute to latest Values by default
+					cagrPoJo.setFinVal(getCurrValueforScripforAttribute(attrName));
+					//Increment the Interval size by 1 for fair comparison with Nifty
+					//cagrPoJo.setInterval(cagrPoJo.getInterval()) ;
+				} else
+				{
+					cagrPoJo.setFinVal(getValueforAttributeByYear(yftseek.getTo(), attrName));
+				}
 				
 				/*
 				 * Calculate CAGR
@@ -252,4 +294,33 @@ public class BalSheetUtilSrv implements IBalSheetUtilSrv
 		
 		return value;
 	}
+	
+	private double getCurrValueforScripforAttribute(
+	        String attrName
+	) throws Exception
+	{
+		double value = 0;
+		
+		//Get Getter Method for Attribute Name
+		Object_Info objInfo = new Object_Info(this.scCurrData);
+		if (objInfo != null)
+		{
+			Method M = objInfo.Get_Getter_for_FieldName(attrName);
+			if (M != null)
+			{
+				//Int to to Double Cast Exception
+				if ((int.class == M.getReturnType()))
+				{
+					//Is a Double No need to convert
+					value = (double) ((Integer) M.invoke(this.scCurrData)).intValue();
+				} else
+				{
+					value = (double) M.invoke(this.scCurrData);
+				}
+			}
+		}
+		
+		return value;
+	}
+	
 }

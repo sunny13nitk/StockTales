@@ -42,10 +42,10 @@ public class NiftyCAGRSrv implements INiftyCAGRSrv
 				fromVal = niftyFrom.get().getNiftyvalue();
 			}
 			
-			Optional<NiftyTracker> niftyTo = repoNiftyT.findByYear(toYear);
-			if (niftyTo.isPresent())
+			Optional<NiftyTracker> niftyToBack = repoNiftyT.findByYear(toYear);
+			if (niftyToBack.isPresent())
 			{
-				toVal = niftyTo.get().getNiftyvalue();
+				toVal = niftyToBack.get().getNiftyvalue();
 			}
 			
 			if (fromVal > 0 && toVal > 0)

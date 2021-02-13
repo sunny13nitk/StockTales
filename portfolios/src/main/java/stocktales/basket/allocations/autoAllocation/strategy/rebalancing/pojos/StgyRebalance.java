@@ -25,4 +25,5 @@ public class StgyRebalance
 	private List<String>               predScrips         = new ArrayList<String>();
 	private List<String>               stgyScrips         = new ArrayList<String>();
 	private List<String>               summary            = new ArrayList<String>();
+	private List<Integer>              tobeDeleted        = new ArrayList<Integer>();
 }

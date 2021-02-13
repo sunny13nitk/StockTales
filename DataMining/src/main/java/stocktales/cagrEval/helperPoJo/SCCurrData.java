@@ -7,12 +7,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class RollOverDurationsParam
+@AllArgsConstructor
+public class SCCurrData
 {
-	private int     baseYr;
-	private int     intervalinYrs;
-	private int     length;
-	private boolean tolastUpdate;
+	private double MCap;
 }

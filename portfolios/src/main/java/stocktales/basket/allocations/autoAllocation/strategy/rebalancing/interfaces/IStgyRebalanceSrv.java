@@ -28,9 +28,10 @@ public interface IStgyRebalanceSrv
 	);
 	
 	/**
-	 * Finally Save the Rebalanced Strategy
+	 * Finally Save the Re-balanced Strategy
 	 * @return - Handle to Saved Strategy
 	 */
-	public Strategy saveStrategy(
+	public void saveStrategy(
+	        Strategy Stgy
 	);
 }

@@ -58,7 +58,7 @@
 
 
 
-                                    <!-- Subscribe Button - Col Start -->
+                                    <!--Details Button - Col Start -->
                                     <div class="colspan-2"
                                        style="margin-left: 20px; margin-top: 30px">
 
@@ -73,7 +73,7 @@
 
 
                                     </div>
-                                    <!-- Subscribe Button - Col End -->
+                                    <!-- Details Button - Col End -->
                                  </blockquote>
 
                               </div>
@@ -90,7 +90,7 @@
                                        <h6
                                           style="color: #000058; background: #F1F2FF; padding: 10px; margin-left: 5px center;">
                                           <span style="color: #585800">Returns
-                                             Factsheet</span>
+                                             Factsheet - CAGR Returns(%)</span>
 
                                        </h6>
                                     </div>
@@ -292,6 +292,177 @@
 
 
                   <!--Cards Row - Starts  -->
+
+
+                  <!-- TO Date rEturns - Starts  -->
+
+                  <div class="row">
+
+                     <!-- E2E Card -->
+                     <div class="colspan-6" style="margin-top: 40px">
+                        <div>
+                           <!-- Title - Starts  -->
+                           <div>
+
+                              <blockquote class="right-side">
+                                 <h2
+                                    style="padding-top: 10px; margin: 2px; color: #4465a1; font-weight: bolder; text-align: center;">
+                                    <span
+                                       style="color: #c30a31; margin-right: 10px"
+                                       th:text="${LUP.getDurationH().from}"></span>
+                                    to <span
+                                       style="color: #c30a31; margin-left: 10px"
+                                       th:text="${LUP.getDurationH().to}"></span>
+                                 </h2>
+                                 <small style="color: #F30C3E"
+                                    th:text="${LUP.getDurationH().durationType}">
+                                 </small>
+                              </blockquote>
+
+
+
+                           </div>
+                           <!-- Title - Ends  -->
+                           <!-- E2E Row - Starts  -->
+                           <div class="row d-flex flex-justify-center">
+
+                              <!--Info Box - Starts  -->
+                              <div class="colspan-6 "
+                                 style="margin-top: 5px">
+                                 <div
+                                    th:if="${LUP.getSummary().nettCAGR > LUP.getSummary().niftyCAGR }"
+                                    class="more-info-box bg-green fg-white">
+                                    <div class="content">
+                                       <h2 class="text-bold mb-0"
+                                          th:text="${LUP.getSummary().nettCAGR}">
+                                          <label> %</label>
+                                       </h2>
+
+                                       <div class="text-medium">
+                                          <label> v/s Nifty</label> <span
+                                             th:text="${LUP.getSummary().niftyCAGR}"></span>
+                                          <label> %</label>
+                                       </div>
+                                       <div class="text-small">CAGR
+                                          Returns</div>
+                                       <div></div>
+
+
+                                    </div>
+                                    <div class="icon">
+                                       <span class="mif-chart-bars"></span>
+                                    </div>
+
+
+
+                                 </div>
+
+                                 <div
+                                    th:if="${LUP.getSummary().nettCAGR < LUP.getSummary().niftyCAGR }"
+                                    class="more-info-box bg-green fg-white">
+                                    <div class="content">
+                                       <h2 class="text-bold mb-0"
+                                          th:text="${LUP.getSummary().nettCAGR}">
+                                          <label> %</label>
+                                       </h2>
+
+                                       <div class="text-medium">
+                                          <label> v/s Nifty</label> <span
+                                             th:text="${LUP.getSummary().niftyCAGR}"></span>
+                                          <label> %</label>
+                                       </div>
+                                       <div class="text-small">CAGR
+                                          Returns</div>
+                                       <div></div>
+
+
+                                    </div>
+                                    <div class="icon">
+                                       <span class="mif-chart-bars"></span>
+                                    </div>
+
+
+
+
+
+                                 </div>
+
+
+
+                              </div>
+                              <!--Info Box - Ends  -->
+
+
+
+                           </div>
+                           <!-- E2E Row - Ends  -->
+
+                        </div>
+                     </div>
+
+
+                     <div class="colspan-6" style="margin-top: 20px">
+
+                        <blockquote class="right-side">
+
+                           <div class="row d-flex flex-justify-center">
+
+                              <h6
+                                 style="color: #000058; background: #F1F2FF; padding: 10px; margin-left: 5px; text-align: center;">
+                                 <span style="color: #585800">Returns
+                                    Details</span>
+
+                              </h6>
+                           </div>
+
+                           <!-- For Each REturn Items Entity -->
+
+
+                           <div class="row"
+                              style="padding-top: -10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px">
+
+                              <table class="table compact striped">
+                                 <thead>
+                                    <tr>
+                                       <th style="text-align: center;">Scrip</th>
+                                       <th style="text-align: center;">Allocation
+                                          (%)</th>
+                                       <th style="text-align: center;">CAGR
+                                          Returns (%)</th>
+                                       <th style="text-align: center;">Wt.
+                                          CAGR Returns (%)</th>
+
+
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <tr th:each="retItem : ${LUP.items}">
+
+                                       <td
+                                          style="text-align: center; color: #5D6A81; font-weight: bolder;"
+                                          th:text="${retItem.scCode}"></td>
+                                       <td
+                                          style="text-align: center; color: #81745D; font-weight: bolder;"
+                                          th:text="${retItem.allocation}"></td>
+                                       <td
+                                          style="text-align: center; color: #81745D; font-weight: bolder;"
+                                          th:text="${retItem.CAGR}"></td>
+                                       <td
+                                          style="text-align: center; color: #488990; font-weight: bold;"
+                                          th:text="${retItem.wtCAGR}"></td>
+
+
+                                    </tr>
+                                 </tbody>
+                              </table>
+
+                           </div>
+
+                        </blockquote>
+                     </div>
+                  </div>
+
+                  <!-- TO Date rEturns - Ends  -->
                   <div class="row">
 
                      <!-- E2E Card -->
@@ -457,6 +628,8 @@
                         </blockquote>
                      </div>
                   </div>
+
+
 
                   <!--Roll Over Rows - Starts  -->
 

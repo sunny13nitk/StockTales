@@ -21,7 +21,8 @@ public class CAGRCalculatorRestController
 	
 	@GetMapping("/{stgyId}/{from}/{intv}/{length}")
 	public List<CAGRResult> getCAGRforStrategy(
-	        @PathVariable int stgyId, @PathVariable int from, @PathVariable int intv, @PathVariable int length
+	        @PathVariable int stgyId, @PathVariable int from, @PathVariable int intv, @PathVariable int length,
+	        @PathVariable boolean toLastUpdate
 	)
 	{
 		List<CAGRResult> results = null;
@@ -31,7 +32,7 @@ public class CAGRCalculatorRestController
 			try
 			{
 				cagrSrv.Initialize(stgyId, false);
-				cagrSrv.calculateCAGR(new RollOverDurationsParam(from, intv, length
+				cagrSrv.calculateCAGR(new RollOverDurationsParam(from, intv, length, toLastUpdate
 				));
 				results = cagrSrv.getCagrResults();
 				
@@ -57,7 +58,7 @@ public class CAGRCalculatorRestController
 			try
 			{
 				cagrSrv.Initialize(stID, false);
-				cagrSrv.calculateCAGR(new RollOverDurationsParam(2010, 5, 10));
+				cagrSrv.calculateCAGR(new RollOverDurationsParam(2010, 5, 10, true));
 				results = cagrSrv.getCagrResults();
 				
 			} catch (Exception e)

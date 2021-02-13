@@ -301,7 +301,7 @@
 
                                     <!-- Deploy Button - Col Start -->
                                     <div class="colspan-2"
-                                       th:if="${summaryStgy.active ==true }"
+                                       th:if="${summaryStgy.active ==true && summaryStgy.rebalanceneeded != true} "
                                        style="margin-left: 20px; margin-top: 30px">
 
                                        <a href="#"
@@ -317,6 +317,28 @@
 
                                     </div>
                                     <!-- Deploy Button - Col End -->
+
+                                    <!-- Rebalance Button - Col Start -->
+                                    <div class="colspan-2"
+                                       th:if="${summaryStgy.active ==true && summaryStgy.rebalanceneeded == true} "
+                                       style="margin-left: 20px; margin-top: 30px">
+
+                                       <a href="#"
+                                          class="button dark rounded outline large"
+                                          th:href="@{/pf/rebal/{id}/{stid} ( id=${summaryStgy.usstId},stid=${summaryStgy.stgyStatsShort.stgyDetails.getStid()})}"
+                                          role="button"> <span
+                                          class="mif-bell icon"
+                                          style="margin-left: 0px"></span>
+                                          <span style="margin-left: 3px">Re-Balance</span>
+                                       </a>
+
+
+                                    </div>
+                                    <!-- Rebalance Button - Col End -->
+
+
+
+
 
                                     <!-- Deactivate Button - Col Start -->
                                     <div class="colspan-2"

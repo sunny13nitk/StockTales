@@ -302,6 +302,16 @@ public class StratergyController
 		stgyRebal_Srv.addNewScrip(scCode);
 		model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
 		model.addAttribute("scCodes", getSCCodes());
+		Optional<Strategy> stgyO = stgRepo.findByStid(this.stgyRebal_Srv.getRblPojo().getStid());
+		if (stgyO.isPresent())
+		{
+			model.addAttribute("concept", stgyO.get().getConcept());
+			GenericSCEDRCSummaryPredicate predBean = predMgrSrv.getActivePredicateBean(stgyO.get().getPredicatebean());
+			if (predBean != null)
+			{
+				model.addAttribute("criteria", predBean.getNotes());
+			}
+		}
 		
 		return "strategy/reBalance";
 	}
@@ -315,6 +325,17 @@ public class StratergyController
 		model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
 		model.addAttribute("scCodes", getSCCodes());
 		
+		Optional<Strategy> stgyO = stgRepo.findByStid(this.stgyRebal_Srv.getRblPojo().getStid());
+		if (stgyO.isPresent())
+		{
+			model.addAttribute("concept", stgyO.get().getConcept());
+			GenericSCEDRCSummaryPredicate predBean = predMgrSrv.getActivePredicateBean(stgyO.get().getPredicatebean());
+			if (predBean != null)
+			{
+				model.addAttribute("criteria", predBean.getNotes());
+			}
+		}
+		
 		return "strategy/reBalance";
 	}
 	
@@ -326,6 +347,17 @@ public class StratergyController
 		stgyRebal_Srv.deleteScrip(scCode);
 		model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
 		model.addAttribute("scCodes", getSCCodes());
+		
+		Optional<Strategy> stgyO = stgRepo.findByStid(this.stgyRebal_Srv.getRblPojo().getStid());
+		if (stgyO.isPresent())
+		{
+			model.addAttribute("concept", stgyO.get().getConcept());
+			GenericSCEDRCSummaryPredicate predBean = predMgrSrv.getActivePredicateBean(stgyO.get().getPredicatebean());
+			if (predBean != null)
+			{
+				model.addAttribute("criteria", predBean.getNotes());
+			}
+		}
 		
 		return "strategy/reBalance";
 	}
@@ -560,7 +592,7 @@ public class StratergyController
 			stgySrv.save(strategy);
 		}
 		
-		return "strategy/list";
+		return "redirect:/stratergy/list";
 	}
 	
 	@PostMapping("/simulation")
@@ -594,6 +626,19 @@ public class StratergyController
 		}
 		
 		return "strategy/reBalance";
+	}
+	
+	@PostMapping("save_rebal")
+	public String saveRebalStgy(
+	        @ModelAttribute("strategy") Strategy Stgy, Model model
+	)
+	{
+		if (Stgy != null)
+		{
+			stgyRebal_Srv.saveStrategy(Stgy);
+		}
+		
+		return "redirect:/stratergy/list";
 	}
 	
 	/*************************************************************************

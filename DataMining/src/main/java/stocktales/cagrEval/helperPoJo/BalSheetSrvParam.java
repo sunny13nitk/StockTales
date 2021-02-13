@@ -16,4 +16,5 @@ public class BalSheetSrvParam
 	private String      scCode;
 	private String      attrName;
 	private EnumAggFxn  fxntoTrigger;
+	private boolean     currentData;
 }

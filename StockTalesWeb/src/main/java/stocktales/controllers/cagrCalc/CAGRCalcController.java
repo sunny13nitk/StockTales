@@ -70,7 +70,8 @@ public class CAGRCalcController
 					cagrCalcSrv.Initialize(pojo.getStgyId(), pojo.isE2EOnly());
 					
 					cagrCalcSrv.calculateCAGR(
-					        new RollOverDurationsParam(pojo.getBaseYr(), pojo.getIntervalinYrs(), pojo.getLength()));
+					        new RollOverDurationsParam(pojo.getBaseYr(), pojo.getIntervalinYrs(), pojo.getLength(),
+					                false));
 					
 					List<CAGRResult> cagrResults = cagrCalcSrv.getCagrResults();
 					
@@ -78,9 +79,15 @@ public class CAGRCalcController
 					        .filter(x -> x.getDurationH().getDurationType() == EnumDurationType.EndToEnd).findFirst()
 					        .get();
 					
+					CAGRResult toLupdresult = cagrResults.stream()
+					        .filter(x -> x.getDurationH().getDurationType() == EnumDurationType.ToLastUpdate)
+					        .findFirst().get();
+					
 					cagrResults.remove(e2eresult);
+					cagrResults.remove(toLupdresult);
 					
 					model.addAttribute("E2E", e2eresult);
+					model.addAttribute("LUP", toLupdresult);
 					model.addAttribute("ROList", cagrResults);
 					model.addAttribute("details", repoStgy.findByStidShort(pojo.getStgyId()));
 					model.addAttribute("summaryStgy", stgyStatsSrv.getStatsforStrategy(pojo.getStgyId()));

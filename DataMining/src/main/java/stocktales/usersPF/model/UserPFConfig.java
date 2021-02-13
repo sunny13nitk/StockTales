@@ -56,7 +56,11 @@ public class UserPFConfig
 	
 	private boolean confirmb4deploy; //Confirm Amount always before deployment
 	
-	private String brokerurl;
+	private double realzpl; //Realized P&L at User Level
+	
+	private double realzdiv; //Realized Dividend at User Level
+	
+	private String brokerurl; //Broker url to trigger trades
 	
 	/*
 	 * Any User(s) can subscribe to Many Strategies
@@ -65,12 +69,36 @@ public class UserPFConfig
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "userpfconfig")
 	private List<UserStrategy> userStrategies = new ArrayList<UserStrategy>();
 	
+	/*
+	 * Consolidated P&L and Dividend Info at user Level across Strategies
+	 * One to Many Relation
+	 */
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "userpfconfig")
+	private List<UserPF_PLDiv> userPF_PL_Div_Details = new ArrayList<UserPF_PLDiv>();
+	
+	/*
+	 * ------------------------- UTILITY METHODS -----------------------------------
+	 */
+	
 	public UserPFConfig subscribeToStrategy(
 	        UserStrategy usStgy
 	)
 	{
 		usStgy.setUserpfconfig(this);
+		//All new Subscriptions REbalanced by Default since - no deployment yet done
+		usStgy.setNeedsrebalance(false);
+		
 		this.userStrategies.add(usStgy);
+		return this;
+	}
+	
+	public UserPFConfig addPL_DivItem(
+	        UserPF_PLDiv pldivItem
+	)
+	{
+		pldivItem.setUserpfconfig(this);
+		this.userPF_PL_Div_Details.add(pldivItem);
+		
 		return this;
 	}
 	

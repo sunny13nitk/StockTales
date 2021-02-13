@@ -157,21 +157,35 @@ public class SessionUserManager implements ISessionUserManager
 						usStgySS.setStgynumbers(repoHoldings.getStgyNumbers(usStgy.getId()));
 						
 						usStgySS.setActive(usStgy.isActive());
+						usStgySS.setRebalanceneeded(usStgy.isNeedsrebalance());
 						
 						if (getTotalDeployments() > 0)
 						{
+							if (usStgySS.getStgynumbers().getTotalAllocation() != null)
+							{
+								usStgySS.setTotalAllocation(UtilDecimaltoMoneyString
+								        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalAllocation(), 1));
+							}
 							
-							usStgySS.setTotalAllocation(UtilDecimaltoMoneyString
-							        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalAllocation(), 1));
-							usStgySS.setRealzPL(UtilDecimaltoMoneyString
-							        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalPL(), 1));
+							if (usStgySS.getStgynumbers().getTotalPL() != null)
+							{
+								usStgySS.setRealzPL(UtilDecimaltoMoneyString
+								        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalPL(), 1));
+							}
 							
-							usStgySS.setRealzDiv(UtilDecimaltoMoneyString
-							        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalDiv(), 1));
+							if (usStgySS.getStgynumbers().getTotalDiv() != null)
+							{
+								usStgySS.setRealzDiv(UtilDecimaltoMoneyString
+								        .getMoneyStringforDecimal(usStgySS.getStgynumbers().getTotalDiv(), 1));
+							}
 							
-							usStgySS.setTotalAllocationPer(Precision.round(
-							        ((usStgySS.getStgynumbers().getTotalAllocation() / getTotalDeployments()) * 100),
-							        1));
+							if (usStgySS.getStgynumbers().getTotalAllocation() != null)
+							{
+								usStgySS.setTotalAllocationPer(Precision.round(
+								        ((usStgySS.getStgynumbers().getTotalAllocation() / getTotalDeployments())
+								                * 100),
+								        1));
+							}
 						}
 						
 						/*

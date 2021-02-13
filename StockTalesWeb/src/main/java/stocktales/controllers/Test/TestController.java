@@ -598,7 +598,7 @@ public class TestController
 			try
 			{
 				cagrCalcSrv.Initialize(scrips, false);
-				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2010, 3, 10));
+				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2010, 3, 10, true));
 				if (cagrCalcSrv.getCagrResults() != null)
 				{
 					for (CAGRResult cagrResult : cagrCalcSrv.getCagrResults())
@@ -645,7 +645,7 @@ public class TestController
 			try
 			{
 				cagrCalcSrv.Initialize(new Integer(stgyId), false);
-				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2010, 5, 10));
+				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2010, 5, 10, false));
 				if (cagrCalcSrv.getCagrResults() != null)
 				{
 					for (CAGRResult cagrResult : cagrCalcSrv.getCagrResults())
@@ -704,7 +704,7 @@ public class TestController
 			try
 			{
 				cagrCalcSrv.Initialize(Scrips, true);
-				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2015, 3, 5));
+				cagrCalcSrv.calculateCAGR(new RollOverDurationsParam(2015, 3, 5, true));
 			} catch (Exception e)
 			{
 				// TODO Auto-generated catch block

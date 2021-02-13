@@ -1,57 +1,46 @@
 package stocktales.usersPF.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stocktales.usersPF.enums.EnumPFImpact;
 
 @Entity
-@Table(name = "userstrategies")
+@Table(name = "userpfpldiv")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserStrategy
+public class UserPF_PLDiv
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private int plid;
 	
-	private int stid;
+	@Enumerated(EnumType.STRING)
+	private EnumPFImpact type;
 	
-	private boolean active; //False means no more money can be deployed
+	private String sccode;
 	
-	private boolean needsrebalance; //Needs to be re-balanced after Stgy Rebalancing
+	private double amount;
+	
+	private String narration;
 	
 	@ManyToOne(cascade =
 	{ CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinColumn(name = "cid")
 	private UserPFConfig userpfconfig;
-	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "userStrategy")
-	private List<Holding> holdings = new ArrayList<Holding>();
-	
-	public UserStrategy addHolding(
-	        Holding holding
-	)
-	{
-		holding.setUserStrategy(this);
-		this.holdings.add(holding);
-		return this;
-	}
 	
 }

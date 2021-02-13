@@ -1,5 +1,6 @@
 package stocktales.basket.allocations.autoAllocation.strategy.pojos;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,8 @@ public class Strategy
 	private boolean active;
 	
 	private boolean rebalanceallowed;
+	
+	private Date lastupdate;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "strategy")
 	private List<StAllocItem> allocItems = new ArrayList<StAllocItem>();

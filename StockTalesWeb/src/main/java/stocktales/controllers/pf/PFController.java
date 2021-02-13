@@ -180,6 +180,10 @@ public class PFController
 				vwName = "pf/pfCusForm";
 			} else
 			{
+				// Set Dividends and Realized P&L at User level to 0
+				pfConfig.setRealzdiv(0);
+				pfConfig.setRealzpl(0);
+				
 				repoPFConfig.save(pfConfig);
 			}
 			

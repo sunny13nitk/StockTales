@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class NiftyStgyCAGR
 {
-	private final String durationPrefix = "Last ";
+	private final String durationPrefix = "Since Last ";
 	private final String durationSuffix = " Yrs.";
 	private String       durationVal;
 	private double       stgyCAGR;

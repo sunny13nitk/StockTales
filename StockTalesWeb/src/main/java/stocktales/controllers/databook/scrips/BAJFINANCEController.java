@@ -55,8 +55,9 @@ public class BAJFINANCEController
 	        ) String valD, Model model
 	)
 	{
+		boolean found = false;
 		//Default View in case FPool with Interval Found - else New FP View
-		String desurl = "/databook/scrip//secsp/BAJFINANCE";
+		String desurl = "redirect:/BAJFINANCE/fp";
 		if (intervalType != null && valM != null)
 		{
 			
@@ -67,8 +68,11 @@ public class BAJFINANCEController
 				if (fpDataList.size() > 0)
 				{
 					desurl = "redirect:/BAJFINANCE/" + fpDataList.get(0).getId();
+					found  = true;
 				}
-			} else //New FieldPool Data - Interval Defaulted
+			}
+			
+			if (found == false) //New FieldPool Data - Interval Defaulted
 			{
 				FPBAJFINANCE newfPool = new FPBAJFINANCE();
 				newfPool.setInterval(intervalType);
@@ -98,6 +102,6 @@ public class BAJFINANCEController
 		{
 			repoBFAL.save(fpData);
 		}
-		return "redirect:/scrips/dataBook/scsp/{scCode}";
+		return "redirect:/scrips/dataBook/scsp/BAJFINANCE";
 	}
 }

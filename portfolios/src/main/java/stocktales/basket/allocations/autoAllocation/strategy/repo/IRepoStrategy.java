@@ -16,7 +16,7 @@ public interface IRepoStrategy extends JpaRepository<Strategy, Integer>
 	        String concept
 	);
 	
-	@Query("Select s.stid as stid, s.name as name, s.concept as concept from Strategy s")
+	@Query("Select s.stid as stid, s.name as name, s.concept as concept from Strategy s where stid = ?1")
 	public IStgyShort findByStidShort(
 	        int id
 	);

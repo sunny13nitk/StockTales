@@ -1,6 +1,7 @@
 package stocktales.cagrEval.srv;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -86,6 +87,8 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 	
 	private final int[] intervals = new int[]
 	{ 3, 5, 7, 10 };
+	
+	private final int maxYr = Calendar.getInstance().get(Calendar.YEAR);
 	
 	@Override
 	public void Initialize(
@@ -227,6 +230,7 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 						bSheetParam.setScCode(scrip);
 						bSheetParam.setAttrName("MCap");
 						bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
+						bSheetParam.setCurrentData(durationsParam.isTolastUpdate());
 						
 						//Call CAGR Calculation
 						double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
@@ -257,6 +261,8 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 				bSheetParam.setAttrName("MCap");
 				bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
 				
+				bSheetParam.setCurrentData(durationsParam.isTolastUpdate());
+				
 				//Call CAGR Calculation
 				double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
 				
@@ -265,6 +271,35 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 			}
 		}
 		this.cagrResults.add(cagrRes); //Add to Srv
+		
+		//Do it for To Last Update Duration Too
+		CAGRResult cagrResLU = new CAGRResult();
+		cagrResLU.setDurationH(new DurationHeader(durations.getE2eYrs().getFrom(),
+		        Calendar.getInstance().get(Calendar.YEAR), EnumDurationType.ToLastUpdate));
+		for (String scrip : this.getScrips())
+		{
+			if (bSheetUtilSrv != null)
+			{
+				//Trigger CAGR Calculation for Each Scrip for current loop pass calculation period
+				BalSheetSrvParam bSheetParam = new BalSheetSrvParam();
+				//Load the Param
+				bSheetParam.setYrsFromToFilter(
+				        new YearsFromTo(durations.getE2eYrs().getFrom(), Calendar.getInstance().get(Calendar.YEAR)));
+				bSheetParam.setScCode(scrip);
+				bSheetParam.setAttrName("MCap");
+				bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
+				
+				//Very Important to get Last Saved Data
+				bSheetParam.setCurrentData(true);
+				
+				//Call CAGR Calculation
+				double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
+				
+				//Populate CAGR Items - Stage 1
+				cagrResLU.getItems().add(new XIRRItems(scrip, 0, cagrVal, 0));
+			}
+		}
+		this.cagrResults.add(cagrResLU); //Add to Srv
 		
 		//Perform Stage 2 -  Allocation weighted CAGR and Summarize findings for Each Rollover and E2E
 		if (this.cagrResults.size() > 0)
@@ -287,7 +322,7 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 		}
 		
 		//Perform Stage 3 - Adjust for No Data Found & Summarize
-		adjustNoData_Summarize();
+		adjustNoData_Summarize(durationsParam.isTolastUpdate());
 		
 	}
 	
@@ -317,7 +352,7 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 						if (duration != null)
 						{
 							RollOverDurationsParam durationParam = new RollOverDurationsParam(duration.getYearFrom(), 1,
-							        (duration.getYearTo() - duration.getYearFrom()));
+							        (duration.getYearTo() - duration.getYearFrom()), true);
 							this.calculateCAGR(durationParam);
 							
 							List<CAGRResult> results = this.getCagrResults();
@@ -326,20 +361,40 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 							{
 								if (results.size() > 0)
 								{
-									CAGRResult cagrResult = results.get(results.size() - 1);
-									if (cagrResult.getSummary() != null)
+									
+									/*
+									 * Filter for Last Update result Enum in duration Type and then the one where to val is maximum 
+									 */
+									
+									List<CAGRResult> cagrResultsLU = results.stream().filter(
+									        x -> x.getDurationH().getDurationType() == EnumDurationType.ToLastUpdate)
+									        .collect(Collectors.toList());
+									if (cagrResultsLU != null)
 									{
-										NiftyStgyCAGR res      = new NiftyStgyCAGR();
-										int           deltaDur = cagrResult.getDurationH().getTo()
-										        - cagrResult.getDurationH().getFrom();
-										res.setDurationVal(
-										        res.getDurationPrefix() + deltaDur + res.getDurationSuffix());
 										
-										res.setStgyCAGR(cagrResult.getSummary().getNettCAGR());
-										res.setNiftyCAGR(cagrResult.getSummary().getNiftyCAGR());
-										
-										this.scAllocCAGRResults.add(res);
+										if (cagrResultsLU.size() > 0)
+										{
+											
+											CAGRResult cagrResult = cagrResultsLU.get(cagrResultsLU.size() - 1);
+											if (cagrResult.getSummary() != null)
+											{
+												NiftyStgyCAGR res = new NiftyStgyCAGR();
+												
+												//Subtract additional 1 for current year - you are talking Since
+												int deltaDur = cagrResult.getDurationH().getTo()
+												        - cagrResult.getDurationH().getFrom() - 1;
+												
+												res.setDurationVal(
+												        res.getDurationPrefix() + deltaDur + res.getDurationSuffix());
+												
+												res.setStgyCAGR(cagrResult.getSummary().getNettCAGR());
+												res.setNiftyCAGR(cagrResult.getSummary().getNiftyCAGR());
+												
+												this.scAllocCAGRResults.add(res);
+											}
+										}
 									}
+									
 								}
 								
 							}
@@ -399,6 +454,7 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 	}
 	
 	private void adjustNoData_Summarize(
+	        boolean tolastUpdate
 	)
 	{
 		for (CAGRResult cagrResult : cagrResults)
@@ -437,13 +493,27 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 			/*
 			 * ---NIFTY CAGR
 			 */
-			if (cagrResult.getDurationH().getDurationType() == EnumDurationType.RollOver)
+			if (cagrResult.getDurationH().getDurationType() != EnumDurationType.ToLastUpdate)
 			{
-				nfRes = niftyCAGRSrv.calculateNiftyCAGR(cagrResult.getDurationH().getFrom(),
-				        cagrResult.getDurationH().getTo());
+				if (tolastUpdate == true)
+				{
+					nfRes = niftyCAGRSrv.calculateNiftyCAGRToDate(cagrResult.getDurationH().getFrom());
+				} else
+				{
+					nfRes = niftyCAGRSrv.calculateNiftyCAGR(cagrResult.getDurationH().getFrom(),
+					        cagrResult.getDurationH().getTo());
+				}
 			} else
 			{
-				nfRes = niftyCAGRSrv.calculateNiftyCAGRToDate(cagrResult.getDurationH().getFrom());
+				if (tolastUpdate == true)
+				{
+					nfRes = niftyCAGRSrv.calculateNiftyCAGRToDate(cagrResult.getDurationH().getFrom());
+					
+				} else
+				{
+					nfRes = niftyCAGRSrv.calculateNiftyCAGR(cagrResult.getDurationH().getFrom(),
+					        cagrResult.getDurationH().getTo());
+				}
 			}
 			
 			if (nfRes != null)
