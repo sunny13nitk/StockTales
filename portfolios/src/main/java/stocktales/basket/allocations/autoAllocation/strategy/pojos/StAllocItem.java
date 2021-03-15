@@ -24,10 +24,11 @@ public class StAllocItem
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int    allocid;
-	private String sccode;
-	private double alloc;
-	private double mos;
+	private int     allocid;
+	private String  sccode;
+	private double  alloc;
+	private double  mos;
+	private boolean adhoc;  //IF Scrip is an Adhoc Scrip
 	
 	@ManyToOne(cascade =
 	{ CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })

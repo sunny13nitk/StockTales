@@ -13,7 +13,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.URL;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,7 +42,7 @@ public class UserPFConfig
 	private double cashbalance; //Initial Balance
 	
 	@Min(value = 0)
-	private double avgannualcorpus; //Amount User can annualy deploy
+	private double avgannualcorpus; //Amount User can annually deploy
 	
 	@Min(value = 0)
 	private int mincagr; //Min Expected CAGR to trigger deployments
@@ -51,7 +54,7 @@ public class UserPFConfig
 	@Max(value = 25)
 	private int maxposbreach; //Percentage Breach on Positive side - Over min CAGR for Position sizing
 	
-	@NotNull
+	@NotBlank
 	private String brokercode; //Broker Code 
 	
 	private boolean confirmb4deploy; //Confirm Amount always before deployment
@@ -60,6 +63,7 @@ public class UserPFConfig
 	
 	private double realzdiv; //Realized Dividend at User Level
 	
+	@URL
 	private String brokerurl; //Broker url to trigger trades
 	
 	/*

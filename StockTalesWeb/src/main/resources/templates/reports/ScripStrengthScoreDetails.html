@@ -46,6 +46,42 @@
 
                      </div>
 
+                     <!--Scrip Sp. Other Actions  -->
+                     <div class="colspan-5" style="margin-left: 50px;">
+                        <div class="multi-action">
+                           <button
+                              class="action-button rotate-minus bg-transparent fg-mauve"
+                              onclick="$(this).toggleClass('active')"
+                              data-role="hint" data-hint-text="More"
+                              data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                              data-hint-position="top">
+                              <span class="icon"><span
+                                 class="mif-plus"></span></span>
+                           </button>
+                           <ul class="actions drop-right">
+                              <li class="bg-transparent fg-mauve"><a
+                                 th:href="@{/hc/{scCode}(scCode=${summary.scCode})}"
+                                 data-role="hint"
+                                 data-hint-text="Health Check"
+                                 data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                                 data-hint-position="top"><span
+                                    class="mif-heartbeat"></span></a></li>
+                              <!--  <li class="bg-transparent fg-mauve"><a
+                                 th:href="@{/pf/BonusShow}"
+                                 data-role="hint" data-hint-text="Bonus"
+                                 data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                                 data-hint-position="bottom"><span
+                                    class="mif-magic-wand"></span></a></li>
+                              <li class="bg-transparent fg-mauve"><a
+                                 th:href="@{/pf/SplitShow}"
+                                 data-role="hint" data-hint-text="Split"
+                                 data-cls-hint="bg-transparent fg-steelblue drop-shadow"
+                                 data-hint-position="bottom"><span
+                                    class="mif-flow-branch"></span></a></li> -->
+                           </ul>
+                        </div>
+                     </div>
+
 
 
                   </div>

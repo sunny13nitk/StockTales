@@ -49,7 +49,7 @@ public class HC_RevenuesMainSrv implements IHC_GetEvaluationResults
 		/*
 		 * Base Value is last 3 years Sales CAGR
 		 */
-		
+		this.mainSrvReturn = new HCBeanReturn();
 		if (scCode != null && fsBuffSrv != null)
 		{
 			scDataContainer scCon = fsBuffSrv.getDataContainerforScrip(scCode);

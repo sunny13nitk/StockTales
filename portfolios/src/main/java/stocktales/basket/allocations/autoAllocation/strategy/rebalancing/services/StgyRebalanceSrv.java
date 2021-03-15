@@ -29,6 +29,7 @@ import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.interfa
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.pojos.StgyRebalance;
 import stocktales.basket.allocations.autoAllocation.strategy.rebalancing.repo.RepoStgyRebalancingTexts;
 import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
+import stocktales.dataBook.model.repo.adhocScrips.RepoAdhocScrip;
 import stocktales.events.main.EV_StrategyRebalanced;
 import stocktales.predicates.GenericSCEDRCSummaryPredicate;
 import stocktales.predicates.manager.PredicateManagerImpl;
@@ -49,6 +50,9 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 	
 	@Autowired
 	private IRepoStrategy repoStgy;
+	
+	@Autowired
+	private RepoAdhocScrip repoAdhocSc;
 	
 	@Autowired
 	private ApplicationEventPublisher evPub;
@@ -221,6 +225,11 @@ public class StgyRebalanceSrv implements IStgyRebalanceSrv
 								
 								//Create POJO
 								StAllocItem allocItem = new StAllocItem();
+								
+								if (repoAdhocSc.findBySccodeIgnoreCase(scAlloc.getScCode()).isPresent())
+								{
+									allocItem.setAdhoc(true);
+								}
 								
 								//Set Properties			
 								allocItem.setSccode(scAlloc.getScCode());

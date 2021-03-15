@@ -165,6 +165,18 @@ public class PFController
 		return "redirect:/pf/ovw";
 	}
 	
+	@GetMapping("/deactivate/{id}")
+	public String deactivateSubscription(
+	        @PathVariable String id, Model model
+	)
+	{
+		
+		usrMgrSrv.deactivateStrategyforUser(new Long(id));
+		
+		//Back to Portfolio OverView
+		return "redirect:/pf/ovw";
+	}
+	
 	@PostMapping("/saveConfig")
 	public String saveConfig(
 	        @Valid @ModelAttribute("pfConfig") UserPFConfig pfConfig, BindingResult bres, Model model
@@ -175,7 +187,6 @@ public class PFController
 		{
 			if (bres.hasErrors())
 			{
-				model.addAttribute("formError", bres.getAllErrors().get(0));
 				model.addAttribute("brokers", repoBrokers.getBrokerNames());
 				vwName = "pf/pfCusForm";
 			} else

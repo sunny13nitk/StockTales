@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stocktales.dataBook.model.repo.adhocScrips.RepoAdhocScrip;
 import stocktales.factsheet.interfaces.IFactSheetBufferSrv;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.DAO.types.scDataContainer;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
@@ -34,6 +35,9 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 {
 	@Autowired
 	private ISCExistsDB_Srv scExSrv;
+	
+	@Autowired
+	private RepoAdhocScrip repoAdhocSc;
 	
 	@Autowired
 	private ISCDataContainerSrv scDCSrv;
@@ -137,19 +141,24 @@ public class FactSheetBufferSrv implements IFactSheetBufferSrv
 		this.scripDataContainers = new ArrayList<scDataContainer>();
 		for (String scrip : scrips)
 		{
-			if (isScripValid(scrip))
+			//Accomodate for Adhoc Scrips
+			
+			if (!repoAdhocSc.findBySccodeIgnoreCase(scrip).isPresent())
 			{
-				
-				if (loadComplete != true)
+				if (isScripValid(scrip))
 				{
 					
-					scDCSrv.load(scrip, sheetName);
-					this.scripDataContainers.add(scDCSrv.getScDC());
-					
-				} else //Load Complete
-				{
-					scDCSrv.load(scrip);
-					this.scripDataContainers.add(scDCSrv.getScDC());
+					if (loadComplete != true)
+					{
+						
+						scDCSrv.load(scrip, sheetName);
+						this.scripDataContainers.add(scDCSrv.getScDC());
+						
+					} else //Load Complete
+					{
+						scDCSrv.load(scrip);
+						this.scripDataContainers.add(scDCSrv.getScDC());
+					}
 				}
 			}
 		}

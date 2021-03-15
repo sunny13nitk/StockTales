@@ -13,6 +13,7 @@ import stocktales.dataBook.enums.EnumEmphasis;
 import stocktales.factsheet.interfaces.IFactSheetBufferSrv;
 import stocktales.healthcheck.annotations.HealthCheckCriteria;
 import stocktales.healthcheck.beanSrv.helperPOJO.NameVal;
+import stocktales.healthcheck.beanSrv.intf.IScDataContSrv;
 import stocktales.healthcheck.enums.EnumDataContainerTitle;
 import stocktales.healthcheck.enums.EnumHCCriteria;
 import stocktales.healthcheck.intf.IHC_SubSrvRes;
@@ -29,6 +30,9 @@ public class SalesTrendsSrv implements IHC_SubSrvRes
 {
 	@Autowired
 	private IFactSheetBufferSrv fsBuffSrv;
+	
+	@Autowired
+	private IScDataContSrv scDCSrv;
 	
 	@Autowired
 	private Repo_CfgHC repocfgHC;
@@ -49,6 +53,7 @@ public class SalesTrendsSrv implements IHC_SubSrvRes
 	{
 		if (scCode != null && fsBuffSrv != null)
 		{
+			this.results.clear();
 			//Get Trends Entities List
 			List<EN_SC_Trends> trends = fsBuffSrv.getDataContainerforScrip(scCode).getTrends_L();
 			if (trends != null)
@@ -63,7 +68,7 @@ public class SalesTrendsSrv implements IHC_SubSrvRes
 						
 						// Populate Data Container
 						result.getContainers().add(new HCDataContainer());
-						result.getContainers().get(0).setTitle(EnumDataContainerTitle.SalesTrends);
+						result.getContainers().get(0).setTitle(EnumDataContainerTitle.SalesInIntervals);
 						
 						for (EN_SC_Trends trend : trends)
 						{
@@ -77,6 +82,7 @@ public class SalesTrendsSrv implements IHC_SubSrvRes
 						
 						//Add to Results to return
 						results.add(result);
+						
 					}
 					
 				}

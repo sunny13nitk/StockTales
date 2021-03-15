@@ -56,6 +56,8 @@ import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.DAO.types.scDataContainer;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
 import stocktales.scripsEngine.uploadEngine.scripSheetServices.interfaces.ISCExistsDB_Srv;
+import stocktales.scsnapshot.model.pojo.StockSnapshot;
+import stocktales.scsnapshot.srv.intf.IStockSnapshotSrv;
 import stocktales.strategy.helperPOJO.NiftyStgyCAGR;
 import stocktales.strategy.helperPOJO.SectorAllocations;
 import stocktales.strategy.helperPOJO.StgyStatsSummary;
@@ -122,6 +124,9 @@ public class TestController
 	
 	@Autowired
 	private IStrategyStatsSrv stgyStatsSrv;
+	
+	@Autowired
+	private IStockSnapshotSrv sSHSrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -855,6 +860,30 @@ public class TestController
 		{
 			System.out.println(alloc.getSccode() + "---" + alloc.getAlloc() + "%");
 		}
+		return "success";
+	}
+	
+	@GetMapping("/ss/{scCode}")
+	public String testStockSnapshot(
+	        @PathVariable String scCode
+	)
+	{
+		if (scCode != null)
+		{
+			try
+			{
+				StockSnapshot ss = sSHSrv.getStockSnapshot(scCode);
+				if (ss != null)
+				{
+					System.out.println(ss.getQuoteBasic());
+				}
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		return "success";
 	}
 	

@@ -26,7 +26,7 @@ import stocktales.basket.allocations.config.pojos.StrengthWeights;
         "classpath:application.properties"
     ), @PropertySource("classpath:messages.properties"), @PropertySource(
         "classpath:HCMessages.properties"
-    ), @PropertySource("classpath:HCRep.properties"), @PropertySource("classpath:HCTags.properties") }
+    ), @PropertySource("classpath:HCRep.properties") }
 )
 public class PropertyConfig
 {

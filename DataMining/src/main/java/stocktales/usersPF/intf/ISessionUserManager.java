@@ -45,4 +45,12 @@ public interface ISessionUserManager
 	 */
 	public List<UserStrategySnaphot> getUserStgySnapshots(
 	) throws Exception;
+	
+	/**
+	 * Deactivate an Already Subscribed User Strategy for the User
+	 * @param id - Primary Key of User Strategy Assignment 
+	 */
+	public void deactivateStrategyforUser(
+	        long id
+	);
 }

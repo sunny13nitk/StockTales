@@ -38,7 +38,8 @@ public class SCHealthCheckEvaluateAspect
 		beanReturnResult = (HCBeanReturn) pjp.proceed();
 		
 		/*
-		 * Find the Custom annotation @HealthCheckCriteria ( Attribute MainSrv )
+		 * Find the Custom annotation @HealthCheckCriteria 
+		 * ( Attribute specified in MainSrv that Implements IHC_GetEvaluationResults)
 		 *  --Scan Through all the Services that Implement IHC_SubSrvRes where their Bean name matches pjp Bean Name
 		 *  - Call its getSubServiceResults and append to pjp's results.HCBeanReturn
 		 */

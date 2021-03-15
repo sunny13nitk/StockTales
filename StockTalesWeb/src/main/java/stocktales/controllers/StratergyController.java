@@ -28,6 +28,8 @@ import stocktales.basket.allocations.autoAllocation.strategy.repo.IRepoStrategy;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation;
 import stocktales.cagrEval.intf.ICAGRCalcSrv;
+import stocktales.dataBook.model.entity.adhocScrips.AdhocScrip;
+import stocktales.dataBook.model.repo.adhocScrips.RepoAdhocScrip;
 import stocktales.predicates.GenericSCEDRCSummaryPredicate;
 import stocktales.predicates.manager.PredicateManager;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
@@ -52,6 +54,9 @@ public class StratergyController
 	
 	@Autowired
 	private ScripService scSrv;
+	
+	@Autowired
+	private RepoAdhocScrip repoAdhocSc;
 	
 	@Autowired
 	private IStrategySrv stgySrv;
@@ -623,6 +628,18 @@ public class StratergyController
 			model.addAttribute("rblPOJO", stgyRebal_Srv.getRblPojo());
 			model.addAttribute("scCodes", getSCCodes());
 			
+			Optional<Strategy> stgyO = stgRepo.findByStid(this.stgyRebal_Srv.getRblPojo().getStid());
+			if (stgyO.isPresent())
+			{
+				model.addAttribute("concept", stgyO.get().getConcept());
+				GenericSCEDRCSummaryPredicate predBean = predMgrSrv
+				        .getActivePredicateBean(stgyO.get().getPredicatebean());
+				if (predBean != null)
+				{
+					model.addAttribute("criteria", predBean.getNotes());
+				}
+			}
+			
 		}
 		
 		return "strategy/reBalance";
@@ -656,17 +673,30 @@ public class StratergyController
 			//for Each Allocation Item
 			for (ScAllocation scAllocation : allocList)
 			{
-				//Get the Valuation = Retrigger Valuation Calculation using current CMP MoS
-				ScValuation scValRecalc = scValSrv.getValuationforScrip(scAllocation.getScCode(), scAllocation.getCMP(),
-				        scAllocation.getMoS());
-				if (scValRecalc != null)
+				
+				//Need to Consider AdHoc Scrips Too here
+				Optional<AdhocScrip> adSCO = repoAdhocSc.findBySccodeIgnoreCase(scAllocation.getScCode());
+				if (adSCO.isPresent())
 				{
-					//Create SCAllocation POJO using this valuation calc above
-					ScAllocation newAlloc = new ScAllocation(scValRecalc);
-					//Set allocation Percentage as per POJO in loop pass to Create SC Allocation
-					newAlloc.setAllocation(scAllocation.getAllocation());
-					//Call Repo Method Refresh passing the Updated SCAllocation POJO
-					this.allocationsRepo.refreshAllocation(newAlloc);
+					//As is with User Ascribed Allocation
+					this.allocationsRepo.refreshAllocation(scAllocation);
+				}
+				
+				else
+				{
+					
+					//Get the Valuation = Retrigger Valuation Calculation using current CMP MoS
+					ScValuation scValRecalc = scValSrv.getValuationforScrip(scAllocation.getScCode(),
+					        scAllocation.getCMP(), scAllocation.getMoS());
+					if (scValRecalc != null)
+					{
+						//Create SCAllocation POJO using this valuation calc above
+						ScAllocation newAlloc = new ScAllocation(scValRecalc);
+						//Set allocation Percentage as per POJO in loop pass to Create SC Allocation
+						newAlloc.setAllocation(scAllocation.getAllocation());
+						//Call Repo Method Refresh passing the Updated SCAllocation POJO
+						this.allocationsRepo.refreshAllocation(newAlloc);
+					}
 				}
 				
 			}
@@ -692,6 +722,15 @@ public class StratergyController
 				try
 				{
 					this.scCodes = scSrv.getAllScripNames();
+					List<String> adSC = repoAdhocSc.getAllAdhoScripNames();
+					if (adSC != null)
+					{
+						if (adSC.size() > 0)
+						{
+							this.scCodes.addAll(adSC);
+						}
+					}
+					
 				} catch (EX_General e)
 				{
 					// TODO Auto-generated catch block

@@ -6,10 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +24,7 @@ import stocktales.services.interfaces.ScripService;
 @NoArgsConstructor
 @AllArgsConstructor
 @Service
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+//@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class HC_Srv implements IHC_Srv
 {
 	@Autowired
@@ -58,6 +55,7 @@ public class HC_Srv implements IHC_Srv
 	{
 		if (scCode != null)
 		{
+			this.results.clear();
 			this.scCode = scCode;
 			fsBuffSrv.Initialize(scCode, true);
 			if (scSrv != null)
@@ -130,7 +128,7 @@ public class HC_Srv implements IHC_Srv
 		/*
 		 * Conversion Layer to be Set up to Use Each HCBeanReturn(valuetocmp) to evaluate as per Config for
 		 * each Service and Populate Corresponding HCEvalResult of Result Entity type HCComboResult
-		 * Taken care by an Aspect - SCHealtCheckFinalReaultsGenerationAspect
+		 * Taken care by an Aspect - SCHealtCheckFinalResultsGenerationAspect
 		 */
 		
 	}

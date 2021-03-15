@@ -10,6 +10,10 @@ import stocktales.healthcheck.beanSrv.helperPOJO.NameVal;
 public interface IScDataContSrv
 {
 	public List<NameVal> getDeltaListforBalSheet(
-	        String attrName
-	);
+	        String scCode, String attrName
+	) throws Exception;
+	
+	public boolean isFieldValid(
+	        String fldName
+	) throws Exception;
 }

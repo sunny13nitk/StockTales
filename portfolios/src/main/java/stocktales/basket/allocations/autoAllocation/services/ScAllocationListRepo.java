@@ -20,6 +20,8 @@ import stocktales.basket.allocations.autoAllocation.interfaces.IScAllocationSrv;
 import stocktales.basket.allocations.autoAllocation.pojos.ScAllocation;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation;
+import stocktales.dataBook.model.entity.adhocScrips.AdhocScrip;
+import stocktales.dataBook.model.repo.adhocScrips.RepoAdhocScrip;
 import stocktales.helperPOJO.ErrorsValidation;
 
 @Getter
@@ -34,6 +36,9 @@ public class ScAllocationListRepo implements IScAllocationListRepo
 	private SCValuationSrv   scValSrv;
 	@Autowired
 	private IScAllocationSrv scAllocSrv;
+	
+	@Autowired
+	private RepoAdhocScrip repoAdhocSc;
 	
 	private List<ScAllocation> scAllocList = new ArrayList<ScAllocation>();
 	
@@ -124,11 +129,31 @@ public class ScAllocationListRepo implements IScAllocationListRepo
 				//Get SC Valuations for All Scrips First
 				for (String scCode : scrips)
 				{
-					ScValuation scVal = scValSrv.getValuationforScrip(scCode, 0, 0);
-					if (scVal != null)
+					//Validate if Scrip is an Adhoc Scrip at this juncture and populate Allocation Accordingly
+					Optional<AdhocScrip> adSCO = this.repoAdhocSc.findBySccodeIgnoreCase(scCode);
+					if (adSCO.isPresent())
 					{
-						this.scAllocList.add(new ScAllocation(scVal));
+						
+						//This is an Adhoc Scrip
+						ScAllocation scAlloc = new ScAllocation();
+						scAlloc.setAllocation(0);
+						scAlloc.setCMP(0);
+						scAlloc.setScCode(scCode);
+						scAlloc.setAdhoc(true);
+						this.scAllocList.add(scAlloc);
+						
+					} else
+					{
+						
+						ScValuation scVal = scValSrv.getValuationforScrip(scCode, 0, 0);
+						if (scVal != null)
+						{
+							ScAllocation scAlloc = new ScAllocation(scVal);
+							scAlloc.setAdhoc(false);
+							this.scAllocList.add(scAlloc);
+						}
 					}
+					
 				}
 				
 				//Send to Allocation Bean to Get List of Allocations by List of Valuations

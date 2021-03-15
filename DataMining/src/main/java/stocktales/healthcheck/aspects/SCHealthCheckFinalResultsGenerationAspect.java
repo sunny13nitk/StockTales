@@ -56,7 +56,7 @@ public class SCHealthCheckFinalResultsGenerationAspect
 				this.hcSrv = (IHC_Srv) pjp.getTarget();
 				if (hcSrv != null)
 				{
-					//Get the results Obtained so Far- before Conversion for Man Service populates HCEvalResult
+					//Get the results Obtained so Far- before Conversion for Main Service populates HCEvalResult
 					this.results = (List<HCComboResult>) pjp.proceed();
 					if (results != null)
 					{

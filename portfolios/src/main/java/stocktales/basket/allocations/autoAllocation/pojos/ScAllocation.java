@@ -12,7 +12,8 @@ import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation
 @AllArgsConstructor
 public class ScAllocation extends ScValuation
 {
-	private double allocation;
+	private double  allocation;
+	private boolean adhoc;
 	
 	//Lock feature Extension for reCalibrating Allocations
 	

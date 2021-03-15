@@ -38,6 +38,8 @@ import stocktales.cagrEval.intf.IBalSheetUtilSrv;
 import stocktales.cagrEval.intf.ICAGRCalcSrv;
 import stocktales.cagrEval.intf.INiftyCAGRSrv;
 import stocktales.cagrEval.intf.IRollOverYrs;
+import stocktales.dataBook.model.entity.adhocScrips.AdhocScrip;
+import stocktales.dataBook.model.repo.adhocScrips.RepoAdhocScrip;
 import stocktales.durations.UtilDurations;
 import stocktales.factsheet.interfaces.IFactSheetBufferSrv;
 import stocktales.healthcheck.beanSrv.helperPOJO.NameVal;
@@ -58,6 +60,9 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 	
 	@Autowired
 	private IRepoStrategy repoStgy;
+	
+	@Autowired
+	private RepoAdhocScrip repoAdhocSc;
 	
 	@Autowired
 	private IRollOverYrs rollOverYrsSrv;
@@ -128,7 +133,9 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 				 *  -- All Scrips Must Exist in DB
 				 */
 				
-				List<String> scrips = new ArrayList<String>();
+				List<String> scrips   = new ArrayList<String>();
+				List<String> scripsDB = new ArrayList<String>();
+				
 				stgyMode     = EnumStgyMode.Adhoc;
 				this.e2eOnly = calcEndToEndOnly;
 				
@@ -147,7 +154,22 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 					}
 					
 					//Load Fact Sheet Buffer for allocation Scrips
-					fsBuffSrv.Initialize(scrips, SheetNames.Analysis, false);
+					// consider AdHoc Scrips Too Here
+					
+					for (String scrip : scrips)
+					{
+						Optional<AdhocScrip> adSCO = repoAdhocSc.findBySccodeIgnoreCase(scrip);
+						if (!adSCO.isPresent())
+						{
+							scripsDB.add(scrip);
+						}
+					}
+					
+					if (scripsDB.size() > 0)
+					{
+						
+						fsBuffSrv.Initialize(scripsDB, SheetNames.Analysis, false);
+					}
 					
 				}
 				
@@ -221,22 +243,25 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 				
 				for (String scrip : this.getScrips())
 				{
-					if (bSheetUtilSrv != null)
+					if (!repoAdhocSc.findBySccodeIgnoreCase(scrip).isPresent())
 					{
-						//Trigger CAGR Calculation for Each Scrip for current loop pass calculation period
-						BalSheetSrvParam bSheetParam = new BalSheetSrvParam();
-						//Load the Param
-						bSheetParam.setYrsFromToFilter(rolloverDuration);
-						bSheetParam.setScCode(scrip);
-						bSheetParam.setAttrName("MCap");
-						bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
-						bSheetParam.setCurrentData(durationsParam.isTolastUpdate());
-						
-						//Call CAGR Calculation
-						double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
-						
-						//Populate CAGR Items - Stage 1
-						cagrRes.getItems().add(new XIRRItems(scrip, 0, cagrVal, 0));
+						if (bSheetUtilSrv != null)
+						{
+							//Trigger CAGR Calculation for Each Scrip for current loop pass calculation period
+							BalSheetSrvParam bSheetParam = new BalSheetSrvParam();
+							//Load the Param
+							bSheetParam.setYrsFromToFilter(rolloverDuration);
+							bSheetParam.setScCode(scrip);
+							bSheetParam.setAttrName("MCap");
+							bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
+							bSheetParam.setCurrentData(durationsParam.isTolastUpdate());
+							
+							//Call CAGR Calculation
+							double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
+							
+							//Populate CAGR Items - Stage 1
+							cagrRes.getItems().add(new XIRRItems(scrip, 0, cagrVal, 0));
+						}
 					}
 				}
 				
@@ -250,24 +275,27 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 		        EnumDurationType.EndToEnd));
 		for (String scrip : this.getScrips())
 		{
-			if (bSheetUtilSrv != null)
+			if (!repoAdhocSc.findBySccodeIgnoreCase(scrip).isPresent())
 			{
-				//Trigger CAGR Calculation for Each Scrip for current loop pass calculation period
-				BalSheetSrvParam bSheetParam = new BalSheetSrvParam();
-				//Load the Param
-				bSheetParam.setYrsFromToFilter(
-				        new YearsFromTo(durations.getE2eYrs().getFrom(), durations.getE2eYrs().getTo()));
-				bSheetParam.setScCode(scrip);
-				bSheetParam.setAttrName("MCap");
-				bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
-				
-				bSheetParam.setCurrentData(durationsParam.isTolastUpdate());
-				
-				//Call CAGR Calculation
-				double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
-				
-				//Populate CAGR Items - Stage 1
-				cagrRes.getItems().add(new XIRRItems(scrip, 0, cagrVal, 0));
+				if (bSheetUtilSrv != null)
+				{
+					//Trigger CAGR Calculation for Each Scrip for current loop pass calculation period
+					BalSheetSrvParam bSheetParam = new BalSheetSrvParam();
+					//Load the Param
+					bSheetParam.setYrsFromToFilter(
+					        new YearsFromTo(durations.getE2eYrs().getFrom(), durations.getE2eYrs().getTo()));
+					bSheetParam.setScCode(scrip);
+					bSheetParam.setAttrName("MCap");
+					bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
+					
+					bSheetParam.setCurrentData(durationsParam.isTolastUpdate());
+					
+					//Call CAGR Calculation
+					double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
+					
+					//Populate CAGR Items - Stage 1
+					cagrRes.getItems().add(new XIRRItems(scrip, 0, cagrVal, 0));
+				}
 			}
 		}
 		this.cagrResults.add(cagrRes); //Add to Srv
@@ -278,25 +306,29 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 		        Calendar.getInstance().get(Calendar.YEAR), EnumDurationType.ToLastUpdate));
 		for (String scrip : this.getScrips())
 		{
-			if (bSheetUtilSrv != null)
+			if (!repoAdhocSc.findBySccodeIgnoreCase(scrip).isPresent())
 			{
-				//Trigger CAGR Calculation for Each Scrip for current loop pass calculation period
-				BalSheetSrvParam bSheetParam = new BalSheetSrvParam();
-				//Load the Param
-				bSheetParam.setYrsFromToFilter(
-				        new YearsFromTo(durations.getE2eYrs().getFrom(), Calendar.getInstance().get(Calendar.YEAR)));
-				bSheetParam.setScCode(scrip);
-				bSheetParam.setAttrName("MCap");
-				bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
-				
-				//Very Important to get Last Saved Data
-				bSheetParam.setCurrentData(true);
-				
-				//Call CAGR Calculation
-				double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
-				
-				//Populate CAGR Items - Stage 1
-				cagrResLU.getItems().add(new XIRRItems(scrip, 0, cagrVal, 0));
+				if (bSheetUtilSrv != null)
+				{
+					//Trigger CAGR Calculation for Each Scrip for current loop pass calculation period
+					BalSheetSrvParam bSheetParam = new BalSheetSrvParam();
+					//Load the Param
+					bSheetParam.setYrsFromToFilter(
+					        new YearsFromTo(durations.getE2eYrs().getFrom(),
+					                Calendar.getInstance().get(Calendar.YEAR)));
+					bSheetParam.setScCode(scrip);
+					bSheetParam.setAttrName("MCap");
+					bSheetParam.setFxntoTrigger(EnumAggFxn.CAGR);
+					
+					//Very Important to get Last Saved Data
+					bSheetParam.setCurrentData(true);
+					
+					//Call CAGR Calculation
+					double cagrVal = Precision.round(bSheetUtilSrv.getFromBalSheetByParam(bSheetParam), 1);
+					
+					//Populate CAGR Items - Stage 1
+					cagrResLU.getItems().add(new XIRRItems(scrip, 0, cagrVal, 0));
+				}
 			}
 		}
 		this.cagrResults.add(cagrResLU); //Add to Srv
@@ -340,7 +372,11 @@ public class CAGRCalcSrv implements ICAGRCalcSrv
 					
 					for (ScAllocation scAllocation : this.getScAllocListSrv().getScAllocList())
 					{
+						/*//Do not Include Adhoc Scrips If Any in Strategy
+						Optional<AdhocScrip> adSCO = repoAdhocSc.findBySccodeIgnoreCase(scAllocation.getScCode());*/
+						
 						namevals.add(new NameVal(scAllocation.getScCode(), scAllocation.getAllocation()));
+						
 					}
 					
 					this.InitializeAdHoc(namevals, true);

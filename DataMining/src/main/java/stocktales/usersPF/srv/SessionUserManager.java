@@ -261,4 +261,29 @@ public class SessionUserManager implements ISessionUserManager
 		return totalDep;
 	}
 	
+	@Override
+	public void deactivateStrategyforUser(
+	        long id
+	)
+	{
+		if (id > 0)
+		{
+			if (userPFDetails == null)
+			{
+				loadPFDetails();
+			} else
+			{
+				Optional<UserStrategy> stgyReqO = userPFDetails.getUserStrategies().stream()
+				        .filter(x -> x.getId() == id).findFirst();
+				if (stgyReqO.isPresent())
+				{
+					stgyReqO.get().setActive(false);
+					repoUserPF.save(userPFDetails);
+				}
+				
+			}
+		}
+		
+	}
+	
 }
