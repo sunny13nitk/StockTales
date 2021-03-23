@@ -16,8 +16,17 @@ public class StockQuoteBasic
 	private String scCode;
 	private String sector;
 	
-	private double uph;
+	private double uph;      //general
+	private double peg;      //general
+	private double fcfyield; //10YData
+	private double cps;      //general		
+	
+	private double CFOPAT; //10YData
+	private double FCFCFO; //10YData
+	
 	private String name;
+	
+	private boolean isFinancial;
 	
 	private BigDecimal MCap;
 	
@@ -25,6 +34,7 @@ public class StockQuoteBasic
 	
 	private BigDecimal cmp;
 	private BigDecimal dma200;
+	private BigDecimal dma50;
 	
 	private BigDecimal High52W;
 	

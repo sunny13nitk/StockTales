@@ -1,5 +1,7 @@
 package stocktales.money;
 
+import java.math.BigDecimal;
+
 import org.apache.commons.math3.util.Precision;
 
 public class UtilDecimaltoMoneyString
@@ -13,7 +15,8 @@ public class UtilDecimaltoMoneyString
 		if (decimalval > 0)
 		{
 			decimalval = Precision.round(decimalval, scale);
-			String s = Double.toString(decimalval);
+			String s      = Double.toString(decimalval);
+			int    length = s.length();
 			
 			int dot = s.indexOf('.');
 			
@@ -21,7 +24,14 @@ public class UtilDecimaltoMoneyString
 			{
 				if (s.length() >= 12) // Cr . Case
 				{
-					moneyStr = s.substring(0, scale + 2) + " Cr.";
+					
+					BigDecimal bgVal  = new BigDecimal(decimalval / 10000000);
+					String     bgValS = bgVal.toString();
+					//int        crLen  = bgValS.length();
+					int crDot = bgValS.indexOf('.');
+					
+					moneyStr = bgValS.substring(0, crDot) + " Cr.";
+					
 				} else
 				{
 					moneyStr = Double.toString(decimalval);

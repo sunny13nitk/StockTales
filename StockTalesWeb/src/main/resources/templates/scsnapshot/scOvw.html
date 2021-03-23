@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<div th:replace="fragments/header :: STHeader"></div>
+<script
+   src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript"
+   src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+
+   <div style="overflow: hidden;"></div>
+
+
+   <div class="grid">
+
+      <!-- Top Row - Starts -->
+      <div class="row">
+
+         <div class="colspan-12 " style="padding: 10px">
+            <div class="card" style="padding-top: -20px">
+               <div class="row flex-align-center">
+                  <div class="cell">
+                     <blockquote class="right-side">
+                        <h1 style="color: #486590"
+                           th:text="${ss.quoteBasic.scCode}"></h1>
+                        <h5 style="color: #907348;"
+                           th:text="${ss.quoteBasic.name}"></h5>
+
+
+
+                     </blockquote>
+                  </div>
+                  <div th:if="${ss.quoteBasic.sector != null}"
+                     class="cell">
+                     <blockquote class="right-side">
+                        <h2 style="color: #5D7EAE"
+                           th:text="${ss.quoteBasic.sector}"></h2>
+                        <span
+                           style="color: #907348; font-weight: medium;">Sector</span>
+
+                        <div class="row flex-align-end">
+                           <div class="cell flex-align-end">
+                              <label
+                                 style="color: #E39657; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                 th:text="${ss.last4QData.OPM}">
+                              </label> <span
+                                 style="color: #DC7B2B; font-weight: medium;">
+                                 % OPM </span>
+
+                           </div>
+
+
+                           <div class="cell flex-align-end">
+                              <label
+                                 style="color: #F88028; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                 th:text="${ss.last4QData.NPM}">
+                              </label> <span
+                                 style="color: #E66507; font-weight: medium;">%
+                                 NPM </span>
+                           </div>
+
+                        </div>
+                        <span
+                           style="color: #907348; font-weight: medium;">Last
+                           4Q</span>
+                     </blockquote>
+                  </div>
+
+
+                  <div th:if="${ss.quoteBasic.uph > 0}" class="cell">
+                     <blockquote class="right-side">
+                        <div id="donut_val" data-role="donut"
+                           style="margin-top: 10px" data-hole=".8"
+                           data-animate="10" data-fill="#4EA8B2"
+                           th:attr="
+                           data-value=${ss.quoteBasic.uph}
+                           "
+                           class="mx-auto"></div>
+                        <div>
+                           <span
+                              style="color: #B2584E; font-weight: medium;">Unpledged
+                              Promoter Holdings</span>
+                        </div>
+                     </blockquote>
+                  </div>
+                  <div class="cell">
+                     <blockquote class="right-side">
+
+                        <div class="row d-flex flex-justify-left">
+
+                           <span th:if="${ss.quoteBasic.peg != 0}"
+                              style="color: #29b98c; margin-top: 4px"
+                              class="mif-sunrise mif-3x"></span> <span
+                              th:if="${ss.quoteBasic.peg != 0}"
+                              style="color: #29b98c; font-weight: bold; font-size: 1.2em; margin: 6px; margin-top: 14px; margin-left: 7px"
+                              th:text="${ss.quoteBasic.peg}"></span> <span
+                              style="color: #29b98c; font-weight: medium; margin-top: 16px; margin-left: 5px">
+                              PEG</span>
+                        </div>
+
+
+
+                        <div class="row d-flex flex-justify-left">
+
+
+
+                           <span
+                              th:if="${ss.quoteBasic.fcfyield != 0 && !ss.quoteBasic.isFinancial()}"
+                              style="color: #D74A76; margin-top: 4px"
+                              class="mif-flag mif-2x"></span> <span
+                              th:if="${ss.quoteBasic.fcfyield != 0}"
+                              style="color: #D74A76; font-weight: bold; font-size: 1.4em; margin: 4px; margin-left: 10px"
+                              th:text="${ss.quoteBasic.fcfyield}"></span>
+
+                           <span
+                              style="color: #D74A76; font-weight: medium; margin-top: 10px; margin-left: 5px">
+                              % FCF Yield </span>
+
+                        </div>
+
+                        <div class="row d-flex flex-justify-left">
+
+                           <span
+                              th:if="${ss.quoteBasic.cps != 0 && !ss.quoteBasic.isFinancial()}"
+                              style="color: #4A76D7; margin-top: 4px"
+                              class="mif-inr mif-2x"></span> <span
+                              th:if="${ss.quoteBasic.cps != 0}"
+                              style="color: #4A76D7; font-weight: bold; font-size: 1.2em; margin: 6px; margin-left: 7px"
+                              th:text="${ss.quoteBasic.cps}"></span> <span
+                              style="color: #4A76D7; font-weight: medium; margin-top: 10px; margin-left: 5px">
+                              Cash/Share</span>
+                        </div>
+                     </blockquote>
+                  </div>
+
+
+
+
+
+                  <div class="cell flex-justify-end">
+                     <div class=" row d-flex flex-justify-left"
+                        style="margin-left: 20px;">
+                        <a href="#"
+                           class="button success rounded outline"
+                           th:href="@{/sc/compare}" role="button"> <span
+                           class="mif-add icon" style="margin-left: 0px"></span>
+                           <span style="margin-left: 3px">Compare</span>
+                        </a>
+                     </div>
+
+                     <div class=" row d-flex flex-justify-left"
+                        style="margin-left: 20px; margin-top: 10px">
+                        <a href="#" class="button alert rounded outline"
+                           th:href="@{/}" role="button"> <span
+                           class="mif-home" style="margin-left: 0px"></span>
+                           <span style="margin-left: 3px">Home</span>
+                        </a>
+                     </div>
+
+                  </div>
+
+               </div>
+            </div>
+
+         </div>
+
+
+      </div>
+
+
+
+
+
+      <!-- Top Row - Ends -->
+
+
+      <!-- Content Row - Starts -->
+
+      <div class="row">
+
+         <div data-role="accordion" data-material="true"
+            data-one-frame="false" data-show-active="true">
+
+            <!-- PRICES Accordion - Starts  -->
+            <div class="frame active">
+               <div class="heading">Prices</div>
+               <div class="content">
+                  <div class="colspan-12 " style="padding: 10px">
+                     <div class="card" style="padding-top: -20px">
+                        <div class="row flex-align-end">
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+                                 <div class="row flex-align-end">
+                                    <div class="cell flex-align-end">
+                                       <span class="mif-inr mif-2x"></span>
+                                       <label
+                                          style="color: #a65965; font-weight: bold; font-size: 1.85em; margin-left: 7px"
+                                          th:text="${ss.quoteBasic.MCapTxt}">
+                                       </label>
+                                    </div>
+
+                                 </div>
+                                 <span
+                                    style="color: #59A69A; font-weight: medium;">Current
+                                    Market Cap</span>
+
+                                 <div class="row flex-align-end">
+                                    <div class="cell flex-align-end">
+                                       <label
+                                          style="color: #8F7087; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                          th:text="${ss.last4QData.McapToSales}">
+                                       </label>
+                                    </div>
+
+                                 </div>
+
+                                 <span
+                                    style="color: #A58D9F; font-weight: medium;">Market
+                                    Cap To Sales - Last 4Q </span>
+
+
+
+
+
+                              </blockquote>
+
+                           </div>
+
+
+
+
+                           <div class="cell ">
+                              <blockquote class="right-side">
+                                 <div class="row flex-align-end">
+                                    <div class="cell flex-align-end">
+                                       <span class="mif-inr mif-2x"></span>
+                                       <label
+                                          style="color: #8000fc; font-weight: bold; font-size: 1.85em; margin-left: 7px"
+                                          th:text="${ss.quoteBasic.cmp}">
+                                       </label>
+                                    </div>
+
+                                 </div>
+                                 <span
+                                    style="color: #486590; font-weight: medium;">Current
+                                    Market Price</span>
+
+                                 <div class="row flex-align-end">
+                                    <div class="cell flex-align-end">
+                                       <label
+                                          style="color: #FC8000; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                          th:text="${ss.quoteBasic.peRatio.doubleValue()}">
+                                       </label>
+                                    </div>
+
+                                 </div>
+
+                                 <span
+                                    style="color: #486590; font-weight: medium;">Current
+                                    PE </span>
+                              </blockquote>
+
+                           </div>
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+
+                                 <div class="row flex-align-end">
+                                    <div class="cell flex-align-end">
+                                       <span class="mif-inr mif-2x"></span>
+                                       <label
+                                          style="color: #CB348C; font-weight: bold; font-size: 1.85em; margin-left: 10px"
+                                          th:text="${ss.targetPrice.price5Yr}">
+                                       </label>
+                                    </div>
+
+                                 </div>
+
+                                 <span
+                                    style="color: #486590; font-weight: medium;">Target
+                                    Price (5yrs. hence)</span>
+
+                                 <div class="row flex-align-end">
+                                    <div class="cell flex-align-end">
+                                       <span
+                                          th:if="${ss.targetPrice.ret5YrCAGR > 0}"
+                                          class="mif-thumbs-up mif-2x fg-darkGreen"></span>
+
+                                       <span
+                                          th:if="${ss.targetPrice.ret5YrCAGR <= 0}"
+                                          class="mif-thumbs-down mif-2x fg-darkRed"></span>
+
+                                       <label
+                                          style="color: #51ae78; font-weight: bold; font-size: 1.75em; margin-left: 7px"
+                                          th:text="${ss.targetPrice.ret5YrCAGR}">
+                                       </label> <span
+                                          style="color: #51ae78; font-weight: bold; font-size: 1.75em;">
+                                          %</span>
+                                    </div>
+
+                                 </div>
+
+                                 <span
+                                    style="color: #6C9C28; font-weight: medium;">CAGR
+                                    Returns (5 Yrs. hence)</span>
+                              </blockquote>
+
+                           </div>
+
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+                                 <h5 style="color: #32B480"
+                                    th:text="${ss.targetPrice.EDScore}"></h5>
+                                 <span
+                                    style="color: #486590; font-weight: medium;">
+                                    Weighted ED yield</span>
+
+                                 <h5 style="color: #D74A76"
+                                    th:text="${ss.targetPrice.weightedPE}"></h5>
+
+                                 <span
+                                    style="color: #486590; font-weight: medium;">
+                                    Weighted Target PE</span>
+                              </blockquote>
+                           </div>
+
+
+
+                        </div>
+
+
+                        <div class="row d-flex flex-justify-center">
+
+                           <h6
+                              style="color: #000058; background: #F1F2FF; padding: 10px; margin-left: 5px; text-align: center;">
+                              <span style="color: #585800">Price
+                                 Trends</span>
+
+                           </h6>
+                        </div>
+
+                        <!-- Table -->
+
+
+                        <div class="row d-flex flex-justify-center"
+                           style="padding-top: -10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px">
+
+                           <table class="table striped">
+                              <thead>
+                                 <tr>
+                                    <th style="text-align: center;">50
+                                       DMA</th>
+                                    <th style="text-align: center;">Delta</th>
+                                    <th style="text-align: center;">200
+                                       DMA</th>
+                                    <th style="text-align: center;">Delta</th>
+                                    <th style="text-align: center;">52Wk
+                                       High</th>
+                                    <th style="text-align: center;">Delta</th>
+                                    <th style="text-align: center;">52Wk
+                                       Low</th>
+                                    <th style="text-align: center;">Delta</th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 <tr>
+
+                                    <td
+                                       style="text-align: center; color: #5D6A81; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.dma50.doubleValue()}"></td>
+                                    <td
+                                       style="text-align: center;; color: #81745D; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.perChg50DMA}"></td>
+
+                                    <td
+                                       style="text-align: center; color: #5D6A81; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.dma200.doubleValue()}"></td>
+                                    <td
+                                       style="text-align: center;; color: #81745D; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.perChg200DMA}"></td>
+
+                                    <td
+                                       style="text-align: center; color: #5D6A81; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.High52W.doubleValue()}"></td>
+                                    <td
+                                       style="text-align: center;; color: #81745D; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.perChg52WkHigh}"></td>
+
+                                    <td
+                                       style="text-align: center; color: #5D6A81; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.Low52W}"></td>
+                                    <td
+                                       style="text-align: center;; color: #81745D; font-weight: bolder;"
+                                       th:text="${ss.quoteBasic.perChg52WkLow}"></td>
+
+
+                                 </tr>
+                              </tbody>
+                           </table>
+
+                        </div>
+
+
+                     </div>
+                  </div>
+
+               </div>
+            </div>
+            <!-- PRICES Accordion - Ends  -->
+
+            <!-- Strength Score Accordion - Starts  -->
+            <div class="frame">
+               <div class="heading">Strength Score</div>
+               <div class="content">
+                  <div class="grid">
+
+                     <!--Top Row - Starts  -->
+                     <div class="row">
+
+                        <div class="colspan-5">
+                           <h3
+                              style="padding-top: 10px; margin: 2px; font-weight: medium; color: #4465a1">
+                              Strength Score Details : <span
+                                 th:text="${ss.summary.scCode}">BAJFINANCE</span>
+                           </h3>
+
+                        </div>
+
+                        <div class="colspan-1"
+                           style="margin-left: 10px;">
+                           <div class="remark alert"
+                              style="padding-top: 10px; margin: 2px; margin-top: -10px; color: #E74C3C; font-weight: bold; font-size: x-large;">
+
+                              <h3
+                                 style="padding-top: 10px; margin: 2px; font-weight: bold; color: #E74C3C"
+                                 th:text="${ss.summary.strengthScore}">30.3</h3>
+
+
+                           </div>
+
+                        </div>
+
+                     </div>
+                     <!--Top Row - Ends  -->
+
+
+                     <!--Table Row - Starts -->
+                     <div class="row">
+
+                        <!-- ED Score - Col Start -->
+                        <div class="colspan-4">
+                           <div class="card" style="padding-top: -20px">
+                              <div class="card-content p-2">
+
+                                 <h6
+                                    style="color: #325254; background-color: #faf0ff; padding: 10px">
+                                    Earnings & Dividend Score</h6>
+                              </div>
+
+
+                              <div class="row"
+                                 style="padding-top: -10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px">
+
+                                 <table class="table compact striped">
+                                    <thead>
+                                       <tr>
+                                          <th
+                                             style="text-align: center;">Duration</th>
+                                          <th
+                                             style="text-align: center;">Value</th>
+                                          <th
+                                             style="text-align: center;">Wt.Value</th>
+
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr
+                                          th:each="EDScoreI : ${ss.summary.scEDRC.earningsDivScore.durItems}">
+                                          <td
+                                             style="text-align: center; font-weight: bolder;"
+                                             th:text="${EDScoreI.duration}">3Yr</td>
+                                          <td
+                                             style="text-align: center; font-weight: bolder; color: #E74C3C;"
+                                             th:text="${EDScoreI.value}">14.3</td>
+                                          <td
+                                             style="text-align: center; font-weight: bolder;"
+                                             th:text="${EDScoreI.wv}">6.7</td>
+
+
+                                       </tr>
+                                    </tbody>
+                                 </table>
+
+                                 <div class="row flex-align-end">
+                                    <div class="cell">
+                                       <blockquote class="right-side">
+                                          <h5 style="color: #8000fc"
+                                             th:text="${ss.summary.scEDRC.earningsDivScore.nettValue}">
+                                          </h5>
+                                          <span
+                                             style="color: #486590; font-weight: medium;">Earnings
+                                             Score</span>
+                                       </blockquote>
+
+                                    </div>
+
+
+                                    <div class="cell">
+                                       <blockquote class="right-side">
+                                          <h5 style="color: #32B480"
+                                             th:text="${ss.summary.scEDRC.earningsDivScore.divYield}">
+                                          </h5>
+                                          <span
+                                             style="color: #486590; font-weight: medium;">Dividend
+                                             Yield</span>
+                                       </blockquote>
+                                    </div>
+
+                                    <div class="cell">
+                                       <blockquote class="right-side">
+                                          <h4 style="color: #D74A76"
+                                             th:text="${ss.summary.scEDRC.earningsDivScore.resValue}">
+                                          </h4>
+                                          <span
+                                             style="color: #486590; font-weight: medium;">ED
+                                             Score </span>
+                                       </blockquote>
+                                    </div>
+
+                                 </div>
+
+
+                              </div>
+                           </div>
+
+                        </div>
+                        <!-- ED Score - Col Ends -->
+
+                        <!-- RR Score - Col Start -->
+                        <div class="colspan-4">
+                           <div class="card" style="padding-top: -20px">
+                              <div class="card-content p-2">
+
+                                 <h6
+                                    style="color: #325254; background-color: #faf0ff; padding: 10px">
+                                    Return Ratios (ROCE/ROE) Score</h6>
+                              </div>
+
+
+                              <div class="row"
+                                 style="padding-top: -10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px">
+
+                                 <table class="table compact striped">
+                                    <thead>
+                                       <tr>
+                                          <th
+                                             style="text-align: center;">Duration</th>
+                                          <th
+                                             style="text-align: center;">Value</th>
+                                          <th
+                                             style="text-align: center;">Wt.Value</th>
+
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr
+                                          th:each="EDScoreI : ${ss.summary.scEDRC.returnRatiosScore.durItems}">
+                                          <td
+                                             style="text-align: center; font-weight: bolder;"
+                                             th:text="${EDScoreI.duration}">3Yr</td>
+                                          <td
+                                             style="text-align: center; font-weight: bolder; color: #E74C3C"
+                                             th:text="${EDScoreI.value}">14.3</td>
+                                          <td
+                                             style="text-align: center; font-weight: bolder;"
+                                             th:text="${EDScoreI.wv}">6.7</td>
+
+
+                                       </tr>
+                                    </tbody>
+                                 </table>
+
+                                 <div class="row">
+                                    <div class="cell-2"></div>
+                                    <div class="cell-2"></div>
+
+                                    <div class="cell">
+                                       <blockquote class="right-side">
+                                          <h4 style="color: #D74A76"
+                                             th:text="${ss.summary.scEDRC.returnRatiosScore.nettValue}">
+                                          </h4>
+                                          <span
+                                             style="color: #486590; font-weight: medium;">RR
+                                             Score </span>
+                                       </blockquote>
+
+
+                                    </div>
+
+                                 </div>
+                              </div>
+                           </div>
+
+
+                        </div>
+                        <!-- RR Score - Col Ends -->
+
+                        <!-- CFO Score - Col Start -->
+
+                        <div
+                           th:if="${ss.summary.scEDRC.cashflowsScore != null}"
+                           class="colspan-4">
+                           <div class="card" style="padding-top: -20px">
+                              <div class="card-content p-2">
+
+                                 <h6
+                                    style="color: #325254; background-color: #faf0ff; padding: 10px">
+                                    Free Cash Flows (FCF/CFO) Score</h6>
+                              </div>
+
+
+                              <div class="row"
+                                 style="padding-top: -10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px">
+
+                                 <table class="table compact striped">
+                                    <thead>
+                                       <tr>
+                                          <th
+                                             style="text-align: center;">Duration</th>
+                                          <th
+                                             style="text-align: center;">Value</th>
+                                          <th
+                                             style="text-align: center;">Wt.Value</th>
+
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr
+                                          th:each="EDScoreI : ${ss.summary.scEDRC.cashflowsScore.durItems}">
+                                          <td
+                                             style="text-align: center; font-weight: bolder;"
+                                             th:text="${EDScoreI.duration}">3Yr</td>
+                                          <td
+                                             style="text-align: center; font-weight: bolder; color: #E74C3C"
+                                             th:text="${EDScoreI.value}">14.3</td>
+                                          <td
+                                             style="text-align: center; font-weight: bolder;"
+                                             th:text="${EDScoreI.wv}">6.7</td>
+
+
+                                       </tr>
+                                    </tbody>
+                                 </table>
+
+                                 <div class="row">
+                                    <div class="cell-2"></div>
+                                    <div class="cell-2"></div>
+
+                                    <div class="cell">
+                                       <blockquote class="right-side">
+                                          <h4 style="color: #D74A76"
+                                             th:text="${ss.summary.scEDRC.cashflowsScore.nettValue}">
+                                          </h4>
+                                          <span
+                                             style="color: #486590; font-weight: medium;">CF
+                                             Score </span>
+                                       </blockquote>
+
+
+                                    </div>
+
+                                 </div>
+                              </div>
+
+                           </div>
+
+
+
+
+                        </div>
+
+                        <!-- CFO Score - Col Ends -->
+
+                     </div>
+
+                     <!--Table Row - Ends -->
+
+
+
+
+                     <!-- Before Calibration Stats - Starts -->
+
+                     <div class="row">
+
+                        <div class="colspan-8 offset-2">
+                           <div class="card" style="padding-top: -20px">
+
+                              <div class="row flex-align-center">
+                                 <div class="cell">
+                                    <blockquote class="right-side">
+                                       <h4 style="color: #8000fc"
+                                          th:text="${ss.summary.EDRC}"></h4>
+                                       <span
+                                          style="color: #486590; font-weight: medium;">EDRC
+                                          Score</span>
+                                    </blockquote>
+
+                                 </div>
+
+
+                                 <div class="cell">
+                                    <blockquote class="right-side">
+                                       <h4 style="color: #32B480"
+                                          th:text="${ss.summary.valR}"></h4>
+                                       <span
+                                          style="color: #486590; font-weight: medium;">Value
+                                          Creation Ratio</span>
+                                    </blockquote>
+                                 </div>
+
+                                 <div class="cell">
+                                    <blockquote class="right-side">
+                                       <h3 style="color: #D74A76"
+                                          th:text="${ss.summary.strengthScoreb4Calibration}"></h3>
+                                       <span
+                                          style="color: #486590; font-weight: medium;">Strength
+                                          Score before Calibration</span>
+                                    </blockquote>
+                                 </div>
+
+                              </div>
+
+                           </div>
+
+                        </div>
+
+                     </div>
+
+
+                     <!-- Before Calibration Stats - Ends -->
+
+                     <!-- Calibration - Starts -->
+
+                     <div class="colspan-9 offset-1">
+                        <div class="card" style="padding-top: -20px">
+                           <div class="card-content p-2">
+
+                              <h6
+                                 style="color: #325254; background-color: #faf0ff; padding: 10px">
+                                 Strength Score Calibration - Details</h6>
+                           </div>
+
+
+                           <div class="row"
+                              style="padding-top: -10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px">
+
+                              <table class="table compact striped">
+                                 <thead>
+                                    <tr>
+                                       <th style="text-align: center;">Header</th>
+                                       <th style="text-align: center;">Trigger
+                                          Value</th>
+                                       <th style="text-align: center;">Score
+                                          Before</th>
+                                       <th style="text-align: center;">Score
+                                          After</th>
+                                       <th style="text-align: center;">Delta
+                                          (%)</th>
+
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <tr
+                                       th:each="calibrationI : ${ss.summary.calibrations}">
+                                       <td
+                                          style="text-align: center; font-weight: bolder; color: #4465a1"
+                                          th:text="${calibrationI.calHeader}">3Yr</td>
+                                       <td
+                                          style="text-align: center; font-weight: bolder; color: #4465a1"
+                                          th:text="${calibrationI.triggerVal}">14.3</td>
+                                       <td
+                                          style="text-align: center; font-weight: bolder; color: #E74C3C"
+                                          th:text="${calibrationI.valB4}">14.3</td>
+                                       <td
+                                          style="text-align: center; font-weight: bolder; color: #E74C3C"
+                                          th:text="${calibrationI.valAfter}">14.3</td>
+
+                                       <td style="text-align: center;"
+                                          th:if="${calibrationI.delta} >= 0">
+                                          <!-- Positive Factor  --> <span
+                                          class="mif-arrow-drop-up mif-2x fg-green"><label
+                                             style="color: green; font-weight: bolder;"
+                                             th:text="${calibrationI.delta}">14.3</label></span>
+
+                                       </td>
+
+
+                                       <td style="text-align: center;"
+                                          th:if="${calibrationI.delta} < 0">
+                                          <!--Negative Factor  --> <span
+                                          class="mif-arrow-drop-down mif-2x fg-red"><label
+                                             style="color: red; font-weight: bolder;"
+                                             th:text="${calibrationI.delta}">14.3</label></span>
+
+                                       </td>
+                                    </tr>
+                                 </tbody>
+                              </table>
+
+
+                           </div>
+
+                        </div>
+
+
+
+
+                     </div>
+
+
+                     <!-- Calibration - Ends -->
+
+
+                  </div>
+
+
+
+
+               </div>
+            </div>
+
+            <!-- Strength Score Accordion - Ends  -->
+
+            <!-- Fundamentals Accordion - Starts  -->
+            <div class="frame">
+               <div class="heading">Fundamentals</div>
+               <div class="content">
+
+                  <div class="colspan-12 " style="padding: 10px">
+                     <div class="card" style="padding-top: -20px">
+                        <div class="row flex-align-end">
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+
+                                 <div class="cell flex-align-end"
+                                    th:if="${ss.quoteBasic.CFOPAT > 0}">
+                                    <label
+                                       style="color: #4289D8; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.quoteBasic.CFOPAT}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #D89142; font-weight: medium;">
+                                    CFO-PAT Adh. % </span>
+
+
+
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #286FBF; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.quoteBasic.FCFCFO}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #BF7828; font-weight: medium;">
+                                    CFO-FCF Conv. %</span>
+
+
+
+
+                              </blockquote>
+                           </div>
+
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #0F4F59; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.ROE3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #59190F; font-weight: medium;">
+                                    ROE (Last3Yr. Avg.) </span>
+
+
+
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #3F919C; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.ROCE3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #9C4A3F; font-weight: medium;">
+                                    ROCE (Last3Yr. Avg.)</span>
+
+
+
+
+                              </blockquote>
+                           </div>
+
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #0F4F59; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.recvInvBySales3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #59190F; font-weight: medium;">
+                                    (Rec+ Inv)/Sales - Last 3Yr </span>
+
+
+
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #618362; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.intDepByPAT3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #836182; font-weight: medium;">
+                                    (Int+ Dep)/PAT - Last 3Yr</span>
+
+
+
+
+                              </blockquote>
+                           </div>
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #D7814C; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.SGToCapex}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #4CA2D7; font-weight: medium;">
+                                    Sales Gr./Capex (%) </span>
+
+
+
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #BA3D72; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.deRatio}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #CB5F8D; font-weight: medium;">
+                                    Debt Equity Ratio</span>
+
+
+
+
+                              </blockquote>
+                           </div>
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #625B99; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.divGrowth3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #92995B; font-weight: medium;">
+                                    Div. Growth (%) - 3Yr Avg. </span>
+
+
+
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #7E78AF; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.divPayout3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #A9AF78; font-weight: medium;">
+                                    Div. Payout (%) - 3Yr Avg.</span>
+
+
+
+
+                              </blockquote>
+                           </div>
+
+
+                           <div class="cell">
+                              <blockquote class="right-side">
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #507E82; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.avgSSGR3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #825450; font-weight: medium;">
+                                    SSGR Avg. (Last 3Yr.) </span>
+
+
+
+
+                                 <div class="cell flex-align-end">
+                                    <label
+                                       style="color: #659BA0; font-weight: bold; font-size: 1.75em; margin-left: 10px"
+                                       th:text="${ss.fundamentals.salesG3Y}">
+                                    </label>
+                                 </div>
+
+                                 <span
+                                    style="color: #A06A65; font-weight: medium;">
+                                    Sales Gr (Last 3Yr.) </span>
+
+
+
+
+                              </blockquote>
+                           </div>
+
+
+
+
+
+                        </div>
+                     </div>
+
+
+
+                  </div>
+               </div>
+            </div>
+            <!-- Fundamentals Accordion - Ends  -->
+
+            <!-- Trends Accordion - Starts  -->
+            <div class="frame">
+               <div class="heading">Trends</div>
+               <div class="content">
+                  <div class="colspan-12 " style="padding: 10px">
+                     <div class="d-flex flex-justify-start"
+                        th:if="${ss.trends.revWCTrends.size() > 0 }">
+
+                        <h4 style="color: #486590">
+                           Revenues and Working Capital Cycle
+
+                           <!--Buttons - Info  -->
+                           <a
+                              style="margin-left: 10px; margin-top: -5px"
+                              class="button secondary cycle mini"
+                              data-role="hint"
+                              data-hint-text="Compare Revenue Trends for Scrip with it's Working Capital Management in terms of it's receivables and WC - ( Sum of Recv. + Sum of Inventory ) / Sales "
+                              data-cls-hint="bg-steel fg-white drop-shadow"
+                              data-hint-position="right"><span
+                              class="mif-info  fg-white"></span></a>
+
+                           <!--Buttons - Info  -->
+
+                        </h4>
+
+
+
+                     </div>
+
+                     <!-- WC cycle and Revenue - Starts -->
+                     <div class="d-flex flex-justify-center">
+
+                        <!-- Table Cell - Starts -->
+                        <div class="cell">
+                           <div class="row d-flex flex-justify-center"
+                              style="padding-top: -10px; padding-left: 10px; padding-right: 10px; padding-bottom: 10px">
+
+                              <table class="table striped compact">
+                                 <thead>
+                                    <tr>
+                                       <th
+                                          style="text-align: center; color: #37646a">Period:
+                                          Last</th>
+                                       <th
+                                          style="text-align: center; color: #37646a">Sales
+                                          Growth(%)</th>
+                                       <th
+                                          style="text-align: center; color: #37646a">Recv.
+                                          Growth(%)</th>
+                                       <th
+                                          style="text-align: center; color: #37646a">WC/Sales
+                                          Avg.</th>
+                                       <th
+                                          style="text-align: center; color: #37646a">SSGR
+                                          Avg.</th>
+
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <tr
+                                       th:each="revWcTrend : ${ss.trends.revWCTrends}">
+
+                                       <td
+                                          style="text-align: center; color: #706F7E; font-weight: bolder;"
+                                          th:text="${revWcTrend.period}"></td>
+                                       <td
+                                          style="text-align: center;; color: #7998c5; font-weight: bolder;"
+                                          th:text="${revWcTrend.revenue}"></td>
+
+                                       <td
+                                          style="text-align: center; color: #C983A0; font-weight: bolder;"
+                                          th:text="${revWcTrend.recv}"></td>
+                                       <td
+                                          style="text-align: center;; color: #63B4BB; font-weight: bolder;"
+                                          th:text="${revWcTrend.wcByrev}"></td>
+
+                                       <td
+                                          style="text-align: center; color: #948FCE; font-weight: bolder;"
+                                          th:text="${revWcTrend.ssgr}"></td>
+
+
+                                    </tr>
+                                 </tbody>
+                              </table>
+
+                           </div>
+
+
+
+
+                        </div>
+
+                        <!-- Table Cell - Ends-->
+
+                        <!-- Chart Cell - Starts -->
+                        <div class="cell">
+
+                           <div id="chart_div"></div>
+
+
+                        </div>
+                        <!-- Chart Cell -Ends -->
+                     </div>
+
+                     <!-- WC cycle and Revenue - Ends -->
+
+                  </div>
+               </div>
+
+
+            </div>
+
+
+            <!-- Trends Accordion - Ends  -->
+
+            <div class="frame">
+               <div class="heading">Balance Sheet</div>
+               <div class="content">
+                  <div class="p-2">Bitter turkey can be made tasty
+                     by brushing with...</div>
+               </div>
+            </div>
+
+            <div class="frame">
+               <div class="heading">Cash Flows</div>
+               <div class="content">
+                  <div class="p-2">Bitter turkey can be made tasty
+                     by brushing with...</div>
+               </div>
+            </div>
+
+            <div class="frame">
+               <div class="heading">Expenses BreakDown</div>
+               <div class="content">
+                  <div class="p-2">Bitter turkey can be made tasty
+                     by brushing with...</div>
+               </div>
+            </div>
+
+            <div class="frame">
+               <div class="heading">Price Targets</div>
+               <div class="content">
+                  <div class="p-2">Bitter turkey can be made tasty
+                     by brushing with...</div>
+               </div>
+            </div>
+         </div>
+
+      </div>
+      <!-- Content Row - Ends -->
+
+   </div>
+
+   <script th:inline="javascript">
+				var real_data = /*[[${chartData}]]*/'noValue';
+				var real_data2 = /*[[${chartData2}]]*/'noValue';
+
+				$(document).ready(function() {
+					google.charts.load('current', {
+						packages : [ 'corechart', 'bar' ]
+					});
+					google.charts.setOnLoadCallback(drawColumnChart);
+
+				});
+
+				function drawColumnChart() {
+
+					var data = new google.visualization.DataTable();
+
+					data.addColumn('string', 'Period');
+					data.addColumn('number', 'Rev');
+					data.addColumn('number', 'Recv');
+					data.addColumn('number', 'WC');
+					data.addColumn('number', 'SSGR');
+
+					var dataArray = [];
+
+					$.each(real_data2, function(i, obj) {
+						dataArray.push([ obj.period, obj.revenue, obj.recv,
+								obj.wcByrev, obj.ssgr ]);
+					});
+
+					data.addRows(dataArray);
+
+					var options = {
+						title : 'Revenue Growth Trends',
+						width : 500,
+						height : 270,
+						margin : 20,
+						pointSize : 5,
+						hAxis : {
+							title : 'Period',
+						},
+						vAxis : {
+							title : 'Growth Trends'
+						},
+						colors : [ '#8fa9ce', '#CE8FA9', '#A9CE8F', '#8FC9CE',
+								'#948FCE' ],
+						seriesType : 'bars',
+						series : {
+							2 : {
+								type : 'line'
+							}
+						}
+
+					};
+					var chart = new google.visualization.ComboChart(document
+							.getElementById('chart_div'));
+					chart.draw(data, options);
+				}
+
+				function drawPieChart() {
+					var data = new google.visualization.DataTable();
+					data.addColumn('string', 'Year');
+					data.addColumn('number', 'Views');
+					Object.keys(real_data).forEach(function(key) {
+						data.addRow([ key, real_data[key] ]);
+					});
+					var options = {
+						title : 'Blog stats'
+					};
+					var chart = new google.visualization.PieChart(document
+							.getElementById('piechart'));
+					chart.draw(data, options);
+				}
+			</script>
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+</html>
