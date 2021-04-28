@@ -3,26 +3,37 @@ package stocktales.scsnapshot.srv.impl;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
 import stocktales.healthcheck.beanSrv.intf.IScDataContSrv;
+import stocktales.maths.UtilPercentages;
 import stocktales.money.UtilDecimaltoMoneyString;
+import stocktales.scripCalc.intf.IScripCalculations;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Last4QData;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Trends;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
 import stocktales.scsnapshot.model.pojo.StockFundamentals;
 import stocktales.scsnapshot.model.pojo.StockMCapLast4QData;
+import stocktales.scsnapshot.model.pojo.StockPETrends;
 import stocktales.scsnapshot.model.pojo.StockQuoteBasic;
 import stocktales.scsnapshot.model.pojo.StockRevWCCycleTrends;
 import stocktales.scsnapshot.model.pojo.StockSnapshot;
+import stocktales.scsnapshot.model.pojo.StockSnapshotMsgs;
 import stocktales.scsnapshot.model.pojo.StockTrends;
+import stocktales.scsnapshot.model.pojo.StockTrendsGeneral;
+import stocktales.scsnapshot.model.pojo.StockValuationsI;
+import stocktales.scsnapshot.model.pojo.StockWCDetails;
+import stocktales.scsnapshot.srv.intf.IStockSnapshotCalcAttr_DESrv;
 import stocktales.scsnapshot.srv.intf.IStockSnapshotSrv;
 import stocktales.services.interfaces.ScripService;
 import yahoofinance.Stock;
@@ -35,6 +46,9 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 	private IScDataContSrv scBalSheetSrv;
 	
 	@Autowired
+	private MessageSource msgSrc;
+	
+	@Autowired
 	private ScripService scSrv;
 	
 	@Autowired
@@ -45,6 +59,17 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 	
 	@Autowired
 	private EDRCFacade edrcSrv;
+	
+	@Autowired
+	private IScripCalculations scCalcSrv;
+	
+	@Autowired
+	@Qualifier("DE_WorkingCapitalSrv")
+	private IStockSnapshotCalcAttr_DESrv wcapDetailSrv;
+	
+	@Autowired
+	@Qualifier("DE_QualityofGrowthSrv")
+	private IStockSnapshotCalcAttr_DESrv qualGrowthSrv;
 	
 	private StockSnapshot ss;
 	
@@ -115,9 +140,25 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 			this.ss.setQuoteBasic(ssB);
 			populateTargetPrice();
 			populateEDRCSummary();
+			populateValuations();
 			populateLast4QData();
 			populateFundamentals();
 			populateTrends();
+			/**
+			 * Triggered in ASPECT ScripCalculationsCustomAttributesAspect via Service 
+			 * ScripSnapshotCalcAttrSrv that implements IScripCalculations
+			 */
+			populateCustomAttrs();
+			
+			/*
+			 * Now, the following methods can use Calculated Custom Attributes
+			 */
+			if (!ss.getQuoteBasic().isFinancial())
+			{
+				populateWCDetails();
+			}
+			populateQualityofGrowth();
+			
 		}
 		
 		return ss;
@@ -206,6 +247,33 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 					this.ss.getFundamentals().setAvgSSGR3Y(trends3Y.getSSGRAvg());
 					this.ss.getFundamentals().setSalesG3Y(trends3Y.getSalesGR());
 					
+					if (!ss.getQuoteBasic().isFinancial()) //Only for Non Financials
+					{
+						if (ss.getQuoteBasic().getCFOPAT() > 0 && ss.getQuoteBasic().getFCFCFO() > 0)
+						{
+							ss.getFundamentals().setPATtoFCF(Precision.round(
+							        (ss.getQuoteBasic().getCFOPAT() * ss.getQuoteBasic().getFCFCFO()) / 10000, 2));
+							
+							if (ss.getLast4QData() != null)
+							{
+								ss.getFundamentals().setREVtoFCF(Precision.round(
+								        (ss.getFundamentals().getPATtoFCF() * ss.getLast4QData().getNPM()) / 100, 2));
+							}
+							
+							String msgText = msgSrc.getMessage("FCF_INF", new Object[]
+							{ ss.getFundamentals().getPATtoFCF(), ss.getLast4QData().getNPM(),
+							        ss.getFundamentals().getREVtoFCF() }, Locale.ENGLISH);
+							if (msgText != null)
+							{
+								if (ss.getMsgs() == null)
+								{
+									ss.setMsgs(new StockSnapshotMsgs());
+								}
+								ss.getMsgs().setFcf_infMsg(msgText);
+							}
+						}
+					}
+					
 				}
 			}
 		}
@@ -229,6 +297,25 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 						 *  New Trends - Initialize
 						 */
 						
+						/*
+						 * REvenue Working Capital Interval Trends
+						 */
+						
+						if (!trend.getPeriod().equalsIgnoreCase("TTM"))
+						{
+							StockTrendsGeneral stGen = new StockTrendsGeneral();
+							stGen.setPeriod(trend.getPeriod());
+							stGen.setSalesG(trend.getSalesGR());
+							stGen.setPatG(trend.getPATGR());
+							stGen.setOpm(trend.getOPMAvg());
+							stGen.setFcfCfoAvg(trend.getFCF_CFO_Avg());
+							stGen.setDivPayO(trend.getDivPayAvg());
+							stGen.setFiRatio(trend.getFViabAvg());
+							
+							this.ss.getTrends().getTrendsGen().add(stGen);
+							
+						}
+						
 						StockRevWCCycleTrends revWCTrend = new StockRevWCCycleTrends();
 						revWCTrend.setPeriod(trend.getPeriod());
 						revWCTrend.setRevenue(trend.getSalesGR());
@@ -237,15 +324,181 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 						revWCTrend.setSsgr(trend.getSSGRAvg());
 						
 						/*
+						 * EPS and PE Trends
+						 */
+						StockPETrends peTrend = new StockPETrends();
+						peTrend.setPtype(trend.getPeriod());
+						peTrend.setAvgpe(Precision.round(trend.getAvgPE(), 1));
+						peTrend.setEpsgr(trend.getPATGR());
+						peTrend.setPegr(trend.getPEGR());
+						
+						/*
 						 * Adding to Final Structures Here
 						 */
 						
 						this.ss.getTrends().getRevWCTrends().add(revWCTrend);
+						this.ss.getTrends().getPeTrends().add(peTrend);
 						
 					}
 					
 				}
 			}
+		}
+	}
+	
+	private void populateValuations(
+	)
+	{
+		if (this.ss.getQuoteBasic() != null)
+		{
+			StockValuationsI scValICMP = new StockValuationsI("CMP",
+			        Precision.round(ss.getQuoteBasic().getCmp().doubleValue(), 0), 0);
+			ss.getValuations().add(scValICMP);
+			
+			StockValuationsI scValI50DMA = new StockValuationsI("50 DMA",
+			        Precision.round(ss.getQuoteBasic().getDma50().doubleValue(), 0),
+			        Precision.round(ss.getQuoteBasic().getPerChg50DMA().doubleValue(), 0));
+			ss.getValuations().add(scValI50DMA);
+			
+			StockValuationsI scValI200DMA = new StockValuationsI("200 DMA",
+			        Precision.round(ss.getQuoteBasic().getDma200().doubleValue(), 0),
+			        Precision.round(ss.getQuoteBasic().getPerChg200DMA().doubleValue(), 0));
+			ss.getValuations().add(scValI200DMA);
+			
+			StockValuationsI scValI52wH = new StockValuationsI("52W High",
+			        Precision.round(ss.getQuoteBasic().getHigh52W().doubleValue(), 0),
+			        Precision.round(ss.getQuoteBasic().getPerChg52WkHigh().doubleValue(), 0));
+			ss.getValuations().add(scValI52wH);
+			
+			StockValuationsI scValI52wL = new StockValuationsI("52W Low",
+			        Precision.round(ss.getQuoteBasic().getLow52W().doubleValue(), 0),
+			        Precision.round(ss.getQuoteBasic().getPerChg52WkLow().doubleValue(), 0));
+			ss.getValuations().add(scValI52wL);
+			
+			// Get Trends for Scrip
+			if (scDCSrv != null)
+			{
+				if (scDCSrv.getScDC() != null)
+				{
+					if (scDCSrv.getScDC().getTrends_L() != null)
+					{
+						
+						//3yr
+						Optional<EN_SC_Trends> trend3Y = scDCSrv.getScDC().getTrends_L().stream()
+						        .filter(x -> x.getPeriod().equals("3Yr")).findFirst();
+						if (trend3Y.isPresent())
+						{
+							
+							double           price3Yr  = Precision.round(
+							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend3Y.get().getAvgPE(), 0);
+							StockValuationsI scValI3Yr = new StockValuationsI("3Y PE Price", price3Yr, UtilPercentages
+							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), price3Yr, 1));
+							ss.getValuations().add(scValI3Yr);
+							
+						}
+						
+						//5yr
+						Optional<EN_SC_Trends> trend5Y = scDCSrv.getScDC().getTrends_L().stream()
+						        .filter(x -> x.getPeriod().equals("5Yr")).findFirst();
+						if (trend5Y.isPresent())
+						{
+							
+							double           price5Yr  = Precision.round(
+							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend5Y.get().getAvgPE(), 0);
+							StockValuationsI scValI5Yr = new StockValuationsI("5Y PE Price", price5Yr, UtilPercentages
+							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), price5Yr, 1));
+							ss.getValuations().add(scValI5Yr);
+							
+						}
+						
+						//7yr
+						Optional<EN_SC_Trends> trend7Y = scDCSrv.getScDC().getTrends_L().stream()
+						        .filter(x -> x.getPeriod().equals("7Yr")).findFirst();
+						if (trend7Y.isPresent())
+						{
+							
+							double           price7Yr  = Precision.round(
+							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend7Y.get().getAvgPE(), 0);
+							StockValuationsI scValI7Yr = new StockValuationsI("7Y PE Price", price7Yr, UtilPercentages
+							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), price7Yr, 1));
+							ss.getValuations().add(scValI7Yr);
+							
+						}
+						
+						//10yr
+						Optional<EN_SC_Trends> trend10Y = scDCSrv.getScDC().getTrends_L().stream()
+						        .filter(x -> x.getPeriod().equals("10Yr")).findFirst();
+						if (trend10Y.isPresent())
+						{
+							
+							double           price10Yr  = Precision.round(
+							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend10Y.get().getAvgPE(), 0);
+							StockValuationsI scValI10Yr = new StockValuationsI("10Y PE Price", price10Yr,
+							        UtilPercentages.getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(),
+							                price10Yr, 1));
+							ss.getValuations().add(scValI10Yr);
+							
+						}
+						
+						//Weighted PE
+						if (ss.getTargetPrice().getWeightedPE() > 0)
+						{
+							double           pricewtPE  = Precision.round(
+							        ss.getQuoteBasic().getEpsCurr().doubleValue() * ss.getTargetPrice().getWeightedPE(),
+							        0);
+							StockValuationsI scValIWTPe = new StockValuationsI("Wt. PE Price", pricewtPE,
+							        UtilPercentages.getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(),
+							                pricewtPE, 1));
+							ss.getValuations().add(scValIWTPe);
+						}
+						
+					}
+				}
+			}
+			
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void populateWCDetails(
+	)
+	{
+		if (wcapDetailSrv != null)
+		{
+			ss.setWcDetails(
+			        (List<StockWCDetails>) wcapDetailSrv.extractStockSnapshotData(scDCSrv, ss.getScCalcAttrResult()));
+		}
+	}
+	
+	private void populateQualityofGrowth(
+	)
+	{
+		if (qualGrowthSrv != null)
+		{
+			
+		}
+	}
+	
+	/*
+	 * Populate Custom Attributes Configured in SRv Bean which implements IScripCalculations
+	 */
+	private void populateCustomAttrs(
+	)
+	{
+		if (scCalcSrv != null)
+		{
+			this.ss.setScCalcAttrResult(
+			        scCalcSrv.getScripCalculatedAttributesResult(this.ss.getQuoteBasic().getScCode()));
+			
+			//			for (TY_AttrMultiContainer multiAttrCont : this.ss.getScCalcAttrResult().getAttrsMulti())
+			//			{
+			//				System.out.println(multiAttrCont.getAttrName());
+			//				
+			//				for (NameVal nameVal : multiAttrCont.getNameVals())
+			//				{
+			//					System.out.println(nameVal.getName() + "-----" + nameVal.getValue());
+			//				}
+			//			}
 		}
 	}
 }

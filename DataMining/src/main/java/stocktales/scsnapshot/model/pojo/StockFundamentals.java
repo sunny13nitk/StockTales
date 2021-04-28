@@ -26,4 +26,7 @@ public class StockFundamentals
 	private double avgSSGR3Y;
 	private double salesG3Y;
 	
+	private double PATtoFCF;
+	private double REVtoFCF;
+	
 }

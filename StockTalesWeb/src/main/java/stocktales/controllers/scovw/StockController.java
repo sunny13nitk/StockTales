@@ -1,5 +1,8 @@
 package stocktales.controllers.scovw;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +35,40 @@ public class StockController
 				{
 					model.addAttribute("ss", ss);
 					
+					/**
+					 * ------------ Charts Data Model Populate
+					 */
+					
+					/*
+					 * Individual Chart Data Objects Addition
+					 */
 					model.addAttribute("chartData2", ss.getTrends().getRevWCTrends());
+					
+					/*
+					 * Trends General except TTM
+					 */
+					model.addAttribute("trendsGen", ss.getTrends().getTrendsGen());
+					
+					/*
+					 * FCF per Units of PAT and Sales - Fundamentals
+					 */
+					Map<String, Double> fcfFundData = new TreeMap<>();
+					fcfFundData.put("FCF/Rupee of PAT", ss.getFundamentals().getPATtoFCF());
+					fcfFundData.put("FCF/Rupee of Revenue", ss.getFundamentals().getREVtoFCF());
+					
+					model.addAttribute("fcfFundData", fcfFundData);
+					
+					/*
+					 * Prices
+					 */
+					
+					model.addAttribute("priceTrends", ss.getValuations());
+					model.addAttribute("PETrends", ss.getTrends().getPeTrends());
+					
+					/*
+					 * Working Capital Details
+					 */
+					model.addAttribute("wcDetails", ss.getWcDetails());
 					
 				}
 			} catch (Exception e)
