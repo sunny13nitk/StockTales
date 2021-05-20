@@ -7,10 +7,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class StockSnapshotMsgs
+@AllArgsConstructor
+public class StockBSPerShareData
 {
-	private String fcf_infMsg;
-	private String bsGranNos;
+	private String year;
+	
+	private double eps;
+	
+	private double cips;
+	
+	private double dps;
 }

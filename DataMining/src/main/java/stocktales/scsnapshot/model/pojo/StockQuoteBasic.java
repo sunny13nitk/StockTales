@@ -19,6 +19,7 @@ public class StockQuoteBasic
 	private double uph;      //general
 	private double peg;      //general
 	private double fcfyield; //10YData
+	private double valratio; //Value Ratio - (MCap Change/Retained Earnings) - Last 10 Yrs
 	private double cps;      //general		
 	
 	private double CFOPAT; //10YData

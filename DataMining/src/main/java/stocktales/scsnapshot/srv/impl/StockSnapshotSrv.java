@@ -14,14 +14,22 @@ import org.springframework.stereotype.Service;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
+import stocktales.dataBook.model.entity.scLinks.ScLinks;
+import stocktales.dataBook.model.repo.scLinks.RepoScLinks;
+import stocktales.durations.UtilDurations;
 import stocktales.healthcheck.beanSrv.intf.IScDataContSrv;
 import stocktales.maths.UtilPercentages;
 import stocktales.money.UtilDecimaltoMoneyString;
 import stocktales.scripCalc.intf.IScripCalculations;
+import stocktales.scripsEngine.uploadEngine.entities.EN_SC_BalSheet;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Last4QData;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Trends;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
+import stocktales.scsnapshot.model.pojo.StockBSGranularNos;
+import stocktales.scsnapshot.model.pojo.StockBSPerShareData;
+import stocktales.scsnapshot.model.pojo.StockBSRatiosData;
+import stocktales.scsnapshot.model.pojo.StockBalSheetData;
 import stocktales.scsnapshot.model.pojo.StockFundamentals;
 import stocktales.scsnapshot.model.pojo.StockMCapLast4QData;
 import stocktales.scsnapshot.model.pojo.StockPETrends;
@@ -35,6 +43,7 @@ import stocktales.scsnapshot.model.pojo.StockValuationsI;
 import stocktales.scsnapshot.model.pojo.StockWCDetails;
 import stocktales.scsnapshot.srv.intf.IStockSnapshotCalcAttr_DESrv;
 import stocktales.scsnapshot.srv.intf.IStockSnapshotSrv;
+import stocktales.scsnapshot.srv.intf.IStockSnapshotTextsHelper;
 import stocktales.services.interfaces.ScripService;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
@@ -44,6 +53,9 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 {
 	@Autowired
 	private IScDataContSrv scBalSheetSrv;
+	
+	@Autowired
+	private RepoScLinks repoScLinks;
 	
 	@Autowired
 	private MessageSource msgSrc;
@@ -71,6 +83,10 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 	@Qualifier("DE_QualityofGrowthSrv")
 	private IStockSnapshotCalcAttr_DESrv qualGrowthSrv;
 	
+	@Autowired
+	@Qualifier("SSTH_GranularTrends")
+	private IStockSnapshotTextsHelper granNosTHSrv;
+	
 	private StockSnapshot ss;
 	
 	@Override
@@ -78,90 +94,159 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 	        String scCode
 	) throws Exception
 	{
-		
-		Stock stock = YahooFinance.get(scCode + ".NS");
-		if (stock != null)
+		if (scCode != null && repoScLinks != null)
 		{
-			ss = new StockSnapshot();
-			MathContext m1 = new MathContext(1);
-			MathContext m0 = new MathContext(0);
+			Optional<ScLinks> SCLO = repoScLinks.findBySccode(scCode);
 			
-			StockQuoteBasic ssB = new StockQuoteBasic();
-			ssB.setScCode(scCode);
-			
-			ssB.setBvps(stock.getStats().getBookValuePerShare().round(m1));
-			ssB.setCmp(stock.getQuote().getPrice().round(m0));
-			ssB.setDma50(stock.getQuote().getPriceAvg50().round(m0));
-			ssB.setDma200(stock.getQuote().getPriceAvg200().round(m0));
-			ssB.setEpsCurr(stock.getStats().getEps().round(m1));
-			ssB.setHigh52W(stock.getQuote().getYearHigh().round(m0));
-			ssB.setLow52W(stock.getQuote().getYearLow().round(m0));
-			ssB.setMCap(stock.getStats().getMarketCap().round(m0));
-			ssB.setMCapTxt(UtilDecimaltoMoneyString.getMoneyStringforDecimal(ssB.getMCap().doubleValue(), 0));
-			ssB.setName(stock.getName());
-			ssB.setPbRatio(stock.getStats().getPriceBook().round(m1));
-			ssB.setPeRatio(stock.getStats().getPe().round(m1));
-			ssB.setPerChg200DMA(stock.getQuote().getChangeFromAvg200InPercent().round(m0));
-			ssB.setPerChg50DMA(stock.getQuote().getChangeFromAvg50InPercent().round(m0));
-			ssB.setPerChg52WkHigh(stock.getQuote().getChangeFromYearHighInPercent().round(m0));
-			ssB.setPerChg52WkLow(stock.getQuote().getChangeFromYearLowInPercent().round(m0));
-			
-			if (scDCSrv != null)
+			Stock stock = YahooFinance.get(scCode + ".NS");
+			if (stock != null)
 			{
-				scDCSrv.load(scCode);
-				if (scDCSrv.getScDC() != null)
+				ss = new StockSnapshot();
+				
+				if (SCLO.isPresent())
 				{
-					ssB.setSector(scDCSrv.getScDC().getSCRoot().getSector());
-					ssB.setUph(scDCSrv.getScDC().getSCRoot().getUPH());
-					ssB.setPeg(scDCSrv.getScDC().getSCRoot().getPEG());
-					ssB.setCps(Precision.round(scDCSrv.getScDC().getSCRoot().getCPS(), 0));
-					if (scDCSrv.getScDC().getTenYData() != null)
+					ss.setScLinks(SCLO.get());
+				}
+				
+				MathContext m1 = new MathContext(1);
+				MathContext m0 = new MathContext(0);
+				
+				StockQuoteBasic ssB = new StockQuoteBasic();
+				ssB.setScCode(scCode);
+				
+				ssB.setBvps(stock.getStats().getBookValuePerShare().round(m1));
+				ssB.setCmp(stock.getQuote().getPrice().round(m0));
+				ssB.setDma50(stock.getQuote().getPriceAvg50().round(m0));
+				ssB.setDma200(stock.getQuote().getPriceAvg200().round(m0));
+				ssB.setEpsCurr(stock.getStats().getEps().round(m1));
+				ssB.setHigh52W(stock.getQuote().getYearHigh().round(m0));
+				ssB.setLow52W(stock.getQuote().getYearLow().round(m0));
+				ssB.setMCap(stock.getStats().getMarketCap().round(m0));
+				ssB.setMCapTxt(UtilDecimaltoMoneyString.getMoneyStringforDecimal(ssB.getMCap().doubleValue(), 0));
+				ssB.setName(stock.getName());
+				ssB.setPbRatio(stock.getStats().getPriceBook().round(m1));
+				ssB.setPeRatio(stock.getStats().getPe().round(m1));
+				ssB.setPerChg200DMA(stock.getQuote().getChangeFromAvg200InPercent().round(m0));
+				ssB.setPerChg50DMA(stock.getQuote().getChangeFromAvg50InPercent().round(m0));
+				ssB.setPerChg52WkHigh(stock.getQuote().getChangeFromYearHighInPercent().round(m0));
+				ssB.setPerChg52WkLow(stock.getQuote().getChangeFromYearLowInPercent().round(m0));
+				
+				if (scDCSrv != null)
+				{
+					scDCSrv.load(scCode);
+					if (scDCSrv.getScDC() != null)
 					{
+						ssB.setSector(scDCSrv.getScDC().getSCRoot().getSector());
+						ssB.setUph(scDCSrv.getScDC().getSCRoot().getUPH());
+						ssB.setPeg(scDCSrv.getScDC().getSCRoot().getPEG());
+						ssB.setCps(Precision.round(scDCSrv.getScDC().getSCRoot().getCPS(), 0));
+						if (scDCSrv.getScDC().getTenYData() != null)
+						{
+							
+							double fcf           = scDCSrv.getScDC().getTenYData().getFCF();
+							double deltaMCap10Yr = scDCSrv.getScDC().getTenYData().getMcapI10Y();
+							double cffld         = (fcf / deltaMCap10Yr) * 100;
+							
+							ssB.setCFOPAT(scDCSrv.getScDC().getTenYData().getCFOPATR());
+							ssB.setFCFCFO(scDCSrv.getScDC().getTenYData().getFCFCFOR());
+							
+							ssB.setFcfyield(Precision.round(cffld, 1));
+							
+							ssB.setValratio(Precision.round(scDCSrv.getScDC().getTenYData().getValR(), 1));
+						}
 						
-						double     fcf   = scDCSrv.getScDC().getTenYData().getFCF();
-						BigDecimal cfcCr = new BigDecimal(fcf * 10000000);
-						double     cffld = (cfcCr.doubleValue() / ssB.getMCap().doubleValue()) * 100;
+						if (scSrv != null)
+						{
+							ssB.setFinancial(scSrv.isScripBelongingToFinancialSector(scCode));
+						}
 						
-						ssB.setCFOPAT(scDCSrv.getScDC().getTenYData().getCFOPATR());
-						ssB.setFCFCFO(scDCSrv.getScDC().getTenYData().getFCFCFOR());
-						
-						ssB.setFcfyield(Precision.round(cffld, 1));
-					}
-					
-					if (scSrv != null)
-					{
-						ssB.setFinancial(scSrv.isScripBelongingToFinancialSector(scCode));
 					}
 					
 				}
 				
+				this.ss.setQuoteBasic(ssB);
+				populateTargetPrice();
+				populateEDRCSummary();
+				populateValuations();
+				populateLast4QData();
+				populateFundamentals();
+				populateTrends();
+				/**
+				 * Triggered in ASPECT ScripCalculationsCustomAttributesAspect via Service 
+				 * ScripSnapshotCalcAttrSrv that implements IScripCalculations
+				 */
+				populateCustomAttrs();
+				
+				/*
+				 * Now, the following methods can use Calculated Custom Attributes
+				 */
+				if (!ss.getQuoteBasic().isFinancial())
+				{
+					populateWCDetails();
+				}
+				
+				populateBSData();
+				
+				populateQualityofGrowth();
+				
 			}
-			
-			this.ss.setQuoteBasic(ssB);
-			populateTargetPrice();
-			populateEDRCSummary();
-			populateValuations();
-			populateLast4QData();
-			populateFundamentals();
-			populateTrends();
-			/**
-			 * Triggered in ASPECT ScripCalculationsCustomAttributesAspect via Service 
-			 * ScripSnapshotCalcAttrSrv that implements IScripCalculations
-			 */
-			populateCustomAttrs();
-			
-			/*
-			 * Now, the following methods can use Calculated Custom Attributes
-			 */
-			if (!ss.getQuoteBasic().isFinancial())
-			{
-				populateWCDetails();
-			}
-			populateQualityofGrowth();
-			
 		}
 		
 		return ss;
+	}
+	
+	private void populateBSData(
+	)
+	{
+		int baseYR = UtilDurations.getYearsFromHistory(10).getYearFrom();
+		
+		if (baseYR > 0)
+		{
+			if (this.scDCSrv.getScDC() != null)
+			{
+				List<EN_SC_BalSheet> balSheetL = this.scDCSrv.getScDC().getBalSheet_L();
+				if (balSheetL != null)
+				{
+					if (balSheetL.size() > 0)
+					{
+						this.ss.setBalSheetData(new StockBalSheetData());
+						for (EN_SC_BalSheet balSheetI : balSheetL)
+						{
+							if (balSheetI.getYear() >= baseYR)
+							{
+								this.ss.getBalSheetData().getBalSheetGrData()
+								        .add(new StockBSGranularNos(balSheetI.getYear(),
+								                String.valueOf(balSheetI.getYear()), balSheetI.getSales(),
+								                balSheetI.getPAT(), balSheetI.getCFO(),
+								                balSheetI.getCFO() - balSheetI.getCapex(), balSheetI.getCashI(),
+								                balSheetI.getRE(), balSheetI.getDebt()));
+								
+								this.ss.getBalSheetData().getEpsData()
+								        .add(new StockBSPerShareData(String.valueOf(balSheetI.getYear()),
+								                Precision.round(balSheetI.getEPS(), 1),
+								                Precision.round(balSheetI.getcips(), 1),
+								                Precision.round(balSheetI.getdivps(), 1)));
+								
+								this.ss.getBalSheetData().getBalSheetRatios()
+								        .add(new StockBSRatiosData(String.valueOf(balSheetI.getYear()),
+								                balSheetI.getOPM(), balSheetI.getNPM(), balSheetI.getROE(),
+								                balSheetI.getROCE(), balSheetI.getcfoyield(),
+								                balSheetI.getdividendpayout(), balSheetI.gettaxper()));
+								
+							}
+						}
+						
+						if (this.granNosTHSrv != null)
+						{
+							this.ss.getMsgs().setBsGranNos(
+							        granNosTHSrv.getMessagesforObject(
+							                this.ss.getBalSheetData().getBalSheetGrData()).get(0));
+						}
+					}
+				}
+			}
+		}
+		
 	}
 	
 	/*
@@ -174,6 +259,11 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 		{
 			this.ss.setTargetPrice(scValSrv.getValuationforScrip(this.ss.getQuoteBasic().getScCode(),
 			        this.ss.getQuoteBasic().getCmp().doubleValue(), 1));
+			if (ss.getQuoteBasic().getCps() > 0 && ss.getTargetPrice().getCMP() > 0)
+			{
+				this.ss.getTargetPrice().setCashCmpRatio(
+				        Precision.round(((ss.getQuoteBasic().getCps() / ss.getTargetPrice().getCMP() * 100)), 1));
+			}
 		}
 	}
 	
@@ -391,7 +481,7 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 							
 							double           price3Yr  = Precision.round(
 							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend3Y.get().getAvgPE(), 0);
-							StockValuationsI scValI3Yr = new StockValuationsI("3Y PE Price", price3Yr, UtilPercentages
+							StockValuationsI scValI3Yr = new StockValuationsI("3Y PE", price3Yr, UtilPercentages
 							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), price3Yr, 1));
 							ss.getValuations().add(scValI3Yr);
 							
@@ -405,7 +495,7 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 							
 							double           price5Yr  = Precision.round(
 							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend5Y.get().getAvgPE(), 0);
-							StockValuationsI scValI5Yr = new StockValuationsI("5Y PE Price", price5Yr, UtilPercentages
+							StockValuationsI scValI5Yr = new StockValuationsI("5Y PE", price5Yr, UtilPercentages
 							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), price5Yr, 1));
 							ss.getValuations().add(scValI5Yr);
 							
@@ -419,7 +509,7 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 							
 							double           price7Yr  = Precision.round(
 							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend7Y.get().getAvgPE(), 0);
-							StockValuationsI scValI7Yr = new StockValuationsI("7Y PE Price", price7Yr, UtilPercentages
+							StockValuationsI scValI7Yr = new StockValuationsI("7Y PE", price7Yr, UtilPercentages
 							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), price7Yr, 1));
 							ss.getValuations().add(scValI7Yr);
 							
@@ -433,9 +523,8 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 							
 							double           price10Yr  = Precision.round(
 							        ss.getQuoteBasic().getEpsCurr().doubleValue() * trend10Y.get().getAvgPE(), 0);
-							StockValuationsI scValI10Yr = new StockValuationsI("10Y PE Price", price10Yr,
-							        UtilPercentages.getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(),
-							                price10Yr, 1));
+							StockValuationsI scValI10Yr = new StockValuationsI("10Y PE", price10Yr, UtilPercentages
+							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), price10Yr, 1));
 							ss.getValuations().add(scValI10Yr);
 							
 						}
@@ -446,9 +535,8 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 							double           pricewtPE  = Precision.round(
 							        ss.getQuoteBasic().getEpsCurr().doubleValue() * ss.getTargetPrice().getWeightedPE(),
 							        0);
-							StockValuationsI scValIWTPe = new StockValuationsI("Wt. PE Price", pricewtPE,
-							        UtilPercentages.getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(),
-							                pricewtPE, 1));
+							StockValuationsI scValIWTPe = new StockValuationsI("Wt. PE", pricewtPE, UtilPercentages
+							        .getPercentageDelta(ss.getQuoteBasic().getCmp().doubleValue(), pricewtPE, 1));
 							ss.getValuations().add(scValIWTPe);
 						}
 						

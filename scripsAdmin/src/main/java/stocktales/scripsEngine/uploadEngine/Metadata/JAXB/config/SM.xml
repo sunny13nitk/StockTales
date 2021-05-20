@@ -283,7 +283,7 @@
 
 		<fldsMdt>
 			<sheetField>Tax%</sheetField>
-			<objField>TaxPer</objField>
+			<objField>taxper</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>

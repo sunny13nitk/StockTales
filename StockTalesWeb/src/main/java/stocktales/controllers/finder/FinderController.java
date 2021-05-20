@@ -20,7 +20,9 @@ public class FinderController
 	)
 	{
 		model.addAttribute("searchTerm", new SearchText());
-		return "finder/finder";
+		/*return "finder/finder";*/
+		
+		return "scsnapshot/scOvwTabs";
 	}
 	
 	/*

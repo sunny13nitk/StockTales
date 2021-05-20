@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stocktales.basket.allocations.autoAllocation.facades.pojos.SC_EDRC_Summary;
 import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation;
+import stocktales.dataBook.model.entity.scLinks.ScLinks;
 import stocktales.scripCalc.pojos.TY_ScripCalcResult;
 
 @Getter
@@ -18,6 +19,8 @@ import stocktales.scripCalc.pojos.TY_ScripCalcResult;
 public class StockSnapshot
 {
 	private StockQuoteBasic quoteBasic;
+	
+	private ScLinks scLinks;
 	
 	private ScValuation targetPrice;
 	
@@ -36,5 +39,7 @@ public class StockSnapshot
 	private List<StockValuationsI> valuations = new ArrayList<StockValuationsI>();
 	
 	private List<StockWCDetails> wcDetails = new ArrayList<StockWCDetails>();
+	
+	private StockBalSheetData balSheetData;
 	
 }

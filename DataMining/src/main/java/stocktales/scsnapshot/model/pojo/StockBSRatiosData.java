@@ -9,8 +9,14 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StockSnapshotMsgs
+public class StockBSRatiosData
 {
-	private String fcf_infMsg;
-	private String bsGranNos;
+	private String year;
+	private int    opm;
+	private int    npm;
+	private int    roe;
+	private int    roce;
+	private int    cfoy;
+	private int    divp;
+	private int    taxper;
 }

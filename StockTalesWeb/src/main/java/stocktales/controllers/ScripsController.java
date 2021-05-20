@@ -1,5 +1,7 @@
 package stocktales.controllers;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import stocktales.basket.allocations.autoAllocation.facades.interfaces.EDRCFacade;
 import stocktales.basket.allocations.autoAllocation.valuations.interfaces.SCValuationSrv;
+import stocktales.dataBook.model.entity.scLinks.ScLinks;
+import stocktales.dataBook.model.repo.scLinks.RepoScLinks;
 import stocktales.helperPOJO.ScValFormPOJO;
 import stocktales.predicates.GenericSCEDRCSummaryPredicate;
 import stocktales.predicates.manager.PredicateManagerImpl;
@@ -32,6 +36,9 @@ public class ScripsController
 	
 	@Autowired
 	private SCValuationSrv scValSrv;
+	
+	@Autowired
+	private RepoScLinks repoScLinks;
 	
 	@GetMapping("/edrc")
 	public String showScripsEDRC(
@@ -87,6 +94,28 @@ public class ScripsController
 		return "reports/ScripStrengthScoreDetails";
 	}
 	
+	@GetMapping("/links/{scCode}")
+	public String showScripsLinks(
+	        @PathVariable String scCode, Model model
+	)
+	{
+		
+		if (scCode != null && this.repoScLinks != null)
+		{
+			Optional<ScLinks> scLinkO = repoScLinks.findBySccode(scCode);
+			if (scLinkO.isPresent())
+			{
+				model.addAttribute("scLinks", scLinkO.get());
+			} else
+			{
+				ScLinks scLink = new ScLinks();
+				scLink.setSccode(scCode);
+				model.addAttribute("scLinks", scLink);
+			}
+		}
+		return "scrips/scLinks";
+	}
+	
 	@GetMapping("/val/{scCode}")
 	public String testscValuation(
 	        @PathVariable String scCode, Model model
@@ -124,6 +153,18 @@ public class ScripsController
 			        scValSrv.getValuationforScrip(scValPOJO.getScCode(), scValPOJO.getCMP(), scValPOJO.getMoS()));
 		}
 		return "valuations/op/scVal";
+	}
+	
+	@PostMapping("/saveLink")
+	public String saveScripLinks(
+	        @ModelAttribute("scLinks") ScLinks scLink, Model model
+	)
+	{
+		if (scLink != null && scLink.getSccode() != null)
+		{
+			repoScLinks.save(scLink);
+		}
+		return "redirect:/scOvw/" + scLink.getSccode();
 	}
 	
 }

@@ -21,7 +21,7 @@ public class StockController
 	private IStockSnapshotSrv ssSrv;
 	
 	@GetMapping("/{scCode}")
-	public String showCAGRForm(
+	public String showScOvw(
 	        @PathVariable String scCode, Model model
 	)
 	{
@@ -70,6 +70,13 @@ public class StockController
 					 */
 					model.addAttribute("wcDetails", ss.getWcDetails());
 					
+					/*
+					 * Balance Sheet Numbers - Last 10 yrs
+					 */
+					model.addAttribute("bsGrNos", ss.getBalSheetData().getBalSheetGrData());
+					model.addAttribute("bsEPSNos", ss.getBalSheetData().getEpsData());
+					model.addAttribute("bsRatios", ss.getBalSheetData().getBalSheetRatios());
+					
 				}
 			} catch (Exception e)
 			{
@@ -79,7 +86,7 @@ public class StockController
 			
 		}
 		
-		return "scsnapshot/scOvw";
+		return "scsnapshot/scOvwTabs";
 	}
 	
 }

@@ -23,5 +23,6 @@ public class ScValuation
 	private double weightedPE;
 	private double price5Yr;
 	private double ret5YrCAGR;
+	private double cashCmpRatio;
 	
 }

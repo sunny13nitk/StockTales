@@ -283,7 +283,7 @@
 
 		<fldsMdt>
 			<sheetField>Tax%</sheetField>
-			<objField>TaxPer</objField>
+			<objField>taxper</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -432,7 +432,7 @@
 
 		<fldsMdt>
 			<sheetField>Share Capital</sheetField>
-			<objField>ShareCapital</objField>
+			<objField>sharecapital</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -441,7 +441,7 @@
 
 		<fldsMdt>
 			<sheetField>Dividend Paid (Div) Without DDT</sheetField>
-			<objField>DividendPaid</objField>
+			<objField>dividendpaid</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -450,7 +450,7 @@
 
 		<fldsMdt>
 			<sheetField>Dividend Payout (Div/PAT)</sheetField>
-			<objField>DividendPayout</objField>
+			<objField>dividendpayout</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -488,7 +488,7 @@
 
 		<fldsMdt>
 			<sheetField>Face Value</sheetField>
-			<objField>FaceValue</objField>
+			<objField>facevalue</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>true</isSplitAware>
 			<isBonusAware>true</isBonusAware>
@@ -499,7 +499,7 @@
 
 		<fldsMdt>
 			<sheetField>Book Value</sheetField>
-			<objField>BookValue</objField>
+			<objField>bookvalue</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>true</isSplitAware>
 			<isBonusAware>true</isBonusAware>
@@ -565,7 +565,7 @@
 
 		<fldsMdt>
 			<sheetField>Raw Materials</sheetField>
-			<objField>RawMToSales</objField>
+			<objField>rawmtosales</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -574,7 +574,7 @@
 
 		<fldsMdt>
 			<sheetField>Employee Costs</sheetField>
-			<objField>EmpCToSales</objField>
+			<objField>empctosales</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -583,7 +583,7 @@
 
 		<fldsMdt>
 			<sheetField>Power and Fuel</sheetField>
-			<objField>PowFToSales</objField>
+			<objField>powftosales</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -592,7 +592,7 @@
 
 		<fldsMdt>
 			<sheetField>Seliing Admin</sheetField>
-			<objField>MktgToSales</objField>
+			<objField>mktgtosales</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -601,7 +601,7 @@
 
 		<fldsMdt>
 			<sheetField>Other Expenses</sheetField>
-			<objField>OtherToSales</objField>
+			<objField>othertosales</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
@@ -610,12 +610,70 @@
 
 		<fldsMdt>
 			<sheetField>Depreciation Percentage</sheetField>
-			<objField>DepToSales</objField>
+			<objField>deptosales</objField>
 			<isMandatory>false</isMandatory>
 			<isSplitAware>false</isSplitAware>
 			<isBonusAware>false</isBonusAware>
 			<dataType>Decimal</dataType>
 		</fldsMdt>
+		
+		
+		
+		<fldsMdt>
+			<sheetField>Cash + Investments Per Share (CIPS)</sheetField>
+			<objField>cips</objField>
+			<isMandatory>false</isMandatory>
+			<isSplitAware>true</isSplitAware>
+			<isBonusAware>true</isBonusAware>
+			<dataType>Decimal</dataType>
+		</fldsMdt>
+		
+		<fldsMdt>
+			<sheetField>CFO Yield</sheetField>
+			<objField>cfoyield</objField>
+			<isMandatory>false</isMandatory>
+			<isSplitAware>false</isSplitAware>
+			<isBonusAware>false</isBonusAware>
+			<dataType>Numerical</dataType>
+		</fldsMdt>
+		
+		<fldsMdt>
+			<sheetField>Receivables/Sales</sheetField>
+			<objField>recvbysales</objField>
+			<isMandatory>false</isMandatory>
+			<isSplitAware>false</isSplitAware>
+			<isBonusAware>false</isBonusAware>
+			<dataType>Numerical</dataType>
+		</fldsMdt>
+		
+		<fldsMdt>
+			<sheetField>Inventory/Sales</sheetField>
+			<objField>invbysales</objField>
+			<isMandatory>false</isMandatory>
+			<isSplitAware>false</isSplitAware>
+			<isBonusAware>false</isBonusAware>
+			<dataType>Numerical</dataType>
+		</fldsMdt>
+		
+		<fldsMdt>
+			<sheetField>Num Shares</sheetField>
+			<objField>numshares</objField>
+			<isMandatory>false</isMandatory>
+			<isSplitAware>false</isSplitAware>
+			<isBonusAware>false</isBonusAware>
+			<dataType>Decimal</dataType>
+		</fldsMdt>
+		
+		<fldsMdt>
+			<sheetField>Dividend/Share</sheetField>
+			<objField>divps</objField>
+			<isMandatory>false</isMandatory>
+			<isSplitAware>true</isSplitAware>
+			<isBonusAware>true</isBonusAware>
+			<dataType>Decimal</dataType>
+		</fldsMdt>
+		
+		
 
 	</sheetMetadata>
 

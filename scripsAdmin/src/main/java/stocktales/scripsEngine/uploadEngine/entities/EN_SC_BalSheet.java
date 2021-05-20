@@ -16,7 +16,7 @@ public class EN_SC_BalSheet
 	@Column(name = "bal_sheet_id")
 	private long BalSheet_ID;
 	
-	private int    year;          //REnamed
+	private int    year;        //REnamed
 	private String SCCode;
 	private int    Sales;
 	private int    OP;
@@ -27,8 +27,8 @@ public class EN_SC_BalSheet
 	private int    Depreciation;
 	private int    PBT;
 	private int    Tax;
-	@Column(name = "tax_per")
-	private int    TaxPer;
+	//@Column(name = "tax_per")
+	private int    taxper;
 	private int    PAT;
 	private int    NPM;
 	private int    CFO;
@@ -44,37 +44,49 @@ public class EN_SC_BalSheet
 	private int    ITR;
 	private int    NFA;
 	private int    CWIP;
-	@Column(name = "share_capital")
-	private int    ShareCapital;
-	@Column(name = "dividend_paid")
-	private int    DividendPaid;
-	@Column(name = "dividend_payout")
-	private int    DividendPayout;
+	//@Column(name = "share_capital")
+	private int sharecapital;
+	//@Column(name = "dividend_paid")
+	private int dividendpaid;
+	//@Column(name = "dividend_payout")
+	private int    dividendpayout;
 	private int    RE;
 	private double PE;
 	private int    MCap;
-	@Column(name = "face_value")
-	private double FaceValue;
-	@Column(name = "book_value")
-	private double BookValue;
+	//@Column(name = "face_value")
+	private double facevalue;
+	//@Column(name = "book_value")
+	private double bookvalue;
 	private int    Equity;
 	private double DERatio;
 	private double ICR;
 	private int    CFI;
 	private int    CFF;
 	private int    NCF;
-	@Column(name = "rawmto_sales")
-	private double RawMToSales;
-	@Column(name = "empcto_sales")
-	private double EmpCToSales;
-	@Column(name = "powfto_sales")
-	private double PowFToSales;
-	@Column(name = "mktg_to_sales")
-	private double MktgToSales;
-	@Column(name = "other_to_sales")
-	private double OtherToSales;
-	@Column(name = "dep_to_sales")
-	private double DepToSales;
+	//@Column(name = "rawmto_sales")
+	private double rawmtosales;
+	//@Column(name = "empcto_sales")
+	private double empctosales;
+	//@Column(name = "powfto_sales")
+	private double powftosales;
+	//@Column(name = "mktg_to_sales")
+	private double mktgtosales;
+	//@Column(name = "other_to_sales")
+	private double othertosales;
+	//@Column(name = "dep_to_sales")
+	private double deptosales;
+	
+	private double cips; //Cash + Investments Per Share
+	
+	private int cfoyield; //CFO/(EV = Debt + Equity)
+	
+	private int recvbysales; //Receivables by Sales as Percentage
+	
+	private int invbysales; //Inventory by sales as percentage
+	
+	private double numshares; //No. of Shares in Cr.
+	
+	private double divps; //Dividend per Share
 	
 	public long getBalSheet_ID(
 	)
@@ -87,6 +99,84 @@ public class EN_SC_BalSheet
 	)
 	{
 		BalSheet_ID = balSheet_ID;
+	}
+	
+	public double getcips(
+	)
+	{
+		return cips;
+	}
+	
+	public void setcips(
+	        double cips
+	)
+	{
+		this.cips = cips;
+	}
+	
+	public int getcfoyield(
+	)
+	{
+		return cfoyield;
+	}
+	
+	public void setcfoyield(
+	        int cfoyield
+	)
+	{
+		this.cfoyield = cfoyield;
+	}
+	
+	public int getrecvbysales(
+	)
+	{
+		return recvbysales;
+	}
+	
+	public void setrecvbysales(
+	        int recvbysales
+	)
+	{
+		this.recvbysales = recvbysales;
+	}
+	
+	public int getinvbysales(
+	)
+	{
+		return invbysales;
+	}
+	
+	public void setinvbysales(
+	        int invbysales
+	)
+	{
+		this.invbysales = invbysales;
+	}
+	
+	public double getnumshares(
+	)
+	{
+		return numshares;
+	}
+	
+	public void setnumshares(
+	        double numshares
+	)
+	{
+		this.numshares = numshares;
+	}
+	
+	public double getdivps(
+	)
+	{
+		return divps;
+	}
+	
+	public void setdivps(
+	        double divps
+	)
+	{
+		this.divps = divps;
 	}
 	
 	public String getSCCode(
@@ -128,30 +218,30 @@ public class EN_SC_BalSheet
 		Sales = sales;
 	}
 	
-	public double getFaceValue(
+	public double getfacevalue(
 	)
 	{
-		return FaceValue;
+		return facevalue;
 	}
 	
-	public void setFaceValue(
+	public void setfacevalue(
 	        double faceValue
 	)
 	{
-		FaceValue = faceValue;
+		facevalue = faceValue;
 	}
 	
-	public double getBookValue(
+	public double getbookvalue(
 	)
 	{
-		return BookValue;
+		return bookvalue;
 	}
 	
-	public void setBookValue(
+	public void setbookvalue(
 	        double bookValue
 	)
 	{
-		BookValue = bookValue;
+		bookvalue = bookValue;
 	}
 	
 	public int getOP(
@@ -258,17 +348,17 @@ public class EN_SC_BalSheet
 		Tax = tax;
 	}
 	
-	public int getTaxPer(
+	public int gettaxper(
 	)
 	{
-		return TaxPer;
+		return taxper;
 	}
 	
-	public void setTaxPer(
-	        int taxPer
+	public void settaxper(
+	        int taxper
 	)
 	{
-		TaxPer = taxPer;
+		this.taxper = taxper;
 	}
 	
 	public int getPAT(
@@ -466,43 +556,43 @@ public class EN_SC_BalSheet
 		CWIP = cWIP;
 	}
 	
-	public int getShareCapital(
+	public int getsharecapital(
 	)
 	{
-		return ShareCapital;
+		return sharecapital;
 	}
 	
-	public void setShareCapital(
+	public void setsharecapital(
 	        int shareCapital
 	)
 	{
-		ShareCapital = shareCapital;
+		sharecapital = shareCapital;
 	}
 	
-	public int getDividendPaid(
+	public int getdividendpaid(
 	)
 	{
-		return DividendPaid;
+		return dividendpaid;
 	}
 	
-	public void setDividendPaid(
+	public void setdividendpaid(
 	        int dividendPaid
 	)
 	{
-		DividendPaid = dividendPaid;
+		this.dividendpaid = dividendPaid;
 	}
 	
-	public int getDividendPayout(
+	public int getdividendpayout(
 	)
 	{
-		return DividendPayout;
+		return dividendpayout;
 	}
 	
-	public void setDividendPayout(
+	public void setdividendpayout(
 	        int dividendPayout
 	)
 	{
-		DividendPayout = dividendPayout;
+		this.dividendpayout = dividendPayout;
 	}
 	
 	public int getRE(
@@ -622,82 +712,82 @@ public class EN_SC_BalSheet
 		NCF = nCF;
 	}
 	
-	public double getRawMToSales(
+	public double getrawmtosales(
 	)
 	{
-		return RawMToSales;
+		return rawmtosales;
 	}
 	
-	public void setRawMToSales(
+	public void setrawmtosales(
 	        double rawMToSales
 	)
 	{
-		RawMToSales = rawMToSales;
+		rawmtosales = rawMToSales;
 	}
 	
-	public double getEmpCToSales(
+	public double getempctosales(
 	)
 	{
-		return EmpCToSales;
+		return empctosales;
 	}
 	
-	public void setEmpCToSales(
+	public void setempctosales(
 	        double empCToSales
 	)
 	{
-		EmpCToSales = empCToSales;
+		empctosales = empCToSales;
 	}
 	
-	public double getPowFToSales(
+	public double getpowftosales(
 	)
 	{
-		return PowFToSales;
+		return powftosales;
 	}
 	
-	public void setPowFToSales(
+	public void setpowftosales(
 	        double powFToSales
 	)
 	{
-		PowFToSales = powFToSales;
+		powftosales = powFToSales;
 	}
 	
-	public double getMktgToSales(
+	public double getmktgtosales(
 	)
 	{
-		return MktgToSales;
+		return mktgtosales;
 	}
 	
-	public void setMktgToSales(
+	public void setmktgtosales(
 	        double mktgToSales
 	)
 	{
-		MktgToSales = mktgToSales;
+		mktgtosales = mktgToSales;
 	}
 	
-	public double getOtherToSales(
+	public double getothertosales(
 	)
 	{
-		return OtherToSales;
+		return othertosales;
 	}
 	
-	public void setOtherToSales(
+	public void setothertosales(
 	        double otherToSales
 	)
 	{
-		OtherToSales = otherToSales;
+		othertosales = otherToSales;
 	}
 	
-	public double getDepToSales(
+	public double getdeptosales(
 	)
 	{
-		return DepToSales;
+		return deptosales;
 	}
 	
-	public void setDepToSales(
+	public void setdeptosales(
 	        double depToSales
 	)
 	{
-		DepToSales = depToSales;
+		deptosales = depToSales;
 	}
 	
 	public EN_SC_BalSheet(

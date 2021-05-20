@@ -32,10 +32,10 @@
                      </blockquote>
                   </div>
                   <div th:if="${ss.quoteBasic.sector != null}"
-                     class="cell">
+                     class="cell-2">
                      <blockquote class="right-side">
-                        <h2 style="color: #5D7EAE"
-                           th:text="${ss.quoteBasic.sector}"></h2>
+                        <h4 style="color: #5D7EAE"
+                           th:text="${ss.quoteBasic.sector}"></h4>
                         <span
                            style="color: #907348; font-weight: medium;">Sector</span>
 
@@ -117,6 +117,17 @@
                               style="color: #D74A76; font-weight: medium; margin-top: 10px; margin-left: 5px">
                               % FCF Yield </span>
 
+                           <!--Buttons - Info  -->
+                           <a style="margin-left: 12px; margin-top: 8px"
+                              class="button warning cycle mini"
+                              data-role="hint"
+                              data-hint-text="Total Free Cash Flow / Change in Market Cap - Last 10 Years"
+                              data-cls-hint="bg-white fg-black drop-shadow"
+                              data-hint-position="right"><span
+                              class="mif-info  fg-white"></span></a>
+
+                           <!--Buttons - Info  -->
+
                         </div>
 
                         <div class="row d-flex flex-justify-left">
@@ -130,6 +141,44 @@
                               th:text="${ss.quoteBasic.cps}"></span> <span
                               style="color: #4A76D7; font-weight: medium; margin-top: 10px; margin-left: 5px">
                               Cash/Share</span>
+
+                        </div>
+
+                        <div class="row d-flex flex-justify-left">
+                           <span
+                              th:if="${ss.quoteBasic.cps != 0 && !ss.quoteBasic.isFinancial()}"
+                              style="color: #2B5AC3; margin-top: 6px"
+                              class="mif-dollar mif-2x"></span> <span
+                              th:if="${ss.targetPrice.cashCmpRatio != 0}"
+                              style="color: #2B5AC3; font-weight: bold; font-size: 1.2em; margin: 8px; margin-left: 7px"
+                              th:text="${ss.targetPrice.cashCmpRatio}"></span>
+                           <span
+                              style="color: #2B5AC3; font-weight: medium; margin-top: 8px; margin-left: 0px; font-size: 1.2em">
+                              % Cash of CMP </span>
+                        </div>
+
+                        <div class="row d-flex flex-justify-left">
+
+                           <span th:if="${ss.quoteBasic.valratio != 0}"
+                              style="color: #299DB8; margin-top: 4px"
+                              class="mif-chart-bars2 mif-2x"></span> <span
+                              th:if="${ss.quoteBasic.valratio != 0}"
+                              style="color: #299DB8; font-weight: bold; font-size: 1.2em; margin: 6px; margin-left: 7px"
+                              th:text="${ss.quoteBasic.valratio}"></span>
+                           <span
+                              style="color: #299DB8; font-weight: medium; margin-top: 10px; margin-left: 5px">
+                              Value Ratio</span>
+
+                           <!--Buttons - Info  -->
+                           <a style="margin-left: 12px; margin-top: 8px"
+                              class="button warning cycle mini"
+                              data-role="hint"
+                              data-hint-text="Change in Market Cap / Retained Earnings - Last 10 Yrs."
+                              data-cls-hint="bg-white fg-black drop-shadow"
+                              data-hint-position="right"><span
+                              class="mif-info  fg-white"></span></a>
+
+                           <!--Buttons - Info  -->
                         </div>
                      </blockquote>
                   </div>
@@ -139,13 +188,26 @@
 
 
                   <div class="cell flex-justify-end">
+
                      <div class=" row d-flex flex-justify-left"
                         style="margin-left: 20px;">
                         <a href="#"
+                           class="button warning rounded outline"
+                           th:href="@{/scrips/links/{scCode}(scCode=${ss.quoteBasic.scCode})}"
+                           role="button"> <span
+                           class="mif-link icon"
+                           style="margin-left: 0px"></span> <span
+                           style="margin-left: 3px">Links</span>
+                        </a>
+                     </div>
+                     <div class=" row d-flex flex-justify-left"
+                        style="margin-left: 20px; margin-top: 10px">
+                        <a href="#"
                            class="button success rounded outline"
-                           th:href="@{/sc/compare}" role="button"> <span
-                           class="mif-add icon" style="margin-left: 0px"></span>
-                           <span style="margin-left: 3px">Compare</span>
+                           th:href="@{/scOvw/details/{scCode}(scCode=${ss.quoteBasic.scCode})}"
+                           role="button"> <span class="mif-add icon"
+                           style="margin-left: 0px"></span> <span
+                           style="margin-left: 3px">Compare</span>
                         </a>
                      </div>
 
@@ -1368,6 +1430,78 @@
                   </div>
                   <div id="chart_trends" class=" flex-justify-center"></div>
 
+
+                  <div class="d-flex flex-justify-center"
+                     style="margin-top: 30px">
+
+                     <h6 style="color: #486590;">Granular Trends-
+                        Last 10 Years</h6>
+                  </div>
+                  <div id="chart_bs_granular"
+                     class=" flex-justify-center"></div>
+
+                  <div class="d-flex flex-justify-center"
+                     style="margin-top: -40px">
+
+                     <span style="color: #486590;">All amounts in
+                        Cr. (10 Millions)</span>
+                  </div>
+
+                  <!-- Remarks  -->
+                  <div class="d-flex flex-justify-center"
+                     style="align-content: center; margin: 10px">
+                     <div class="remark secondary"
+                        th:if="${ss.msgs.getBsGranNos() != null}">
+                        <h6 style="color: #706E6A"
+                           th:text="${ss.msgs.bsGranNos}"></h6>
+
+                     </div>
+
+
+
+                  </div>
+
+
+                  <div class="d-flex flex-justify-center"
+                     style="margin-top: 30px">
+
+                     <h6 style="color: #486590;">Per Share Trend</h6>
+                  </div>
+                  <div id="chart_eps" class=" flex-justify-center"></div>
+                  <div class="d-flex flex-justify-center"
+                     style="margin-top: -40px">
+
+                     <span style="color: #486590;">All amounts in
+                        INR</span>
+                  </div>
+
+
+
+                  <div class="d-flex flex-justify-center"
+                     style="margin-top: 30px">
+
+                     <h6 style="color: #486590;">Margins Profile</h6>
+                  </div>
+                  <div id="chart_margins" class=" flex-justify-center"></div>
+
+
+                  <div class="d-flex flex-justify-center"
+                     style="margin-top: 30px">
+
+                     <h6 style="color: #486590;">Return Ratios &
+                        Cash Flow from Operations Yield Trends</h6>
+                  </div>
+                  <div id="chart_rr" class=" flex-justify-center"></div>
+
+                  <div class="d-flex flex-justify-center"
+                     style="margin-top: 30px">
+
+                     <h6 style="color: #486590;">Dividend Payout
+                        and Tax Paid</h6>
+                  </div>
+                  <div id="chart_divtax" class=" flex-justify-center"></div>
+
+
                </div>
             </div>
 
@@ -1412,6 +1546,10 @@
                 var pe_trends_data = /*[[${PETrends}]]*/'noValue';
                 var wc_nfa_data = /*[[${wcDetails}]]*/'noValue';
                 var gen_trends_data = /*[[${trendsGen}]]*/'noValue';
+                var bs_trends_gran = /*[[${bsGrNos}]]*/'noValue';
+                var eps_trends_data = /*[[${bsEPSNos}]]*/'noValue';
+                var margins_trends_data = /*[[${bsRatios}]]*/'noValue';
+
 
 				$(document).ready(function() {
 					google.charts.load('current', {
@@ -1426,6 +1564,11 @@
                     google.charts.setOnLoadCallback( drawWCNFACombo);
                     google.charts.setOnLoadCallback(drawLineChartITR);
                     google.charts.setOnLoadCallback(trendsBarChart);
+                    google.charts.setOnLoadCallback(granBarChart);
+                    google.charts.setOnLoadCallback(epsBarChart);
+                    google.charts.setOnLoadCallback(drawLineChartMargins);
+                    google.charts.setOnLoadCallback(drawRRCFOYComboChart);
+                    google.charts.setOnLoadCallback(drawDivTaxChart);
 
 				});
 
@@ -2151,7 +2294,8 @@
                       }
                      
                   },
-
+               
+                 
                   width : 1210,
                   height : 350,
                   margin : 20,
@@ -2172,11 +2316,519 @@
                var chartTrendsGen = new google.visualization.ComboChart(document
                      .getElementById('chart_trends'));
                chartTrendsGen.draw(data9, options9);
-              
+               
+              }
+/*
+      ----------------------  Quality of Growth - Granular Trends ----------------
+*/
+             function granBarChart() {
 
+               var data10 = new google.visualization.DataTable();
+
+               data10.addColumn('string', 'Year');
+               data10.addColumn('number', 'Sales');
+
+               data10.addColumn('number', 'PAT');
+
+               data10.addColumn('number', 'CFO');
+               
+               data10.addColumn('number', 'FCF');
+               
+               data10.addColumn('number', 'Cash + Inv.');
+               
+               data10.addColumn('number', 'Retained Earn.');
+               
+               data10.addColumn('number', 'Debt');
+               
+
+
+               var dataArray10 = [];
+
+               $.each(bs_trends_gran, function(i, obj) {
+                  dataArray10.push([ obj.year, obj.sales, obj.pat,
+                        obj.cfo, obj.fcf, obj.cashi, obj.re, obj.debt ]);
+               });
+
+               data10.addRows(dataArray10);
+            
+               
+               var options10 = {
+                  focusTarget : 'category',
+                   legend: { position: 'right', maxLines: 2 ,
+                   textStyle:
+                   {
+                       color: '#3C6EB7',
+                       fontName: 'Calibri',
+                       fontSize: 12,
+                       bold: true
+
+                   } } ,
+                   
+                   hAxis : {
+                     
+                     viewWindow : 
+                     {
+                        min : [ 7, 30, 0 ],
+                        max : [ 17, 30, 0 ]
+                     },
+                     textStyle:
+                     { 
+                       color: '#238126',
+                       fontName: 'Calibri',
+                       fontSize: 12,
+                       bold: true
+                      }
+                     
+                  },
+               
+                 
+                  width : 1210,
+                  height : 350,
+                  margin : 20,
+                  pointSize : 5,
+                  colors : [ '#7998C5', '#C8819E', '#8ABC67', '#69B7BE',
+                        '#C5A679','#E16F52','#DDAD3A' ],
+                  seriesType : 'bars',
+                  series : {
+                     3 : {
+                        type : 'line'
+                     },
+                      5 : {
+                        type : 'line'
+                     }
+                  }
+
+               };
+               var chartTrendsQGran = new google.visualization.ComboChart(document
+                     .getElementById('chart_bs_granular'));
+               chartTrendsQGran.draw(data10, options10);
+             
+            
+            
+            
             
             }
             
+            
+            /*
+             ------------ EPS Trends Chart
+            */
+            
+             function epsBarChart() {
+
+               var data11 = new google.visualization.DataTable();
+               data11.addColumn('string', 'year');
+               data11.addColumn('number', 'EPS (INR)');
+               data11.addColumn('number', 'Cash + Inv. /Share');
+               data11.addColumn('number', 'Dividend/Share');
+               
+               var dataArray11 = [];
+               
+                $.each(eps_trends_data, function(i, obj) {
+                  dataArray11.push([ obj.year, obj.eps, obj.cips, obj.dps]);
+               });
+
+               data11.addRows(dataArray11);
+               
+               
+            
+
+               /*
+               In case Data labels are needed on Bar Chart */
+               var view11 = new google.visualization.DataView(data11);
+               
+                        
+          
+
+               var options11 = {
+                  width : 1210,
+                  height : 350,
+                  margin : 20,
+                  pointSize : 5,
+                  focusTarget : 'category', 
+
+                colors : ['#5886a5', '#ffde69', '#93003a'],
+                legend: { position: 'right', maxLines: 2 ,
+                   textStyle:
+                   {
+                       color: '#3C6EB7',
+                       fontName: 'Calibri',
+                       fontSize: 12,
+                       bold: true
+
+                   } } ,
+                  
+                    hAxis : {
+                     
+                     viewWindow : 
+                     {
+                        min : [ 7, 30, 0 ],
+                        max : [ 17, 30, 0 ]
+                     },
+                     textStyle:
+                     { 
+                       color: '#698AFF',
+                       fontName: 'Calibri',
+                       fontSize: 12,
+                       bold: true
+                      }
+                     
+                  },
+                  
+                  vAxis : {
+                     
+                     viewWindow : 
+                     {
+                        min : [ 7, 30, 0 ],
+                        max : [ 17, 30, 0 ]
+                     },
+                     textStyle:
+                     { 
+                       color: '#698AFF',
+                       fontName: 'Calibri',
+                       fontSize: 12,
+                       bold: true
+                      }
+                     
+                  },
+                  
+                  seriesType : 'bars',
+                  series : {
+                     2 : {
+                        type : 'line'
+                     }
+                  
+                  }
+                  
+               };
+               
+               
+               var chartEPS = new google.visualization.ComboChart(
+                     document.getElementById('chart_eps'));
+        
+               
+               //In case of Data points enabled on chart series
+               chartEPS.draw(view11, options11);
+            }   
+            
+            
+            /*
+            ----- MARGINS - OPM and NPM Line Chart ----------------
+            */
+            
+            function drawLineChartMargins() {
+
+                var data12 = new google.visualization.DataTable();
+                
+                data12.addColumn('string', 'Year');
+                data12.addColumn('number', 'OPM');
+                data12.addColumn('number', 'NPM');
+                
+                var dataArray12 = [];
+                
+                 $.each(margins_trends_data, function(i, obj) {
+                   dataArray12.push([ obj.year, obj.opm, obj.npm]);
+                });
+
+                data12.addRows(dataArray12);
+                
+                
+             
+
+                /*
+                In case Data labels are needed on Bar Chart - Not working on combo*/
+                var view12 = new google.visualization.DataView(data12);
+                
+                view12.setColumns([ 0, 1, {
+                   calc : "stringify",
+                   sourceColumn : 1,
+                   type : "string",
+                   role : "annotation"
+                },
+                
+                2, {
+                   calc : "stringify",
+                   sourceColumn : 2,
+                   type : "string",
+                   role : "annotation"
+                },
+                ],
+                 
+                
+                );
+
+                var options12 = {
+                   width : 1210,
+                   height : 300,
+                   margin : 20,
+                   pointSize : 5,
+
+                   colors : [ '#B430AF','#AFB430','#30AFB4' ],
+                   seriesType : 'line',
+                   legend: { position: 'right', maxLines: 2 ,
+                    textStyle:
+                    {
+                        color: '#3C6EB7',
+                        fontName: 'Calibri',
+                        fontSize: 12,
+                        bold: true
+
+                    } } ,
+                   
+                     hAxis : {
+                      
+                      viewWindow : 
+                      {
+                         min : [ 7, 30, 0 ],
+                         max : [ 17, 30, 0 ]
+                      },
+                      textStyle:
+                      { 
+                        color: '#238126',
+                        fontName: 'Calibri',
+                        fontSize: 12,
+                        bold: true
+                       }
+                      
+                   },
+                   
+                   vAxis : {
+                      
+                      viewWindow : 
+                      {
+                         min : [ 7, 30, 0 ],
+                         max : [ 17, 30, 0 ]
+                      },
+                      textStyle:
+                      { 
+                        color: '#30B435',
+                        fontName: 'Calibri',
+                        fontSize: 12,
+                        bold: true
+                       }
+                      
+                   },
+                   
+                   
+                   
+                };
+                
+                 var chartMargins = new google.visualization.LineChart(
+                      document.getElementById('chart_margins'));
+         
+                
+                //In case of Data points enabled on chart series
+                chartMargins.draw(view12, options12);
+           }
+           
+       /*
+            ----------------------  Return Ratios and CFO Yield ----------------
+      */
+                   function drawRRCFOYComboChart() {
+
+                     var data13 = new google.visualization.DataTable();
+
+                     data13.addColumn('string', 'Year');
+                     
+                     data13.addColumn('number', 'ROCE');
+                     data13.addColumn('number', 'ROE');
+                     data13.addColumn('number', 'CFO Yield');
+               
+                                       
+                   
+
+	
+                     var dataArray13 = [];
+
+                     $.each(margins_trends_data, function(i, obj) {
+                        dataArray13.push([ obj.year, obj.roce, obj.roe,
+                              obj.cfoy ]);
+                     });
+
+                     data13.addRows(dataArray13);
+                     
+                     /*
+                     In case Data labels are needed on Bar Chart */
+                     var view13 = new google.visualization.DataView(data13);
+                     
+                     view13.setColumns([ 0, 1, 2,
+                     
+                     3, {
+                         calc : "stringify",
+                         sourceColumn : 3,
+                         type : "string",
+                         role : "annotation"
+                      },
+                      
+                    
+                      
+                     ],
+                      
+                     
+                     );
+                  
+                     
+                     var options13 = {
+                        focusTarget : 'category',
+                         legend: { position: 'right', maxLines: 2 ,
+                         textStyle:
+                         {
+                             color: '#3C6EB7',
+                             fontName: 'Calibri',
+                             fontSize: 12,
+                             bold: true
+
+                         } } ,
+                         
+                         hAxis : {
+                           
+                           viewWindow : 
+                           {
+                              min : [ 7, 30, 0 ],
+                              max : [ 17, 30, 0 ]
+                           },
+                           textStyle:
+                           { 
+                             color: '#238126',
+                             fontName: 'Calibri',
+                             fontSize: 12,
+                             bold: true
+                            }
+                           
+                        },
+                     
+                       
+                        width : 1210,
+                        height : 350,
+                        margin : 20,
+                        pointSize : 5,
+                        colors : ['#ad8aff', '#d9c1fa', '#93003a'],
+                        seriesType : 'bars',
+                        series : {
+                            2 : {
+                               type : 'line'
+                            } 
+                         }
+
+                     };
+                     var chartRR = new google.visualization.ComboChart(document
+                           .getElementById('chart_rr'));
+                     chartRR.draw(view13, options13);
+                   
+                  
+                  
+                  
+                  
+                  }
+
+                   /*
+                   ----- Div PAYOUT & Tax Paid Line Chart ----------------
+                   */
+                   
+                   function drawDivTaxChart() {
+
+                       var data14 = new google.visualization.DataTable();
+                       
+                       data14.addColumn('string', 'Year');
+                       data14.addColumn('number', 'Div. Payout(%)');
+                       data14.addColumn('number', 'Tax Paid(%)');
+                       
+                       var dataArray14 = [];
+                       
+                        $.each(margins_trends_data, function(i, obj) {
+                          dataArray14.push([ obj.year, obj.divp, obj.taxper]);
+                       });
+
+                       data14.addRows(dataArray14);
+                       
+                       
+                    
+
+                       /*
+                       In case Data labels are needed on Bar Chart - Not working on combo*/
+                       var view14 = new google.visualization.DataView(data14);
+                       
+                       view14.setColumns([ 0, 1, {
+                          calc : "stringify",
+                          sourceColumn : 1,
+                          type : "string",
+                          role : "annotation"
+                       },
+                       
+                       2, {
+                          calc : "stringify",
+                          sourceColumn : 2,
+                          type : "string",
+                          role : "annotation"
+                       },
+                       ],
+                        
+                       
+                       );
+
+                       var options14 = {
+                          width : 1210,
+                          height : 300,
+                          margin : 20,
+                          pointSize : 5,
+
+                          colors : [ '#B430AF','#AFB430','#30AFB4' ],
+                          seriesType : 'line',
+                          legend: { position: 'right', maxLines: 2 ,
+                           textStyle:
+                           {
+                               color: '#3C6EB7',
+                               fontName: 'Calibri',
+                               fontSize: 12,
+                               bold: true
+
+                           } } ,
+                          
+                            hAxis : {
+                             
+                             viewWindow : 
+                             {
+                                min : [ 7, 30, 0 ],
+                                max : [ 17, 30, 0 ]
+                             },
+                             textStyle:
+                             { 
+                               color: '#238126',
+                               fontName: 'Calibri',
+                               fontSize: 12,
+                               bold: true
+                              }
+                             
+                          },
+                          
+                          vAxis : {
+                             
+                             viewWindow : 
+                             {
+                                min : [ 7, 30, 0 ],
+                                max : [ 17, 30, 0 ]
+                             },
+                             textStyle:
+                             { 
+                               color: '#30B435',
+                               fontName: 'Calibri',
+                               fontSize: 12,
+                               bold: true
+                              }
+                             
+                          },
+                          
+                          
+                          
+                       };
+                       
+                        var chartDivTax = new google.visualization.LineChart(
+                             document.getElementById('chart_divtax'));
+                
+                       
+                       //In case of Data points enabled on chart series
+                       chartDivTax.draw(view14, options14);
+                  }
             
         
             

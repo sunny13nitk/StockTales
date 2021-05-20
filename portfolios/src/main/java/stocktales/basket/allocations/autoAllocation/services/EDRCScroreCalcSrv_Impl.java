@@ -198,16 +198,23 @@ public class EDRCScroreCalcSrv_Impl implements EDRCScoreCalcSrv
 						        1));
 					}
 				}
-			} else //Invalid Scrip Code
+			} else
 			{
-				//If Not also an Adhoc Scrip
 				
-				Optional<AdhocScrip> adSCO = repoAdHocSc.findBySccodeIgnoreCase(scCode);
-				if (!adSCO.isPresent())
+				//Validate if - Invalid Scrip Code
+				// else can be case of a new scrip that does not have Trends data
+				if (scripSrv.getScripHeader(scCode) == null)
 				{
 					
-					throw new ExceptionNotFound(msgSrc.getMessage("INVALID_SCRIP", new Object[]
-					{ scCode }, Locale.ENGLISH));
+					//If Not also an Adhoc Scrip
+					
+					Optional<AdhocScrip> adSCO = repoAdHocSc.findBySccodeIgnoreCase(scCode);
+					if (!adSCO.isPresent())
+					{
+						
+						throw new ExceptionNotFound(msgSrc.getMessage("INVALID_SCRIP", new Object[]
+						{ scCode }, Locale.ENGLISH));
+					}
 				}
 			}
 		}
