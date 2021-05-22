@@ -137,4 +137,49 @@ public class UtilDurations
 		return yearFromTo;
 	}
 	
+	/*
+	 * -- convert 2020|4 to Dec-2020 
+	 */
+	public static String getQuarterNamefromNumber(
+	        String Quarter
+	)
+	{
+		String qtrName = null;
+		
+		if (Quarter != null)
+		{
+			if (Quarter.trim().length() > 0)
+			{
+				String[] parts = Quarter.split("\\|");
+				if (parts.length == 2)
+				{
+					qtrName = new String();
+					switch (parts[1].charAt(0))
+					{
+						case '1':
+							qtrName += "Mar-";
+							break;
+						case '2':
+							qtrName += "Jun-";
+							break;
+						
+						case '3':
+							qtrName += "Sep-";
+							break;
+						
+						case '4':
+							qtrName += "Dec-";
+							break;
+						
+					}
+					
+					qtrName += parts[0];
+				}
+			}
+		}
+		
+		return qtrName;
+		
+	}
+	
 }

@@ -2,9 +2,11 @@ package stocktales.scsnapshot.srv.impl;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import stocktales.scripCalc.intf.IScripCalculations;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_BalSheet;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_GeneralQ;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Last4QData;
+import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Quarters;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_Trends;
 import stocktales.scripsEngine.uploadEngine.scDataContainer.services.interfaces.ISCDataContainerSrv;
 import stocktales.scsnapshot.model.pojo.StockBSGranularNos;
@@ -33,6 +36,7 @@ import stocktales.scsnapshot.model.pojo.StockBalSheetData;
 import stocktales.scsnapshot.model.pojo.StockFundamentals;
 import stocktales.scsnapshot.model.pojo.StockMCapLast4QData;
 import stocktales.scsnapshot.model.pojo.StockPETrends;
+import stocktales.scsnapshot.model.pojo.StockQtrNos;
 import stocktales.scsnapshot.model.pojo.StockQuoteBasic;
 import stocktales.scsnapshot.model.pojo.StockRevWCCycleTrends;
 import stocktales.scsnapshot.model.pojo.StockSnapshot;
@@ -169,6 +173,7 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 				populateEDRCSummary();
 				populateValuations();
 				populateLast4QData();
+				populateLast10QData();
 				populateFundamentals();
 				populateTrends();
 				/**
@@ -193,6 +198,56 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 		}
 		
 		return ss;
+	}
+	
+	private void populateLast10QData(
+	)
+	{
+		if (this.scDCSrv.getScDC() != null)
+		{
+			List<EN_SC_Quarters> qtrSheetL = this.scDCSrv.getScDC().getQuarters_L();
+			if (qtrSheetL != null)
+			{
+				if (qtrSheetL.size() > 0)
+				{
+					
+					List<EN_SC_Quarters> last10Q    = null;
+					List<EN_SC_Quarters> allQSorted = null;
+					
+					allQSorted = qtrSheetL.stream()
+					        .sorted(Comparator.comparingLong(EN_SC_Quarters::getQTR_ID).reversed())
+					        .collect(Collectors.toList());
+					last10Q    = allQSorted.stream().limit(10).collect(Collectors.toList());
+					
+					if (last10Q != null)
+					{
+						if (last10Q.size() > 0)
+						{
+							int idx = 0;
+							for (EN_SC_Quarters qtrEnt : last10Q)
+							{
+								if (idx == 0)
+								{
+									this.ss.setLatestQ(UtilDurations.getQuarterNamefromNumber(qtrEnt.getYearQ()));
+								}
+								
+								StockQtrNos stQtrNos = new StockQtrNos();
+								
+								stQtrNos.setQtr(UtilDurations.getQuarterNamefromNumber(qtrEnt.getYearQ()));
+								stQtrNos.setSales(Precision.round(qtrEnt.getSalesQ(), 0));
+								stQtrNos.setNp(Precision.round(qtrEnt.getNPQ(), 0));
+								stQtrNos.setOi(Precision.round(qtrEnt.getOI(), 0));
+								stQtrNos.setNpm(Precision.round(stQtrNos.getNp() / stQtrNos.getSales(), 1));
+								
+								this.ss.getLast10QNos().add(stQtrNos);
+								idx++;
+							}
+						}
+					}
+					
+				}
+			}
+		}
 	}
 	
 	private void populateBSData(
@@ -236,7 +291,7 @@ public class StockSnapshotSrv implements IStockSnapshotSrv
 							}
 						}
 						
-						if (this.granNosTHSrv != null)
+						if (this.granNosTHSrv != null && ss.getMsgs() != null)
 						{
 							this.ss.getMsgs().setBsGranNos(
 							        granNosTHSrv.getMessagesforObject(

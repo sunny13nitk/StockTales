@@ -52,35 +52,49 @@ public class StockController
 					/*
 					 * FCF per Units of PAT and Sales - Fundamentals
 					 */
-					Map<String, Double> fcfFundData = new TreeMap<>();
-					fcfFundData.put("FCF/Rupee of PAT", ss.getFundamentals().getPATtoFCF());
-					fcfFundData.put("FCF/Rupee of Revenue", ss.getFundamentals().getREVtoFCF());
-					
-					model.addAttribute("fcfFundData", fcfFundData);
-					
+					if (ss.getFundamentals() != null)
+					{
+						Map<String, Double> fcfFundData = new TreeMap<>();
+						fcfFundData.put("FCF/Rupee of PAT", ss.getFundamentals().getPATtoFCF());
+						fcfFundData.put("FCF/Rupee of Revenue", ss.getFundamentals().getREVtoFCF());
+						
+						model.addAttribute("fcfFundData", fcfFundData);
+					}
 					/*
 					 * Prices
 					 */
 					
-					model.addAttribute("priceTrends", ss.getValuations());
-					model.addAttribute("PETrends", ss.getTrends().getPeTrends());
+					if (ss.getValuations() != null)
+					{
+						model.addAttribute("priceTrends", ss.getValuations());
+					}
+					if (ss.getTrends() != null)
+					{
+						model.addAttribute("PETrends", ss.getTrends().getPeTrends());
+					}
 					
 					/*
 					 * Working Capital Details
 					 */
-					model.addAttribute("wcDetails", ss.getWcDetails());
+					if (ss.getWcDetails() != null)
+					{
+						model.addAttribute("wcDetails", ss.getWcDetails());
+					}
 					
 					/*
 					 * Balance Sheet Numbers - Last 10 yrs
 					 */
-					model.addAttribute("bsGrNos", ss.getBalSheetData().getBalSheetGrData());
-					model.addAttribute("bsEPSNos", ss.getBalSheetData().getEpsData());
-					model.addAttribute("bsRatios", ss.getBalSheetData().getBalSheetRatios());
+					if (ss.getBalSheetData() != null)
+					{
+						model.addAttribute("bsGrNos", ss.getBalSheetData().getBalSheetGrData());
+						model.addAttribute("bsEPSNos", ss.getBalSheetData().getEpsData());
+						model.addAttribute("bsRatios", ss.getBalSheetData().getBalSheetRatios());
+					}
 					
 				}
 			} catch (Exception e)
 			{
-				model.addAttribute("formError", "Invalid Scrip Code ! - " + scCode);
+				model.addAttribute("formError", "Invalid Scrip Code ! - " + scCode + e.getMessage());
 				return "Error";
 			}
 			

@@ -16,11 +16,21 @@
       <div class="cell-9">
          <a href="#" class="button alert rounded outline"
             style="border: none;" th:href="@{/}" role="button"> <span
-            class="mif-home mif-home mif-2x"></span>
+            class="mif-home  mif-2x"></span>
 
          </a> <label
             style="color: #E15851; font-weight: bold; font-size: 1.75em; margin-left: 10px"
-            th:text="${ss.quoteBasic.name}"></label>
+            th:text="${ss.quoteBasic.name}"></label> <label
+            th:if="${ ss.latestQ != null}"
+            style="color: #5851E1; font-weight: bold; font-size: .8em; margin-left: 10px"
+            th:text="${ss.latestQ}"> </label> <a href="#"
+            class="button alert rounded outline" style="border: none;"
+            th:href="@{/admin/sc/upload}" role="button"> <span
+            class="mif-upload  mif-2x"></span>
+         </a>
+
+
+
       </div>
 
       <div class="cell flex-justify-end" th:if="${ ss.scLinks != null}">

@@ -28,6 +28,10 @@ public class StockSnapshot
 	
 	private StockMCapLast4QData last4QData;
 	
+	private List<StockQtrNos> last10QNos = new ArrayList<StockQtrNos>();
+	
+	private String latestQ;
+	
 	private StockFundamentals fundamentals;
 	
 	private StockTrends trends;
