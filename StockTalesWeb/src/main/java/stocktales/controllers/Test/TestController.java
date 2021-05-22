@@ -2,6 +2,7 @@ package stocktales.controllers.Test;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +49,9 @@ import stocktales.healthcheck.repo.Repo_CfgHC;
 import stocktales.healthcheck.repo.intf.IRepoCfgSrvStext;
 import stocktales.helperPOJO.NameValDouble;
 import stocktales.helperPOJO.ScValFormPOJO;
+import stocktales.historicalPrices.pojo.HistoricalQuote;
+import stocktales.historicalPrices.pojo.StockHistory;
+import stocktales.historicalPrices.utility.StockPricesUtility;
 import stocktales.predicates.manager.PredicateManager;
 import stocktales.repository.SC10YearRepository;
 import stocktales.scripsEngine.uploadEngine.entities.EN_SC_10YData;
@@ -63,6 +67,7 @@ import stocktales.strategy.helperPOJO.SectorAllocations;
 import stocktales.strategy.helperPOJO.StgyStatsSummary;
 import stocktales.strategy.intf.IStrategyStatsSrv;
 import stocktales.usersPF.repo.RepoHoldings;
+import yahoofinance.histquotes.Interval;
 
 @Controller
 @RequestMapping("/test")
@@ -882,6 +887,39 @@ public class TestController
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/quoteHAll")
+	public String testStocksPricesHistory(
+	
+	)
+	{
+		
+		String[] stocks = new String[]
+		{ "BAJFINANCE", "ALKYLAMINE", "LTI", "AFFLE" };
+		
+		try
+		{
+			List<StockHistory> scripsHistory = StockPricesUtility.getHistoricalPricesforScrips(stocks, Calendar.MONTH,
+			        3, Interval.DAILY);
+			if (scripsHistory != null)
+			{
+				for (StockHistory stockHistory : scripsHistory)
+				{
+					System.out.println(stockHistory.getScCode());
+					for (HistoricalQuote hQ : stockHistory.getPriceHistory())
+					{
+						System.out.println(hQ.getDate() + "--" + hQ.getClosePrice());
+					}
+				}
+			}
+		} catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return "success";
