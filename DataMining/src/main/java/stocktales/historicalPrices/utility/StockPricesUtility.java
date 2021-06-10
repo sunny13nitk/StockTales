@@ -80,10 +80,16 @@ public class StockPricesUtility
 									{
 										for (HistoricalQuote hQuote : HistQuotes)
 										{
-											stocktales.historicalPrices.pojo.HistoricalQuote newQuote = new stocktales.historicalPrices.pojo.HistoricalQuote(
-											        format1.format(hQuote.getDate().getTime()),
-											        Precision.round(hQuote.getClose().doubleValue(), 1));
-											stHist.getPriceHistory().add(newQuote);
+											if (hQuote != null)
+											{
+												if (hQuote.getDate() != null && hQuote.getClose() != null)
+												{
+													stocktales.historicalPrices.pojo.HistoricalQuote newQuote = new stocktales.historicalPrices.pojo.HistoricalQuote(
+													        format1.format(hQuote.getDate().getTime()),
+													        Precision.round(hQuote.getClose().doubleValue(), 1));
+													stHist.getPriceHistory().add(newQuote);
+												}
+											}
 										}
 									}
 								}

@@ -21,6 +21,21 @@ public class UtilPercentages
 		return Precision.round(delta, decimalplaces);
 	}
 	
+	public static double getProportion(
+	        double from, double to, int decimalplaces
+	)
+	{
+		double delta = 0;
+		
+		if (from > 0)
+		{
+			
+			delta = (to / from) * 100;
+		}
+		
+		return Precision.round(delta, decimalplaces);
+	}
+	
 	public static double adjustNumberbyPercentage(
 	        double numtoAdjust, double percentage, EnumDirection direction
 	)

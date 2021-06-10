@@ -30,6 +30,9 @@ import stocktales.basket.allocations.autoAllocation.valuations.pojos.ScValuation
 import stocktales.cagrEval.intf.ICAGRCalcSrv;
 import stocktales.dataBook.model.entity.adhocScrips.AdhocScrip;
 import stocktales.dataBook.model.repo.adhocScrips.RepoAdhocScrip;
+import stocktales.historicalPrices.enums.EnumInterval;
+import stocktales.historicalPrices.pojo.StgyRelValuation;
+import stocktales.historicalPrices.srv.intf.ITimeSeriesStgyValuationSrv;
 import stocktales.predicates.GenericSCEDRCSummaryPredicate;
 import stocktales.predicates.manager.PredicateManager;
 import stocktales.scripsEngine.uploadEngine.exceptions.EX_General;
@@ -70,10 +73,13 @@ public class StratergyController
 	@Autowired
 	private ICAGRCalcSrv cagrCalcSrv;
 	
-	private List<String> scCodes;
-	
 	@Autowired
 	private MessageSource msgSrc;
+	
+	@Autowired
+	private ITimeSeriesStgyValuationSrv timeSeriesSrv;
+	
+	private List<String> scCodes;
 	
 	@GetMapping("/myFilter")
 	public String showStratergyStaging(
@@ -297,6 +303,40 @@ public class StratergyController
 			model.addAttribute("scCodes", getSCCodes());
 		}
 		return "strategy/reBalance";
+	}
+	
+	@GetMapping("/timeseries/{stgId}/{interval}")
+	public String showTimeSeries(
+	        @PathVariable("stgId") String stgId, @PathVariable("interval") EnumInterval interval, Model model
+	)
+	{
+		int          stgyId = new Integer(stgId);
+		EnumInterval intv   = interval;
+		
+		if (stgyId > 0 && timeSeriesSrv != null && intv != null && this.stgRepo != null)
+		{
+			//Default option for last 1 year
+			try
+			{
+				List<StgyRelValuation> pricePoints = timeSeriesSrv.getValuationsforStrategy(stgyId, intv);
+				if (pricePoints != null)
+				{
+					model.addAttribute("latestVal",
+					        Precision.round(pricePoints.get(pricePoints.size() - 1).getValue(), 1));
+					model.addAttribute("stgyData", stgRepo.findByStidShort(stgyId));
+					model.addAttribute("seriesval", pricePoints);
+					model.addAttribute("interval", intv);
+				}
+				
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return "strategy/timeseries";
+		
 	}
 	
 	@GetMapping("/rebal/add4mProposal/{scCode}")

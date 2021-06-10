@@ -50,7 +50,9 @@ import stocktales.healthcheck.repo.intf.IRepoCfgSrvStext;
 import stocktales.helperPOJO.NameValDouble;
 import stocktales.helperPOJO.ScValFormPOJO;
 import stocktales.historicalPrices.pojo.HistoricalQuote;
+import stocktales.historicalPrices.pojo.StgyRelValuation;
 import stocktales.historicalPrices.pojo.StockHistory;
+import stocktales.historicalPrices.srv.intf.ITimeSeriesStgyValuationSrv;
 import stocktales.historicalPrices.utility.StockPricesUtility;
 import stocktales.predicates.manager.PredicateManager;
 import stocktales.repository.SC10YearRepository;
@@ -132,6 +134,9 @@ public class TestController
 	
 	@Autowired
 	private IStockSnapshotSrv sSHSrv;
+	
+	@Autowired
+	private ITimeSeriesStgyValuationSrv timeSeriesSrv;
 	
 	@GetMapping("/edrcSrv/{scCode}")
 	public String testEDRCSrv(
@@ -914,6 +919,32 @@ public class TestController
 					{
 						System.out.println(hQ.getDate() + "--" + hQ.getClosePrice());
 					}
+				}
+			}
+		} catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "success";
+	}
+	
+	@GetMapping("/timeseries/{stgyId}")
+	public String timeSeries(
+	        @PathVariable int stgyId
+	)
+	{
+		List<StgyRelValuation> valuationsbyDate;
+		try
+		{
+			valuationsbyDate = timeSeriesSrv.getValuationsforStrategy(stgyId,
+			        stocktales.historicalPrices.enums.EnumInterval.Last5Yrs);
+			if (valuationsbyDate != null)
+			{
+				for (StgyRelValuation stgyRelValuation : valuationsbyDate)
+				{
+					System.out.println(stgyRelValuation.getDate() + "----" + stgyRelValuation.getValue());
 				}
 			}
 		} catch (Exception e)

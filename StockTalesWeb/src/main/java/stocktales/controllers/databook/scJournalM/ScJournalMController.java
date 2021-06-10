@@ -336,13 +336,20 @@ public class ScJournalMController
 	{
 		if (scCode != null)
 		{
-			model.addAttribute("scCode", scCode);
-			model.addAttribute("snippet", scJSrv.getQStats_New_ByScrip(scCode));
-			model.addAttribute("summary", repoScJ.getSummaryByScCode(scCode).get(0));
-			model.addAttribute("catgClass", repoScJ.countEntriesByCategory(scCode));
-			model.addAttribute("srcClass", repoScJ.countEntriesBySource(scCode));
-			model.addAttribute("tagDetails", scJSrv.getTagDetailsOvw(scCode));
-			model.addAttribute("effectClass", repoScJ.countEntriesByEffect(scCode));
+			
+			try
+			{
+				model.addAttribute("scCode", scCode);
+				model.addAttribute("snippet", scJSrv.getQStats_New_ByScrip(scCode));
+				model.addAttribute("summary", repoScJ.getSummaryByScCode(scCode).get(0));
+				model.addAttribute("catgClass", repoScJ.countEntriesByCategory(scCode));
+				model.addAttribute("srcClass", repoScJ.countEntriesBySource(scCode));
+				model.addAttribute("tagDetails", scJSrv.getTagDetailsOvw(scCode));
+				model.addAttribute("effectClass", repoScJ.countEntriesByEffect(scCode));
+			} catch (Exception e)
+			{
+				return "redirect:/scJournalM/new/" + scCode;
+			}
 		}
 		
 		return "scrips/dataBook/scJournalM/scJOvw";
